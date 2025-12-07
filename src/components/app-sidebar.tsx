@@ -1,8 +1,8 @@
 import * as React from 'react'
 import {
     LayoutDashboard,
-    Users,
     Settings,
+    GraduationCap,
 } from 'lucide-react'
 
 import { NavMain } from '@/components/nav-main'
@@ -29,9 +29,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             isActive: false,
         },
         {
-            title: 'Users',
-            url: '/users',
-            icon: Users,
+            title: 'Teachers',
+            url: '/teachers/teacher-list',
+            icon: GraduationCap,
             isActive: false,
         },
         {

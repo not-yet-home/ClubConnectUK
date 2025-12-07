@@ -4,321 +4,204 @@
 -- Created: 2025-01-01
 
 -- ============================================
--- PROFILES TABLE RLS
+-- SCHOOLS TABLE RLS
 -- ============================================
 
 -- Enable RLS
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.schools ENABLE ROW LEVEL SECURITY;
 
--- Policy: Anyone can view profiles
-CREATE POLICY "Profiles are viewable by everyone"
-    ON public.profiles
-    FOR SELECT
-    TO authenticated
-    USING (true);
-
--- Policy: Users can insert their own profile
-CREATE POLICY "Users can insert their own profile"
-    ON public.profiles
-    FOR INSERT
-    TO authenticated
-    WITH CHECK (auth.uid() = id);
-
--- Policy: Users can update their own profile
-CREATE POLICY "Users can update their own profile"
-    ON public.profiles
-    FOR UPDATE
-    TO authenticated
-    USING (auth.uid() = id)
-    WITH CHECK (auth.uid() = id);
-
--- ============================================
--- CLUBS TABLE RLS
--- ============================================
-
--- Enable RLS
-ALTER TABLE public.clubs ENABLE ROW LEVEL SECURITY;
-
--- Policy: Anyone can view active clubs
-CREATE POLICY "Active clubs are viewable by everyone"
-    ON public.clubs
+-- Policy: Active schools are viewable by everyone
+CREATE POLICY "Active schools are viewable by everyone"
+    ON public.schools
     FOR SELECT
     TO authenticated
     USING (is_active = true);
 
--- Policy: Authenticated users can create clubs
-CREATE POLICY "Authenticated users can create clubs"
-    ON public.clubs
+-- Policy: Only service role can insert schools
+-- Note: In production, you may want to create an admin role
+CREATE POLICY "Service role can insert schools"
+    ON public.schools
     FOR INSERT
-    TO authenticated
-    WITH CHECK (auth.uid() = created_by);
+    TO service_role
+    WITH CHECK (true);
 
--- Policy: Club admins can update their clubs
-CREATE POLICY "Club admins can update their clubs"
-    ON public.clubs
+-- Policy: Only service role can update schools
+CREATE POLICY "Service role can update schools"
+    ON public.schools
     FOR UPDATE
-    TO authenticated
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.memberships
-            WHERE club_id = clubs.id
-            AND user_id = auth.uid()
-            AND role IN ('admin', 'owner')
-            AND status = 'active'
-        )
-    );
+    TO service_role
+    USING (true);
 
--- Policy: Club owners can delete their clubs
-CREATE POLICY "Club owners can delete their clubs"
-    ON public.clubs
+-- Policy: Only service role can delete schools
+CREATE POLICY "Service role can delete schools"
+    ON public.schools
     FOR DELETE
-    TO authenticated
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.memberships
-            WHERE club_id = clubs.id
-            AND user_id = auth.uid()
-            AND role = 'owner'
-            AND status = 'active'
-        )
-    );
+    TO service_role
+    USING (true);
 
 -- ============================================
--- MEMBERSHIPS TABLE RLS
+-- TEACHERS TABLE RLS
 -- ============================================
 
 -- Enable RLS
-ALTER TABLE public.memberships ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.teachers ENABLE ROW LEVEL SECURITY;
 
--- Policy: Members can view memberships of their clubs
-CREATE POLICY "Members can view their club memberships"
-    ON public.memberships
+-- Policy: Active teachers are viewable by everyone
+CREATE POLICY "Active teachers are viewable by everyone"
+    ON public.teachers
     FOR SELECT
     TO authenticated
-    USING (
-        -- User is a member of the club
-        user_id = auth.uid()
-        OR
-        -- User is viewing memberships of a club they belong to
-        EXISTS (
-            SELECT 1 FROM public.memberships AS m
-            WHERE m.club_id = memberships.club_id
-            AND m.user_id = auth.uid()
-            AND m.status = 'active'
-        )
-    );
+    USING (is_active = true);
 
--- Policy: Users can join clubs (create membership)
-CREATE POLICY "Users can join clubs"
-    ON public.memberships
+-- Policy: Only service role can insert teachers
+CREATE POLICY "Service role can insert teachers"
+    ON public.teachers
     FOR INSERT
-    TO authenticated
-    WITH CHECK (
-        auth.uid() = user_id
-        AND role = 'member'
-        AND status IN ('pending', 'active')
-    );
+    TO service_role
+    WITH CHECK (true);
 
--- Policy: Club admins can update memberships
-CREATE POLICY "Club admins can update memberships"
-    ON public.memberships
+-- Policy: Only service role can update teachers
+CREATE POLICY "Service role can update teachers"
+    ON public.teachers
     FOR UPDATE
-    TO authenticated
-    USING (
-        -- User is updating their own membership
-        user_id = auth.uid()
-        OR
-        -- User is an admin/owner of the club
-        EXISTS (
-            SELECT 1 FROM public.memberships AS m
-            WHERE m.club_id = memberships.club_id
-            AND m.user_id = auth.uid()
-            AND m.role IN ('admin', 'owner')
-            AND m.status = 'active'
-        )
-    );
+    TO service_role
+    USING (true);
 
--- Policy: Users can leave clubs (delete their membership)
-CREATE POLICY "Users can leave clubs"
-    ON public.memberships
+-- Policy: Only service role can delete teachers
+CREATE POLICY "Service role can delete teachers"
+    ON public.teachers
     FOR DELETE
-    TO authenticated
-    USING (
-        user_id = auth.uid()
-        OR
-        -- Club admins can remove members
-        EXISTS (
-            SELECT 1 FROM public.memberships AS m
-            WHERE m.club_id = memberships.club_id
-            AND m.user_id = auth.uid()
-            AND m.role IN ('admin', 'owner')
-            AND m.status = 'active'
-        )
-    );
+    TO service_role
+    USING (true);
 
 -- ============================================
--- EVENTS TABLE RLS
+-- SCHOOL_CLUBS TABLE RLS
 -- ============================================
 
 -- Enable RLS
-ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.school_clubs ENABLE ROW LEVEL SECURITY;
 
--- Policy: Public events are viewable by everyone
-CREATE POLICY "Public events are viewable by everyone"
-    ON public.events
+-- Policy: Active school clubs are viewable by everyone
+CREATE POLICY "Active school clubs are viewable by everyone"
+    ON public.school_clubs
     FOR SELECT
     TO authenticated
-    USING (
-        is_public = true
-        OR
-        -- Private events viewable by club members
-        EXISTS (
-            SELECT 1 FROM public.memberships
-            WHERE club_id = events.club_id
-            AND user_id = auth.uid()
-            AND status = 'active'
-        )
-    );
+    USING (is_active = true);
 
--- Policy: Club admins can create events
-CREATE POLICY "Club admins can create events"
-    ON public.events
+-- Policy: Only service role can insert school clubs
+CREATE POLICY "Service role can insert school clubs"
+    ON public.school_clubs
     FOR INSERT
-    TO authenticated
-    WITH CHECK (
-        auth.uid() = created_by
-        AND
-        EXISTS (
-            SELECT 1 FROM public.memberships
-            WHERE club_id = events.club_id
-            AND user_id = auth.uid()
-            AND role IN ('admin', 'owner')
-            AND status = 'active'
-        )
-    );
+    TO service_role
+    WITH CHECK (true);
 
--- Policy: Club admins can update events
-CREATE POLICY "Club admins can update events"
-    ON public.events
+-- Policy: Only service role can update school clubs
+CREATE POLICY "Service role can update school clubs"
+    ON public.school_clubs
     FOR UPDATE
-    TO authenticated
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.memberships
-            WHERE club_id = events.club_id
-            AND user_id = auth.uid()
-            AND role IN ('admin', 'owner')
-            AND status = 'active'
-        )
-    );
+    TO service_role
+    USING (true);
 
--- Policy: Club admins can delete events
-CREATE POLICY "Club admins can delete events"
-    ON public.events
+-- Policy: Only service role can delete school clubs
+CREATE POLICY "Service role can delete school clubs"
+    ON public.school_clubs
     FOR DELETE
-    TO authenticated
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.memberships
-            WHERE club_id = events.club_id
-            AND user_id = auth.uid()
-            AND role IN ('admin', 'owner')
-            AND status = 'active'
-        )
-    );
+    TO service_role
+    USING (true);
 
 -- ============================================
--- EVENT_ATTENDEES TABLE RLS
+-- BULK_MESSAGES TABLE RLS
 -- ============================================
 
 -- Enable RLS
-ALTER TABLE public.event_attendees ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.bulk_messages ENABLE ROW LEVEL SECURITY;
 
--- Policy: Users can view attendees of events they can see
-CREATE POLICY "Users can view event attendees"
-    ON public.event_attendees
+-- Policy: Only service role can view bulk messages
+-- Note: In production, you may want school admins to view their own messages
+CREATE POLICY "Service role can view bulk messages"
+    ON public.bulk_messages
     FOR SELECT
-    TO authenticated
-    USING (
-        -- User is the attendee
-        user_id = auth.uid()
-        OR
-        -- User can view the event
-        EXISTS (
-            SELECT 1 FROM public.events
-            WHERE id = event_attendees.event_id
-            AND (
-                is_public = true
-                OR
-                EXISTS (
-                    SELECT 1 FROM public.memberships
-                    WHERE club_id = events.club_id
-                    AND user_id = auth.uid()
-                    AND status = 'active'
-                )
-            )
-        )
-    );
+    TO service_role
+    USING (true);
 
--- Policy: Users can RSVP to events
-CREATE POLICY "Users can RSVP to events"
-    ON public.event_attendees
+-- Policy: Only service role can insert bulk messages
+CREATE POLICY "Service role can insert bulk messages"
+    ON public.bulk_messages
     FOR INSERT
-    TO authenticated
-    WITH CHECK (
-        auth.uid() = user_id
-        AND
-        -- User can view the event
-        EXISTS (
-            SELECT 1 FROM public.events
-            WHERE id = event_attendees.event_id
-            AND (
-                is_public = true
-                OR
-                EXISTS (
-                    SELECT 1 FROM public.memberships
-                    WHERE club_id = events.club_id
-                    AND user_id = auth.uid()
-                    AND status = 'active'
-                )
-            )
-        )
-    );
+    TO service_role
+    WITH CHECK (true);
 
--- Policy: Users can update their RSVP
-CREATE POLICY "Users can update their RSVP"
-    ON public.event_attendees
+-- Policy: Only service role can update bulk messages
+CREATE POLICY "Service role can update bulk messages"
+    ON public.bulk_messages
     FOR UPDATE
-    TO authenticated
-    USING (auth.uid() = user_id)
-    WITH CHECK (auth.uid() = user_id);
+    TO service_role
+    USING (true);
 
--- Policy: Users can remove their RSVP
-CREATE POLICY "Users can remove their RSVP"
-    ON public.event_attendees
+-- Policy: Only service role can delete bulk messages
+CREATE POLICY "Service role can delete bulk messages"
+    ON public.bulk_messages
     FOR DELETE
-    TO authenticated
-    USING (
-        auth.uid() = user_id
-        OR
-        -- Event organizers can remove attendees
-        EXISTS (
-            SELECT 1 FROM public.events e
-            JOIN public.memberships m ON m.club_id = e.club_id
-            WHERE e.id = event_attendees.event_id
-            AND m.user_id = auth.uid()
-            AND m.role IN ('admin', 'owner')
-            AND m.status = 'active'
-        )
-    );
+    TO service_role
+    USING (true);
+
+-- ============================================
+-- BULK_MESSAGE_RECIPIENTS TABLE RLS
+-- ============================================
+
+-- Enable RLS
+ALTER TABLE public.bulk_message_recipients ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Only service role can view message recipients
+CREATE POLICY "Service role can view message recipients"
+    ON public.bulk_message_recipients
+    FOR SELECT
+    TO service_role
+    USING (true);
+
+-- Policy: Only service role can insert message recipients
+CREATE POLICY "Service role can insert message recipients"
+    ON public.bulk_message_recipients
+    FOR INSERT
+    TO service_role
+    WITH CHECK (true);
+
+-- Policy: Only service role can update message recipients
+CREATE POLICY "Service role can update message recipients"
+    ON public.bulk_message_recipients
+    FOR UPDATE
+    TO service_role
+    USING (true);
+
+-- Policy: Only service role can delete message recipients
+CREATE POLICY "Service role can delete message recipients"
+    ON public.bulk_message_recipients
+    FOR DELETE
+    TO service_role
+    USING (true);
 
 -- ============================================
 -- STORAGE POLICIES
 -- ============================================
 -- Note: These need to be configured in Supabase Dashboard or via separate commands
 
--- Bucket for club logos, banners, and event images should be configured with:
+-- Bucket for school logos and club images should be configured with:
 -- - Public read access for all authenticated users
--- - Write access only for club admins/owners
+-- - Write access only for service role or school admins
 -- - File size limits (e.g., 5MB for images)
 -- - Allowed file types: image/jpeg, image/png, image/webp
+
+-- ============================================
+-- NOTES ON SECURITY
+-- ============================================
+-- 
+-- Current Setup:
+-- - All tables are protected by RLS
+-- - Only authenticated users can view active records
+-- - Only service_role (backend/admin) can modify data
+--
+-- Future Enhancements:
+-- - Add custom claims or JWT tokens to identify school admins
+-- - Create policies that allow school admins to manage their own school's data
+-- - Implement teacher authentication so teachers can update their own profiles
+-- - Add role-based access control (RBAC) for different user types

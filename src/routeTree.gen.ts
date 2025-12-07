@@ -15,7 +15,6 @@ import { Route as DemoIndexRouteImport } from './routes/demo/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoTanchatRouteImport } from './routes/demo/tanchat'
 import { Route as DemoStoreRouteImport } from './routes/demo/store'
-import { Route as ProtectedUsersRouteImport } from './routes/_protected/users'
 import { Route as ProtectedSettingsRouteImport } from './routes/_protected/settings'
 import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
 import { Route as ExampleGuitarsIndexRouteImport } from './routes/example.guitars/index'
@@ -26,6 +25,7 @@ import { Route as DemoSentryTestingRouteImport } from './routes/demo/sentry.test
 import { Route as DemoApiTqTodosRouteImport } from './routes/demo/api.tq-todos'
 import { Route as DemoApiTanchatRouteImport } from './routes/demo/api.tanchat'
 import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
+import { Route as ProtectedTeachersTeacherListRouteImport } from './routes/_protected/teachers/teacher-list'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
 import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
@@ -59,11 +59,6 @@ const DemoStoreRoute = DemoStoreRouteImport.update({
   id: '/demo/store',
   path: '/demo/store',
   getParentRoute: () => rootRouteImport,
-} as any)
-const ProtectedUsersRoute = ProtectedUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedSettingsRoute = ProtectedSettingsRouteImport.update({
   id: '/settings',
@@ -115,6 +110,12 @@ const DemoApiNamesRoute = DemoApiNamesRouteImport.update({
   path: '/demo/api/names',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProtectedTeachersTeacherListRoute =
+  ProtectedTeachersTeacherListRouteImport.update({
+    id: '/teachers/teacher-list',
+    path: '/teachers/teacher-list',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
 const DemoStartSsrIndexRoute = DemoStartSsrIndexRouteImport.update({
   id: '/demo/start/ssr/',
   path: '/demo/start/ssr/',
@@ -140,11 +141,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/settings': typeof ProtectedSettingsRoute
-  '/users': typeof ProtectedUsersRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanchat': typeof DemoTanchatRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo': typeof DemoIndexRoute
+  '/teachers/teacher-list': typeof ProtectedTeachersTeacherListRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tanchat': typeof DemoApiTanchatRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -162,11 +163,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/settings': typeof ProtectedSettingsRoute
-  '/users': typeof ProtectedUsersRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanchat': typeof DemoTanchatRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo': typeof DemoIndexRoute
+  '/teachers/teacher-list': typeof ProtectedTeachersTeacherListRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tanchat': typeof DemoApiTanchatRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -186,11 +187,11 @@ export interface FileRoutesById {
   '/_protected': typeof ProtectedRouteWithChildren
   '/_protected/dashboard': typeof ProtectedDashboardRoute
   '/_protected/settings': typeof ProtectedSettingsRoute
-  '/_protected/users': typeof ProtectedUsersRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanchat': typeof DemoTanchatRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/': typeof DemoIndexRoute
+  '/_protected/teachers/teacher-list': typeof ProtectedTeachersTeacherListRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tanchat': typeof DemoApiTanchatRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -210,11 +211,11 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/settings'
-    | '/users'
     | '/demo/store'
     | '/demo/tanchat'
     | '/demo/tanstack-query'
     | '/demo'
+    | '/teachers/teacher-list'
     | '/demo/api/names'
     | '/demo/api/tanchat'
     | '/demo/api/tq-todos'
@@ -232,11 +233,11 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/settings'
-    | '/users'
     | '/demo/store'
     | '/demo/tanchat'
     | '/demo/tanstack-query'
     | '/demo'
+    | '/teachers/teacher-list'
     | '/demo/api/names'
     | '/demo/api/tanchat'
     | '/demo/api/tq-todos'
@@ -255,11 +256,11 @@ export interface FileRouteTypes {
     | '/_protected'
     | '/_protected/dashboard'
     | '/_protected/settings'
-    | '/_protected/users'
     | '/demo/store'
     | '/demo/tanchat'
     | '/demo/tanstack-query'
     | '/demo/'
+    | '/_protected/teachers/teacher-list'
     | '/demo/api/names'
     | '/demo/api/tanchat'
     | '/demo/api/tq-todos'
@@ -339,13 +340,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStoreRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_protected/users': {
-      id: '/_protected/users'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof ProtectedUsersRouteImport
-      parentRoute: typeof ProtectedRoute
-    }
     '/_protected/settings': {
       id: '/_protected/settings'
       path: '/settings'
@@ -416,6 +410,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoApiNamesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_protected/teachers/teacher-list': {
+      id: '/_protected/teachers/teacher-list'
+      path: '/teachers/teacher-list'
+      fullPath: '/teachers/teacher-list'
+      preLoaderRoute: typeof ProtectedTeachersTeacherListRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
     '/demo/start/ssr/': {
       id: '/demo/start/ssr/'
       path: '/demo/start/ssr'
@@ -450,13 +451,13 @@ declare module '@tanstack/react-router' {
 interface ProtectedRouteChildren {
   ProtectedDashboardRoute: typeof ProtectedDashboardRoute
   ProtectedSettingsRoute: typeof ProtectedSettingsRoute
-  ProtectedUsersRoute: typeof ProtectedUsersRoute
+  ProtectedTeachersTeacherListRoute: typeof ProtectedTeachersTeacherListRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedDashboardRoute: ProtectedDashboardRoute,
   ProtectedSettingsRoute: ProtectedSettingsRoute,
-  ProtectedUsersRoute: ProtectedUsersRoute,
+  ProtectedTeachersTeacherListRoute: ProtectedTeachersTeacherListRoute,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(

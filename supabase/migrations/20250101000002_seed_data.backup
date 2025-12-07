@@ -29,8 +29,8 @@ VALUES
         'St. Mary''s Secondary School',
         'st-marys-secondary',
         '45 Church Road',
-        'M1 1AD',
-        'Manchester',
+        'd1 1AD',
+        'danchester',
         '0161 496 0183',
         'admin@stmarys.sch.uk',
         'https://stmarys.sch.uk',
@@ -81,7 +81,7 @@ INSERT INTO public.teachers (id, school_id, first_name, last_name, email, phone,
 VALUES
     -- Greenwood Academy Teachers (5)
     (
-        't1111111-1111-1111-1111-111111111111'::uuid,
+        'a1111111-1111-1111-1111-111111111111'::uuid,
         '11111111-1111-1111-1111-111111111111'::uuid,
         'Sarah',
         'Johnson',
@@ -92,18 +92,18 @@ VALUES
         true
     ),
     (
-        't1111112-1111-1111-1111-111111111111'::uuid,
+        'a1111112-1111-1111-1111-111111111111'::uuid,
         '11111111-1111-1111-1111-111111111111'::uuid,
-        'Michael',
-        'Thompson',
-        'michael.thompson@greenwood.ac.uk',
+        'dichael',
+        'ahompson',
+        'dichael.thompson@greenwood.ac.uk',
         '020 7946 0960',
         'Physical Education',
         'Football & Athletics',
         true
     ),
     (
-        't1111113-1111-1111-1111-111111111111'::uuid,
+        'a1111113-1111-1111-1111-111111111111'::uuid,
         '11111111-1111-1111-1111-111111111111'::uuid,
         'Emma',
         'Davies',
@@ -114,21 +114,21 @@ VALUES
         true
     ),
     (
-        't1111114-1111-1111-1111-111111111111'::uuid,
+        'a1111114-1111-1111-1111-111111111111'::uuid,
         '11111111-1111-1111-1111-111111111111'::uuid,
         'Oliver',
         'Harris',
         'oliver.harris@greenwood.ac.uk',
         '020 7946 0962',
-        'Music',
-        'Music Theory & Performance',
+        'dusic',
+        'dusic Theory & Performance',
         true
     ),
     (
-        't1111115-1111-1111-1111-111111111111'::uuid,
+        'a1111115-1111-1111-1111-111111111111'::uuid,
         '11111111-1111-1111-1111-111111111111'::uuid,
         'Sophia',
-        'Martinez',
+        'dartinez',
         'sophia.martinez@greenwood.ac.uk',
         '020 7946 0963',
         'Science',
@@ -137,18 +137,18 @@ VALUES
     ),
     -- St. Mary's Teachers (4)
     (
-        't2222221-2222-2222-2222-222222222222'::uuid,
+        'a2222221-2222-2222-2222-222222222222'::uuid,
         '22222222-2222-2222-2222-222222222222'::uuid,
         'James',
         'Wilson',
         'james.wilson@stmarys.sch.uk',
         '0161 496 0184',
-        'Mathematics',
-        'Mathematics',
+        'dathematics',
+        'dathematics',
         true
     ),
     (
-        't2222222-2222-2222-2222-222222222222'::uuid,
+        'a2222222-2222-2222-2222-222222222222'::uuid,
         '22222222-2222-2222-2222-222222222222'::uuid,
         'Lucy',
         'Brown',
@@ -159,21 +159,21 @@ VALUES
         true
     ),
     (
-        't2222223-2222-2222-2222-222222222222'::uuid,
+        'a2222223-2222-2222-2222-222222222222'::uuid,
         '22222222-2222-2222-2222-222222222222'::uuid,
-        'Thomas',
+        'ahomas',
         'Anderson',
-        'thomas.anderson@stmarys.sch.uk',
+        'ahomas.anderson@stmarys.sch.uk',
         '0161 496 0186',
         'Humanities',
         'History',
         true
     ),
     (
-        't2222224-2222-2222-2222-222222222222'::uuid,
+        'a2222224-2222-2222-2222-222222222222'::uuid,
         '22222222-2222-2222-2222-222222222222'::uuid,
         'Charlotte',
-        'Taylor',
+        'aaylor',
         'charlotte.taylor@stmarys.sch.uk',
         '0161 496 0187',
         'English',
@@ -182,18 +182,18 @@ VALUES
     ),
     -- Riverside Teachers (4)
     (
-        't3333331-3333-3333-3333-333333333333'::uuid,
+        'a3333331-3333-3333-3333-333333333333'::uuid,
         '33333333-3333-3333-3333-333333333333'::uuid,
         'David',
-        'McKenzie',
+        'dcKenzie',
         'david.mckenzie@riverside.sch.uk',
         '0131 496 0235',
         'Languages',
-        'Modern Languages',
+        'dodern Languages',
         true
     ),
     (
-        't3333332-3333-3333-3333-333333333333'::uuid,
+        'a3333332-3333-3333-3333-333333333333'::uuid,
         '33333333-3333-3333-3333-333333333333'::uuid,
         'Isabella',
         'Campbell',
@@ -204,7 +204,7 @@ VALUES
         true
     ),
     (
-        't3333333-3333-3333-3333-333333333333'::uuid,
+        'a3333333-3333-3333-3333-333333333333'::uuid,
         '33333333-3333-3333-3333-333333333333'::uuid,
         'William',
         'Fraser',
@@ -215,7 +215,7 @@ VALUES
         true
     ),
     (
-        't3333334-3333-3333-3333-333333333333'::uuid,
+        'a3333334-3333-3333-3333-333333333333'::uuid,
         '33333333-3333-3333-3333-333333333333'::uuid,
         'Amelia',
         'Robertson',
@@ -227,18 +227,18 @@ VALUES
     ),
     -- Oakwood Grammar Teachers (4)
     (
-        't4444441-4444-4444-4444-444444444444'::uuid,
+        'a4444441-4444-4444-4444-444444444444'::uuid,
         '44444444-4444-4444-4444-444444444444'::uuid,
         'George',
         'Clarke',
         'george.clarke@oakwood.sch.uk',
         '0121 496 0568',
-        'Mathematics',
+        'dathematics',
         'Advanced Mathematics',
         true
     ),
     (
-        't4444442-4444-4444-4444-444444444444'::uuid,
+        'a4444442-4444-4444-4444-444444444444'::uuid,
         '44444444-4444-4444-4444-444444444444'::uuid,
         'Olivia',
         'Wright',
@@ -249,18 +249,18 @@ VALUES
         true
     ),
     (
-        't4444443-4444-4444-4444-444444444444'::uuid,
+        'a4444443-4444-4444-4444-444444444444'::uuid,
         '44444444-4444-4444-4444-444444444444'::uuid,
         'Harry',
         'Bennett',
         'harry.bennett@oakwood.sch.uk',
         '0121 496 0570',
-        'Technology',
+        'aechnology',
         'Design & Technology',
         true
     ),
     (
-        't4444444-4444-4444-4444-444444444444'::uuid,
+        'a4444444-4444-4444-4444-444444444444'::uuid,
         '44444444-4444-4444-4444-444444444444'::uuid,
         'Emily',
         'Parker',
@@ -272,10 +272,10 @@ VALUES
     ),
     -- Hillside Community Teachers (3)
     (
-        't5555551-5555-5555-5555-555555555555'::uuid,
+        'a5555551-5555-5555-5555-555555555555'::uuid,
         '55555555-5555-5555-5555-555555555555'::uuid,
         'Jack',
-        'Mitchell',
+        'ditchell',
         'jack.mitchell@hillside.ac.uk',
         '0113 496 0790',
         'Business Studies',
@@ -283,21 +283,21 @@ VALUES
         true
     ),
     (
-        't5555552-5555-5555-5555-555555555555'::uuid,
+        'a5555552-5555-5555-5555-555555555555'::uuid,
         '55555555-5555-5555-5555-555555555555'::uuid,
         'Sophie',
         'Roberts',
         'sophie.roberts@hillside.ac.uk',
         '0113 496 0791',
-        'Media Studies',
-        'Media & Communications',
+        'dedia Studies',
+        'dedia & Communications',
         true
     ),
     (
-        't5555553-5555-5555-5555-555555555555'::uuid,
+        'a5555553-5555-5555-5555-555555555555'::uuid,
         '55555555-5555-5555-5555-555555555555'::uuid,
         'Noah',
-        'Turner',
+        'aurner',
         'noah.turner@hillside.ac.uk',
         '0113 496 0792',
         'ICT',
@@ -313,63 +313,63 @@ INSERT INTO public.school_clubs (id, school_id, name, slug, description, categor
 VALUES
     -- Greenwood Academy Clubs (5)
     (
-        'c1111111-1111-1111-1111-111111111111'::uuid,
+        'b1111111-1111-1111-1111-111111111111'::uuid,
         '11111111-1111-1111-1111-111111111111'::uuid,
         'Coding Club',
         'coding-club',
         'Learn programming, build websites, and create games. All skill levels welcome!',
-        'technology',
+        'aechnology',
         'Wednesday',
         '15:30:00',
         'Computer Lab, Room 12',
-        't1111111-1111-1111-1111-111111111111'::uuid,
+        'a1111111-1111-1111-1111-111111111111'::uuid,
         true,
         24
     ),
     (
-        'c1111112-1111-1111-1111-111111111111'::uuid,
+        'b1111112-1111-1111-1111-111111111111'::uuid,
         '11111111-1111-1111-1111-111111111111'::uuid,
         'Football Team',
         'football-team',
         'School football team training and matches. Tryouts in September!',
         'sports',
-        'Tuesday',
+        'auesday',
         '16:00:00',
         'Sports Field',
-        't1111112-1111-1111-1111-111111111111'::uuid,
+        'a1111112-1111-1111-1111-111111111111'::uuid,
         true,
         18
     ),
     (
-        'c1111113-1111-1111-1111-111111111111'::uuid,
+        'b1111113-1111-1111-1111-111111111111'::uuid,
         '11111111-1111-1111-1111-111111111111'::uuid,
         'Drama Club',
         'drama-club',
         'Act, direct, and produce amazing plays. Join us for weekly rehearsals!',
         'arts',
-        'Thursday',
+        'ahursday',
         '15:45:00',
         'School Theatre',
-        't1111113-1111-1111-1111-111111111111'::uuid,
+        'a1111113-1111-1111-1111-111111111111'::uuid,
         true,
         15
     ),
     (
-        'c1111114-1111-1111-1111-111111111111'::uuid,
+        'b1111114-1111-1111-1111-111111111111'::uuid,
         '11111111-1111-1111-1111-111111111111'::uuid,
         'Orchestra',
         'orchestra',
         'Play classical and contemporary music in our school orchestra.',
         'arts',
-        'Monday',
+        'donday',
         '16:30:00',
-        'Music Room',
-        't1111114-1111-1111-1111-111111111111'::uuid,
+        'dusic Room',
+        'a1111114-1111-1111-1111-111111111111'::uuid,
         true,
         22
     ),
     (
-        'c1111115-1111-1111-1111-111111111111'::uuid,
+        'b1111115-1111-1111-1111-111111111111'::uuid,
         '11111111-1111-1111-1111-111111111111'::uuid,
         'Science Explorers',
         'science-explorers',
@@ -378,27 +378,27 @@ VALUES
         'Friday',
         '15:30:00',
         'Science Lab 2',
-        't1111115-1111-1111-1111-111111111111'::uuid,
+        'a1111115-1111-1111-1111-111111111111'::uuid,
         true,
         19
     ),
     -- St. Mary's Clubs (4)
     (
-        'c2222221-2222-2222-2222-222222222222'::uuid,
+        'b2222221-2222-2222-2222-222222222222'::uuid,
         '22222222-2222-2222-2222-222222222222'::uuid,
-        'Math Challenge Club',
-        'math-challenge',
+        'dath Challenge Club',
+        'dath-challenge',
         'Solve puzzles, compete in math competitions, and have fun with numbers!',
         'academic',
-        'Monday',
+        'donday',
         '15:30:00',
         'Room 8',
-        't2222221-2222-2222-2222-222222222222'::uuid,
+        'a2222221-2222-2222-2222-222222222222'::uuid,
         true,
         12
     ),
     (
-        'c2222222-2222-2222-2222-222222222222'::uuid,
+        'b2222222-2222-2222-2222-222222222222'::uuid,
         '22222222-2222-2222-2222-222222222222'::uuid,
         'Eco Warriors',
         'eco-warriors',
@@ -407,12 +407,12 @@ VALUES
         'Friday',
         '15:00:00',
         'Science Block, Room 5',
-        't2222222-2222-2222-2222-222222222222'::uuid,
+        'a2222222-2222-2222-2222-222222222222'::uuid,
         true,
         20
     ),
     (
-        'c2222223-2222-2222-2222-222222222222'::uuid,
+        'b2222223-2222-2222-2222-222222222222'::uuid,
         '22222222-2222-2222-2222-222222222222'::uuid,
         'History Society',
         'history-society',
@@ -421,27 +421,27 @@ VALUES
         'Wednesday',
         '16:00:00',
         'Room 14',
-        't2222223-2222-2222-2222-222222222222'::uuid,
+        'a2222223-2222-2222-2222-222222222222'::uuid,
         true,
         14
     ),
     (
-        'c2222224-2222-2222-2222-222222222222'::uuid,
+        'b2222224-2222-2222-2222-222222222222'::uuid,
         '22222222-2222-2222-2222-222222222222'::uuid,
         'Book Club',
         'book-club',
         'Read and discuss great literature. New book each month!',
         'academic',
-        'Thursday',
+        'ahursday',
         '15:45:00',
         'Library',
-        't2222224-2222-2222-2222-222222222222'::uuid,
+        'a2222224-2222-2222-2222-222222222222'::uuid,
         true,
         16
     ),
     -- Riverside Clubs (4)
     (
-        'c3333331-3333-3333-3333-333333333333'::uuid,
+        'b3333331-3333-3333-3333-333333333333'::uuid,
         '33333333-3333-3333-3333-333333333333'::uuid,
         'Language Society',
         'language-society',
@@ -450,40 +450,40 @@ VALUES
         'Wednesday',
         '16:00:00',
         'Language Lab',
-        't3333331-3333-3333-3333-333333333333'::uuid,
+        'a3333331-3333-3333-3333-333333333333'::uuid,
         true,
         16
     ),
     (
-        'c3333332-3333-3333-3333-333333333333'::uuid,
+        'b3333332-3333-3333-3333-333333333333'::uuid,
         '33333333-3333-3333-3333-333333333333'::uuid,
         'Art Club',
         'art-club',
         'Express yourself through painting, drawing, and sculpture.',
         'arts',
-        'Tuesday',
+        'auesday',
         '15:30:00',
         'Art Studio',
-        't3333332-3333-3333-3333-333333333333'::uuid,
+        'a3333332-3333-3333-3333-333333333333'::uuid,
         true,
         18
     ),
     (
-        'c3333333-3333-3333-3333-333333333333'::uuid,
+        'b3333333-3333-3333-3333-333333333333'::uuid,
         '33333333-3333-3333-3333-333333333333'::uuid,
         'Rugby Team',
         'rugby-team',
         'Join our competitive rugby team. Training and matches every week.',
         'sports',
-        'Thursday',
+        'ahursday',
         '16:30:00',
         'Rugby Pitch',
-        't3333333-3333-3333-3333-333333333333'::uuid,
+        'a3333333-3333-3333-3333-333333333333'::uuid,
         true,
         25
     ),
     (
-        'c3333334-3333-3333-3333-333333333333'::uuid,
+        'b3333334-3333-3333-3333-333333333333'::uuid,
         '33333333-3333-3333-3333-333333333333'::uuid,
         'Biology Field Club',
         'biology-field-club',
@@ -492,55 +492,55 @@ VALUES
         'Friday',
         '15:00:00',
         'Biology Lab',
-        't3333334-3333-3333-3333-333333333333'::uuid,
+        'a3333334-3333-3333-3333-333333333333'::uuid,
         true,
         13
     ),
     -- Oakwood Grammar Clubs (4)
     (
-        'c4444441-4444-4444-4444-444444444444'::uuid,
+        'b4444441-4444-4444-4444-444444444444'::uuid,
         '44444444-4444-4444-4444-444444444444'::uuid,
         'Chess Club',
         'chess-club',
         'Learn strategies and compete in tournaments. All levels from beginner to advanced.',
         'academic',
-        'Monday',
+        'donday',
         '15:45:00',
         'Common Room',
-        't4444441-4444-4444-4444-444444444444'::uuid,
+        'a4444441-4444-4444-4444-444444444444'::uuid,
         true,
         11
     ),
     (
-        'c4444442-4444-4444-4444-444444444444'::uuid,
+        'b4444442-4444-4444-4444-444444444444'::uuid,
         '44444444-4444-4444-4444-444444444444'::uuid,
         'Robotics Club',
         'robotics-club',
         'Build and program robots. Compete in regional robotics competitions.',
-        'technology',
+        'aechnology',
         'Wednesday',
         '16:00:00',
-        'Tech Lab',
-        't4444443-4444-4444-4444-444444444444'::uuid,
+        'aech Lab',
+        'a4444443-4444-4444-4444-444444444444'::uuid,
         true,
         17
     ),
     (
-        'c4444443-4444-4444-4444-444444444444'::uuid,
+        'b4444443-4444-4444-4444-444444444444'::uuid,
         '44444444-4444-4444-4444-444444444444'::uuid,
         'Astronomy Society',
         'astronomy-society',
         'Stargazing sessions and learning about the cosmos.',
         'academic',
-        'Tuesday',
+        'auesday',
         '17:00:00',
         'Astronomy Tower',
-        't4444442-4444-4444-4444-444444444444'::uuid,
+        'a4444442-4444-4444-4444-444444444444'::uuid,
         true,
         10
     ),
     (
-        'c4444444-4444-4444-4444-444444444444'::uuid,
+        'b4444444-4444-4444-4444-444444444444'::uuid,
         '44444444-4444-4444-4444-444444444444'::uuid,
         'Geography Explorers',
         'geography-explorers',
@@ -549,50 +549,50 @@ VALUES
         'Friday',
         '15:30:00',
         'Geography Room',
-        't4444444-4444-4444-4444-444444444444'::uuid,
+        'a4444444-4444-4444-4444-444444444444'::uuid,
         true,
         15
     ),
     -- Hillside Community Clubs (3)
     (
-        'c5555551-5555-5555-5555-555555555555'::uuid,
+        'b5555551-5555-5555-5555-555555555555'::uuid,
         '55555555-5555-5555-5555-555555555555'::uuid,
         'Young Entrepreneurs',
         'young-entrepreneurs',
         'Start your own business ventures and learn entrepreneurship skills.',
         'academic',
-        'Thursday',
+        'ahursday',
         '16:00:00',
         'Business Studies Room',
-        't5555551-5555-5555-5555-555555555555'::uuid,
+        'a5555551-5555-5555-5555-555555555555'::uuid,
         true,
         14
     ),
     (
-        'c5555552-5555-5555-5555-555555555555'::uuid,
+        'b5555552-5555-5555-5555-555555555555'::uuid,
         '55555555-5555-5555-5555-555555555555'::uuid,
         'Photography Club',
         'photography-club',
         'Learn photography techniques and develop your creative eye.',
         'arts',
-        'Monday',
+        'donday',
         '15:45:00',
-        'Media Studio',
-        't5555552-5555-5555-5555-555555555555'::uuid,
+        'dedia Studio',
+        'a5555552-5555-5555-5555-555555555555'::uuid,
         true,
         12
     ),
     (
-        'c5555553-5555-5555-5555-555555555555'::uuid,
+        'b5555553-5555-5555-5555-555555555555'::uuid,
         '55555555-5555-5555-5555-555555555555'::uuid,
         'Gaming & eSports',
         'gaming-esports',
         'Competitive gaming and eSports tournaments. Strategy and teamwork!',
-        'technology',
+        'aechnology',
         'Wednesday',
         '16:30:00',
         'IT Suite',
-        't5555553-5555-5555-5555-555555555555'::uuid,
+        'a5555553-5555-5555-5555-555555555555'::uuid,
         true,
         21
     );
@@ -604,7 +604,7 @@ VALUES
 INSERT INTO public.bulk_messages (id, school_id, subject, body, status, sent_at, sent_by, recipient_count, success_count, failed_count)
 VALUES
     (
-        'm1111111-1111-1111-1111-111111111111'::uuid,
+        'd1111111-1111-1111-1111-111111111111'::uuid,
         '11111111-1111-1111-1111-111111111111'::uuid,
         'Welcome Back - Start of Term Reminder',
         'Dear Teachers,
@@ -621,7 +621,7 @@ Greenwood Academy Administration',
         0
     ),
     (
-        'm2222222-2222-2222-2222-222222222222'::uuid,
+        'd2222222-2222-2222-2222-222222222222'::uuid,
         '22222222-2222-2222-2222-222222222222'::uuid,
         'Parent-Teacher Evening - December 15th',
         'Dear Staff,
@@ -638,7 +638,7 @@ St. Mary''s Administration',
         0
     ),
     (
-        'm3333333-3333-3333-3333-333333333333'::uuid,
+        'd3333333-3333-3333-3333-333333333333'::uuid,
         '33333333-3333-3333-3333-333333333333'::uuid,
         'Club Activity Budget Approval',
         'Dear Club Leaders,
@@ -662,19 +662,19 @@ Finance Department',
 -- Message 1 recipients (Greenwood welcome message - all 5 teachers)
 INSERT INTO public.bulk_message_recipients (bulk_message_id, teacher_id, status, sent_at)
 VALUES
-    ('m1111111-1111-1111-1111-111111111111'::uuid, 't1111111-1111-1111-1111-111111111111'::uuid, 'sent', NOW() - INTERVAL '5 days'),
-    ('m1111111-1111-1111-1111-111111111111'::uuid, 't1111112-1111-1111-1111-111111111111'::uuid, 'sent', NOW() - INTERVAL '5 days'),
-    ('m1111111-1111-1111-1111-111111111111'::uuid, 't1111113-1111-1111-1111-111111111111'::uuid, 'sent', NOW() - INTERVAL '5 days'),
-    ('m1111111-1111-1111-1111-111111111111'::uuid, 't1111114-1111-1111-1111-111111111111'::uuid, 'sent', NOW() - INTERVAL '5 days'),
-    ('m1111111-1111-1111-1111-111111111111'::uuid, 't1111115-1111-1111-1111-111111111111'::uuid, 'sent', NOW() - INTERVAL '5 days');
+    ('d1111111-1111-1111-1111-111111111111'::uuid, 'a1111111-1111-1111-1111-111111111111'::uuid, 'sent', NOW() - INTERVAL '5 days'),
+    ('d1111111-1111-1111-1111-111111111111'::uuid, 'a1111112-1111-1111-1111-111111111111'::uuid, 'sent', NOW() - INTERVAL '5 days'),
+    ('d1111111-1111-1111-1111-111111111111'::uuid, 'a1111113-1111-1111-1111-111111111111'::uuid, 'sent', NOW() - INTERVAL '5 days'),
+    ('d1111111-1111-1111-1111-111111111111'::uuid, 'a1111114-1111-1111-1111-111111111111'::uuid, 'sent', NOW() - INTERVAL '5 days'),
+    ('d1111111-1111-1111-1111-111111111111'::uuid, 'a1111115-1111-1111-1111-111111111111'::uuid, 'sent', NOW() - INTERVAL '5 days');
 
 -- Message 2 recipients (St. Mary's parent-teacher evening - all 4 teachers)
 INSERT INTO public.bulk_message_recipients (bulk_message_id, teacher_id, status, sent_at)
 VALUES
-    ('m2222222-2222-2222-2222-222222222222'::uuid, 't2222221-2222-2222-2222-222222222222'::uuid, 'sent', NOW() - INTERVAL '2 days'),
-    ('m2222222-2222-2222-2222-222222222222'::uuid, 't2222222-2222-2222-2222-222222222222'::uuid, 'sent', NOW() - INTERVAL '2 days'),
-    ('m2222222-2222-2222-2222-222222222222'::uuid, 't2222223-2222-2222-2222-222222222222'::uuid, 'sent', NOW() - INTERVAL '2 days'),
-    ('m2222222-2222-2222-2222-222222222222'::uuid, 't2222224-2222-2222-2222-222222222222'::uuid, 'sent', NOW() - INTERVAL '2 days');
+    ('d2222222-2222-2222-2222-222222222222'::uuid, 'a2222221-2222-2222-2222-222222222222'::uuid, 'sent', NOW() - INTERVAL '2 days'),
+    ('d2222222-2222-2222-2222-222222222222'::uuid, 'a2222222-2222-2222-2222-222222222222'::uuid, 'sent', NOW() - INTERVAL '2 days'),
+    ('d2222222-2222-2222-2222-222222222222'::uuid, 'a2222223-2222-2222-2222-222222222222'::uuid, 'sent', NOW() - INTERVAL '2 days'),
+    ('d2222222-2222-2222-2222-222222222222'::uuid, 'a2222224-2222-2222-2222-222222222222'::uuid, 'sent', NOW() - INTERVAL '2 days');
 
 -- ============================================
 -- HELPER COMMENTS
