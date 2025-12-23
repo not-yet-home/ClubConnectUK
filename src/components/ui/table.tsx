@@ -1,6 +1,6 @@
-import * as React from "react"
-import { Table as TanstackTable } from "@tanstack/react-table"
 
+import { type Column } from "@tanstack/react-table"
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
@@ -106,50 +106,60 @@ function TableCaption({
   )
 }
 
-interface DataTablePaginationProps<TData> {
-  table: TanstackTable<TData>
+interface DataTablePaginationProps {
+  pageIndex: number
+  pageCount: number
+  pageSize: number
+  totalRows: number
+  onPageChange: (pageIndex: number) => void
   className?: string
 }
 
-function DataTablePagination<TData>({
-  table,
+function DataTablePagination({
+  pageIndex,
+  pageCount,
+  pageSize,
+  totalRows,
+  onPageChange,
   className,
-}: DataTablePaginationProps<TData>) {
-  const currentPage = table.getState().pagination.pageIndex
-  const totalPages = table.getPageCount()
-  const pageSize = table.getState().pagination.pageSize
-  const totalRows = table.getFilteredRowModel().rows.length
+}: DataTablePaginationProps) {
+  const canGoPrevious = pageIndex > 0
+  const canGoNext = pageIndex < pageCount - 1
+
+  const startRow = totalRows === 0 ? 0 : pageIndex * pageSize + 1
+  const endRow = Math.min((pageIndex + 1) * pageSize, totalRows)
 
   // Generate page numbers with ellipsis
-  const getPageNumbers = (): (number | string)[] => {
-    const pages: (number | string)[] = []
+  const getPageNumbers = (): (number | "ellipsis")[] => {
+    const pages: (number | "ellipsis")[] = []
 
-    if (totalPages <= 7) {
-      for (let i = 0; i < totalPages; i++) {
+    if (pageCount <= 7) {
+      for (let i = 0; i < pageCount; i++) {
         pages.push(i)
       }
     } else {
+      // Always show first page
       pages.push(0)
 
-      if (currentPage > 2) {
-        pages.push("...")
+      if (pageIndex > 2) {
+        pages.push("ellipsis")
       }
 
-      const start = Math.max(1, currentPage - 1)
-      const end = Math.min(totalPages - 2, currentPage + 1)
+      // Pages around current
+      const start = Math.max(1, pageIndex - 1)
+      const end = Math.min(pageCount - 2, pageIndex + 1)
 
       for (let i = start; i <= end; i++) {
-        if (!pages.includes(i)) {
-          pages.push(i)
-        }
+        pages.push(i)
       }
 
-      if (currentPage < totalPages - 3) {
-        pages.push("...")
+      if (pageIndex < pageCount - 3) {
+        pages.push("ellipsis")
       }
 
-      if (!pages.includes(totalPages - 1)) {
-        pages.push(totalPages - 1)
+      // Always show last page
+      if (pageCount > 1) {
+        pages.push(pageCount - 1)
       }
     }
 
@@ -161,27 +171,23 @@ function DataTablePagination<TData>({
       {/* Left side - Showing X-Y from Z */}
       <div className="text-sm text-muted-foreground">
         Showing{" "}
-        <span className="font-medium">
-          {totalRows === 0 ? 0 : currentPage * pageSize + 1}
-        </span>
+        <span className="font-medium">{startRow}</span>
         -
-        <span className="font-medium">
-          {Math.min((currentPage + 1) * pageSize, totalRows)}
-        </span>{" "}
-        from <span className="font-medium">{totalRows}</span>
+        <span className="font-medium">{endRow}</span>
+        {" "}from{" "}
+        <span className="font-medium">{totalRows}</span>
       </div>
 
       {/* Right side - Pagination controls */}
-      <div className="flex items-center space-x-1">
+      <div className="flex items-center gap-1">
         {/* First page */}
         <Button
           variant="outline"
           size="icon"
           className="h-8 w-8"
-          onClick={() => table.setPageIndex(0)}
-          disabled={!table.getCanPreviousPage()}
+          onClick={() => onPageChange(0)}
+          disabled={!canGoPrevious}
         >
-          <span className="sr-only">Go to first page</span>
           <span className="text-xs">{"<<"}</span>
         </Button>
         {/* Previous page */}
@@ -189,26 +195,25 @@ function DataTablePagination<TData>({
           variant="outline"
           size="icon"
           className="h-8 w-8"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
+          onClick={() => onPageChange(pageIndex - 1)}
+          disabled={!canGoPrevious}
         >
-          <span className="sr-only">Go to previous page</span>
           <span className="text-xs">{"<"}</span>
         </Button>
 
         {/* Page numbers */}
         {getPageNumbers().map((page, idx) =>
-          typeof page === "string" ? (
+          page === "ellipsis" ? (
             <span key={`ellipsis-${idx}`} className="px-2 text-muted-foreground">
-              {page}
+              ...
             </span>
           ) : (
             <Button
               key={page}
-              variant={currentPage === page ? "default" : "outline"}
+              variant={pageIndex === page ? "default" : "outline"}
               size="icon"
               className="h-8 w-8"
-              onClick={() => table.setPageIndex(page)}
+              onClick={() => onPageChange(page)}
             >
               {page + 1}
             </Button>
@@ -220,10 +225,9 @@ function DataTablePagination<TData>({
           variant="outline"
           size="icon"
           className="h-8 w-8"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
+          onClick={() => onPageChange(pageIndex + 1)}
+          disabled={!canGoNext}
         >
-          <span className="sr-only">Go to next page</span>
           <span className="text-xs">{">"}</span>
         </Button>
         {/* Last page */}
@@ -231,14 +235,49 @@ function DataTablePagination<TData>({
           variant="outline"
           size="icon"
           className="h-8 w-8"
-          onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-          disabled={!table.getCanNextPage()}
+          onClick={() => onPageChange(pageCount - 1)}
+          disabled={!canGoNext}
         >
-          <span className="sr-only">Go to last page</span>
           <span className="text-xs">{">>"}</span>
         </Button>
       </div>
     </div>
+  )
+}
+
+interface DataTableColumnHeaderProps<TData, TValue> {
+  column: Column<TData, TValue>
+  title: string
+  className?: string
+}
+
+function DataTableColumnHeader<TData, TValue>({
+  column,
+  title,
+  className,
+}: DataTableColumnHeaderProps<TData, TValue>) {
+  if (!column.getCanSort()) {
+    return <div className={cn(className)}>{title}</div>
+  }
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      className={cn("-ml-3 h-8 data-[state=open]:bg-accent group", className)}
+      onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+    >
+      {title}
+      <span className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        {column.getIsSorted() === "desc" ? (
+          <ArrowDown className="h-4 w-4" />
+        ) : column.getIsSorted() === "asc" ? (
+          <ArrowUp className="h-4 w-4" />
+        ) : (
+          <ArrowUpDown className="h-4 w-4" />
+        )}
+      </span>
+    </Button>
   )
 }
 
@@ -252,4 +291,5 @@ export {
   TableCell,
   TableCaption,
   DataTablePagination,
+  DataTableColumnHeader,
 }

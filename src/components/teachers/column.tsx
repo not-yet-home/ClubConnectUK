@@ -1,6 +1,7 @@
 "use client"
 import { Teacher } from "@/types/teacher.types"
 import { ColumnDef } from "@tanstack/react-table"
+import { DataTableColumnHeader } from "@/components/ui/table"
 
 export const columns: ColumnDef<Teacher>[] = [
   {
@@ -33,26 +34,38 @@ export const columns: ColumnDef<Teacher>[] = [
   },
   {
     accessorKey: "first_name",
-    header: "First Name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="First Name" />
+    ),
   },
   {
     accessorKey: "last_name",
-    header: "Last Name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Last Name" />
+    ),
   },
   {
     accessorKey: "email",
-    header: "Email",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Email" />
+    ),
   },
   {
     accessorKey: "department",
-    header: "Department",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Department" />
+    ),
   },
   {
     accessorKey: "phone",
-    header: "Phone",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Phone" />
+    ),
   },
   {
     accessorKey: "school_id",
-    header: "School ID",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="School ID" />
+    ),
   },
 ]
