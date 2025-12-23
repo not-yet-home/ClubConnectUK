@@ -1,16 +1,19 @@
-"use client"
-
+import * as React from "react"
 import { useState } from "react"
 import {
   ColumnDef,
+  ColumnFiltersState,
   SortingState,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
   useReactTable,
+  type Table as TanstackTable,
 } from "@tanstack/react-table"
-
 import {
   Table,
   TableBody,
@@ -24,31 +27,52 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  toolbar?: (table: TanstackTable<TData>) => React.ReactNode
+  globalFilterPlaceholder?: string
+  onRowClick?: (row: TData) => void
+  meta?: Record<string, any>
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  toolbar,
+  onRowClick,
+  meta,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [globalFilter, setGlobalFilter] = useState("")
 
   const table = useReactTable({
     data,
     columns,
+    meta,
     state: {
       sorting,
+      columnFilters,
+      globalFilter,
     },
     onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
   })
 
   const pageSize = table.getState().pagination.pageSize
-  const pageCount = Math.ceil(data.length / pageSize)
+  const pageCount = table.getPageCount()
 
   return (
-    <div>
+    <div className="space-y-4">
+      {/* Toolbar Section - Renders toolbar component if provided */}
+      {toolbar && toolbar(table)}
+
+      {/* Table Section */}
       <div className="overflow-hidden rounded-md border border-border shadow-sm">
         <Table>
           <TableHeader>
@@ -75,6 +99,8 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  onClick={() => onRowClick?.(row.original)}
+                  className={onRowClick ? "cursor-pointer" : ""}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} checkbox={cell.column.id === "select"}>
@@ -93,13 +119,17 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination Section */}
       <DataTablePagination
         pageIndex={table.getState().pagination.pageIndex}
         pageCount={pageCount}
         pageSize={pageSize}
-        totalRows={data.length}
+        totalRows={table.getFilteredRowModel().rows.length}
         onPageChange={(page) => table.setPageIndex(page)}
       />
     </div>
   )
 }
+
+export type { TanstackTable as DataTableInstance }

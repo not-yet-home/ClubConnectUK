@@ -2,6 +2,11 @@
 import { Teacher } from "@/types/teacher.types"
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTableColumnHeader } from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Edit02Icon, Delete02Icon } from "@hugeicons/core-free-icons"
+import { ICON_SIZES } from "@/constants/sizes"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip"
 
 export const columns: ColumnDef<Teacher>[] = [
   {
@@ -67,5 +72,50 @@ export const columns: ColumnDef<Teacher>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="School ID" />
     ),
+  },
+  {
+    id: "actions",
+    header: "Actions",
+    cell: ({ row, table }) => {
+      const teacher = row.original
+      const meta = table.options.meta as {
+        onEdit?: (teacher: Teacher) => void
+        onDelete?: (teacher: Teacher) => void
+      } | undefined
+
+      return (
+        <div className="flex items-center gap-2">
+          <Tooltip>
+            <TooltipTrigger>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={(e) => {
+                  e.stopPropagation()
+              meta?.onEdit?.(teacher)
+            }}
+          >
+            <HugeiconsIcon icon={Edit02Icon} className={ICON_SIZES.md} />
+          </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Edit Teacher</p>
+          </TooltipContent>
+          </Tooltip>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={(e) => {
+              e.stopPropagation()
+              meta?.onDelete?.(teacher)
+            }}
+          >
+            <HugeiconsIcon icon={Delete02Icon} className={ICON_SIZES.md} />
+          </Button>
+        </div>
+      )
+    },
+    enableSorting: false,
+    enableHiding: false,
   },
 ]

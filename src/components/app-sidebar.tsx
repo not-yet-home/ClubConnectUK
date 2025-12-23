@@ -2,13 +2,11 @@ import * as React from 'react'
 import {
     DashboardSquare01Icon,
     Settings01Icon,
-    Mortarboard01Icon,
     SentIcon,
     TeachingIcon
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ICON_SIZES } from '@/constants/sizes'
-
 import { NavMain } from '@/components/nav-main'
 import { NavUser } from '@/components/nav-user'
 import {
