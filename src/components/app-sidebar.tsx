@@ -1,10 +1,13 @@
 import * as React from 'react'
 import {
-    LayoutDashboard,
-    Settings,
-    GraduationCap,
-    Send
-} from 'lucide-react'
+    DashboardSquare01Icon,
+    Settings01Icon,
+    Mortarboard01Icon,
+    SentIcon,
+    TeachingIcon
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { ICON_SIZES } from '@/constants/sizes'
 
 import { NavMain } from '@/components/nav-main'
 import { NavUser } from '@/components/nav-user'
@@ -26,25 +29,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
             title: 'Dashboard',
             url: '/dashboard',
-            icon: LayoutDashboard,
+            icon: () => <HugeiconsIcon icon={DashboardSquare01Icon} className={ICON_SIZES.md} />,
             isActive: false,
         },
         {
             title: 'Teachers',
             url: '/teachers/teacher-list',
-            icon: GraduationCap,
+            icon: () => <HugeiconsIcon icon={TeachingIcon} className={ICON_SIZES.md} />,
             isActive: false,
         },
         {
             title: 'Settings',
             url: '/settings',
-            icon: Settings,
+            icon: () => <HugeiconsIcon icon={Settings01Icon} className={ICON_SIZES.md} />,
             isActive: false,
         },
         {
             title: 'Broadcasts',
             url: '/stepper',
-            icon: Send,
+            icon: () => <HugeiconsIcon icon={SentIcon} className={ICON_SIZES.md} />,
             isActive: false,
         }
     ]

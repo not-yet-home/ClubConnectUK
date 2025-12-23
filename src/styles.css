@@ -19,13 +19,13 @@ code {
 }
 
 :root {
-  --background: #FAF6F3;
+  --background: #fffcfa;
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.141 0.005 285.823);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: #e1ea3f;
+  --primary: #e4b859;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: #f2ede5;
   --secondary-foreground: oklch(96.419% 0.05365 114.225);

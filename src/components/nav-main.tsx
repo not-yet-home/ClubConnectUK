@@ -1,4 +1,4 @@
-import { type LucideIcon } from 'lucide-react'
+
 import { Link, useLocation } from '@tanstack/react-router'
 
 import {
@@ -13,7 +13,7 @@ export function NavMain({
   items: {
     title: string
     url: string
-    icon?: LucideIcon
+    icon?: React.ComponentType
     isActive?: boolean
   }[]
 }) {
