@@ -3,6 +3,7 @@ import {
     LayoutDashboard,
     Settings,
     GraduationCap,
+    Send
 } from 'lucide-react'
 
 import { NavMain } from '@/components/nav-main'
@@ -40,6 +41,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             icon: Settings,
             isActive: false,
         },
+        {
+            title: 'Broadcasts',
+            url: '/stepper',
+            icon: Send,
+            isActive: false,
+        }
     ]
 
     const userData = {
@@ -52,7 +59,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
                 <SidebarGroup>
-                    <div className="flex items-center gap-2 px-2 py-2">
+                    <div className="flex items-center gap-2">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                             <span className="text-sm font-bold">CC</span>
                         </div>

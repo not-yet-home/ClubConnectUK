@@ -15,6 +15,7 @@ import { Route as DemoIndexRouteImport } from './routes/demo/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoTanchatRouteImport } from './routes/demo/tanchat'
 import { Route as DemoStoreRouteImport } from './routes/demo/store'
+import { Route as ProtectedStepperRouteImport } from './routes/_protected/stepper'
 import { Route as ProtectedSettingsRouteImport } from './routes/_protected/settings'
 import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
 import { Route as ExampleGuitarsIndexRouteImport } from './routes/example.guitars/index'
@@ -59,6 +60,11 @@ const DemoStoreRoute = DemoStoreRouteImport.update({
   id: '/demo/store',
   path: '/demo/store',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedStepperRoute = ProtectedStepperRouteImport.update({
+  id: '/stepper',
+  path: '/stepper',
+  getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedSettingsRoute = ProtectedSettingsRouteImport.update({
   id: '/settings',
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/settings': typeof ProtectedSettingsRoute
+  '/stepper': typeof ProtectedStepperRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanchat': typeof DemoTanchatRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/settings': typeof ProtectedSettingsRoute
+  '/stepper': typeof ProtectedStepperRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanchat': typeof DemoTanchatRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/_protected': typeof ProtectedRouteWithChildren
   '/_protected/dashboard': typeof ProtectedDashboardRoute
   '/_protected/settings': typeof ProtectedSettingsRoute
+  '/_protected/stepper': typeof ProtectedStepperRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanchat': typeof DemoTanchatRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/settings'
+    | '/stepper'
     | '/demo/store'
     | '/demo/tanchat'
     | '/demo/tanstack-query'
@@ -233,6 +243,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/settings'
+    | '/stepper'
     | '/demo/store'
     | '/demo/tanchat'
     | '/demo/tanstack-query'
@@ -256,6 +267,7 @@ export interface FileRouteTypes {
     | '/_protected'
     | '/_protected/dashboard'
     | '/_protected/settings'
+    | '/_protected/stepper'
     | '/demo/store'
     | '/demo/tanchat'
     | '/demo/tanstack-query'
@@ -339,6 +351,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/demo/store'
       preLoaderRoute: typeof DemoStoreRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_protected/stepper': {
+      id: '/_protected/stepper'
+      path: '/stepper'
+      fullPath: '/stepper'
+      preLoaderRoute: typeof ProtectedStepperRouteImport
+      parentRoute: typeof ProtectedRoute
     }
     '/_protected/settings': {
       id: '/_protected/settings'
@@ -451,12 +470,14 @@ declare module '@tanstack/react-router' {
 interface ProtectedRouteChildren {
   ProtectedDashboardRoute: typeof ProtectedDashboardRoute
   ProtectedSettingsRoute: typeof ProtectedSettingsRoute
+  ProtectedStepperRoute: typeof ProtectedStepperRoute
   ProtectedTeachersTeacherListRoute: typeof ProtectedTeachersTeacherListRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedDashboardRoute: ProtectedDashboardRoute,
   ProtectedSettingsRoute: ProtectedSettingsRoute,
+  ProtectedStepperRoute: ProtectedStepperRoute,
   ProtectedTeachersTeacherListRoute: ProtectedTeachersTeacherListRoute,
 }
 

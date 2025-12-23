@@ -139,3 +139,46 @@ code {
     @apply bg-background text-foreground;
   }
 }
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e4e4e7;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d4d4d8;
+}
+
+/* Hide native checkbox */
+.custom-checkbox input:checked + div {
+  background-color: #18181b;
+  border-color: #18181b;
+}
+
+.custom-checkbox input:checked + div svg {
+  display: block;
+}
+
+/* Custom Switch */
+.custom-switch input:checked + div {
+  background-color: #18181b;
+}
+
+.custom-switch input:checked + div span {
+  transform: translateX(100%);
+  background-color: white;
+}

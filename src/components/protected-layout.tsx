@@ -1,6 +1,5 @@
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/app-sidebar'
-import { AppHeader } from './app-header'
 
 interface ProtectedLayoutProps {
     children: React.ReactNode
@@ -11,7 +10,10 @@ export function ProtectedLayout({ children }: ProtectedLayoutProps) {
     return (
         <SidebarProvider>
             <AppSidebar />
-            <SidebarInset className="mt-10">{children}</SidebarInset>
+            <section className="bg-sidebar p-3">
+                <SidebarInset>{children}</SidebarInset>
+            </section>
+
         </SidebarProvider>
     )
 }
