@@ -2,8 +2,8 @@ import { CardContent, CardDescription, CardHeader, CardTitle } from '@/component
 import { createFileRoute } from '@tanstack/react-router'
 import { AppHeader } from '@/components/app-header'
 import useTeachers from '@/hooks/use-teachers'
-import { DataTable } from './data-table'
-import { columns } from './column'
+import { DataTable } from '@/components/teachers/data-table'
+import { columns } from '@/components/teachers/column'
 
 export const Route = createFileRoute('/_protected/teachers/teacher-list')({
   component: RouteComponent,
@@ -15,7 +15,7 @@ function RouteComponent() {
   return (
     <>
       <AppHeader breadcrumbs={[{ label: 'Teachers' }]} />
-      <main className="flex-1 overflow-auto p-6">
+      <main className="flex-1 overflow-auto p-6 bg-background">
         <div className="mx-auto space-y-6">
           <div>
             <CardHeader>

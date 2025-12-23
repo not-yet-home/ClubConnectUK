@@ -10,7 +10,7 @@ export function ProtectedLayout({ children }: ProtectedLayoutProps) {
     return (
         <SidebarProvider>
             <AppSidebar />
-            <section className="bg-sidebar p-3">
+            <section className="flex min-h-0 w-full flex-1 flex-col bg-sidebar p-3">
                 <SidebarInset>{children}</SidebarInset>
             </section>
 
