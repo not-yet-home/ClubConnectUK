@@ -19,7 +19,7 @@ code {
 }
 
 :root {
-  --background: oklch(1 0 0);
+  --background: #FAF6F3;
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.141 0.005 285.823);
@@ -27,7 +27,7 @@ code {
   --popover-foreground: oklch(0.141 0.005 285.823);
   --primary: #e1ea3f;
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.967 0.001 286.375);
+  --secondary: #f2ede5;
   --secondary-foreground: oklch(96.419% 0.05365 114.225);
   --muted: oklch(0.967 0.001 286.375);
   --muted-foreground: oklch(0.552 0.016 285.938);
@@ -53,7 +53,7 @@ code {
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.871 0.006 286.286);
   --primary-opacity: rgba(255, 229, 42, 0.1);
-
+  --text: #6e6055;
 }
 
 .dark {
@@ -89,6 +89,7 @@ code {
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.274 0.006 286.033);
   --sidebar-ring: oklch(0.442 0.017 285.786);
+  --text: #6e6055;
 }
 
 @theme inline {
