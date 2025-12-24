@@ -1,324 +1,217 @@
 -- Row Level Security (RLS) Policies
 -- Ensures data security and proper access control
 -- Author: ClubConnect Team
--- Created: 2025-01-01
+-- Updated: 2025-12-24 to match new schema
 
 -- ============================================
--- PROFILES TABLE RLS
+-- PERSON_DETAILS TABLE RLS
 -- ============================================
+ALTER TABLE public.person_details ENABLE ROW LEVEL SECURITY;
 
--- Enable RLS
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Service role can manage person_details"
+    ON public.person_details
+    FOR ALL
+    TO service_role
+    USING (true)
+    WITH CHECK (true);
 
--- Policy: Anyone can view profiles
-CREATE POLICY "Profiles are viewable by everyone"
-    ON public.profiles
+CREATE POLICY "Authenticated users can view person_details"
+    ON public.person_details
     FOR SELECT
     TO authenticated
     USING (true);
 
--- Policy: Users can insert their own profile
-CREATE POLICY "Users can insert their own profile"
-    ON public.profiles
-    FOR INSERT
-    TO authenticated
-    WITH CHECK (auth.uid() = id);
+-- ============================================
+-- DOCUMENTS TABLE RLS
+-- ============================================
+ALTER TABLE public.documents ENABLE ROW LEVEL SECURITY;
 
--- Policy: Users can update their own profile
-CREATE POLICY "Users can update their own profile"
-    ON public.profiles
-    FOR UPDATE
+CREATE POLICY "Service role can manage documents"
+    ON public.documents
+    FOR ALL
+    TO service_role
+    USING (true)
+    WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can view active documents"
+    ON public.documents
+    FOR SELECT
     TO authenticated
-    USING (auth.uid() = id)
-    WITH CHECK (auth.uid() = id);
+    USING (status = 'active');
+
+-- ============================================
+-- SCHOOLS TABLE RLS
+-- ============================================
+ALTER TABLE public.schools ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Service role can manage schools"
+    ON public.schools
+    FOR ALL
+    TO service_role
+    USING (true)
+    WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can view active schools"
+    ON public.schools
+    FOR SELECT
+    TO authenticated
+    USING (status = 'active');
 
 -- ============================================
 -- CLUBS TABLE RLS
 -- ============================================
-
--- Enable RLS
 ALTER TABLE public.clubs ENABLE ROW LEVEL SECURITY;
 
--- Policy: Anyone can view active clubs
-CREATE POLICY "Active clubs are viewable by everyone"
+CREATE POLICY "Service role can manage clubs"
+    ON public.clubs
+    FOR ALL
+    TO service_role
+    USING (true)
+    WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can view clubs"
     ON public.clubs
     FOR SELECT
     TO authenticated
-    USING (is_active = true);
-
--- Policy: Authenticated users can create clubs
-CREATE POLICY "Authenticated users can create clubs"
-    ON public.clubs
-    FOR INSERT
-    TO authenticated
-    WITH CHECK (auth.uid() = created_by);
-
--- Policy: Club admins can update their clubs
-CREATE POLICY "Club admins can update their clubs"
-    ON public.clubs
-    FOR UPDATE
-    TO authenticated
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.memberships
-            WHERE club_id = clubs.id
-            AND user_id = auth.uid()
-            AND role IN ('admin', 'owner')
-            AND status = 'active'
-        )
-    );
-
--- Policy: Club owners can delete their clubs
-CREATE POLICY "Club owners can delete their clubs"
-    ON public.clubs
-    FOR DELETE
-    TO authenticated
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.memberships
-            WHERE club_id = clubs.id
-            AND user_id = auth.uid()
-            AND role = 'owner'
-            AND status = 'active'
-        )
-    );
+    USING (true);
 
 -- ============================================
--- MEMBERSHIPS TABLE RLS
+-- TEACHERS TABLE RLS
 -- ============================================
+ALTER TABLE public.teachers ENABLE ROW LEVEL SECURITY;
 
--- Enable RLS
-ALTER TABLE public.memberships ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Service role can manage teachers"
+    ON public.teachers
+    FOR ALL
+    TO service_role
+    USING (true)
+    WITH CHECK (true);
 
--- Policy: Members can view memberships of their clubs
-CREATE POLICY "Members can view their club memberships"
-    ON public.memberships
+CREATE POLICY "Authenticated users can view non-blocked teachers"
+    ON public.teachers
     FOR SELECT
     TO authenticated
-    USING (
-        -- User is a member of the club
-        user_id = auth.uid()
-        OR
-        -- User is viewing memberships of a club they belong to
-        EXISTS (
-            SELECT 1 FROM public.memberships AS m
-            WHERE m.club_id = memberships.club_id
-            AND m.user_id = auth.uid()
-            AND m.status = 'active'
-        )
-    );
-
--- Policy: Users can join clubs (create membership)
-CREATE POLICY "Users can join clubs"
-    ON public.memberships
-    FOR INSERT
-    TO authenticated
-    WITH CHECK (
-        auth.uid() = user_id
-        AND role = 'member'
-        AND status IN ('pending', 'active')
-    );
-
--- Policy: Club admins can update memberships
-CREATE POLICY "Club admins can update memberships"
-    ON public.memberships
-    FOR UPDATE
-    TO authenticated
-    USING (
-        -- User is updating their own membership
-        user_id = auth.uid()
-        OR
-        -- User is an admin/owner of the club
-        EXISTS (
-            SELECT 1 FROM public.memberships AS m
-            WHERE m.club_id = memberships.club_id
-            AND m.user_id = auth.uid()
-            AND m.role IN ('admin', 'owner')
-            AND m.status = 'active'
-        )
-    );
-
--- Policy: Users can leave clubs (delete their membership)
-CREATE POLICY "Users can leave clubs"
-    ON public.memberships
-    FOR DELETE
-    TO authenticated
-    USING (
-        user_id = auth.uid()
-        OR
-        -- Club admins can remove members
-        EXISTS (
-            SELECT 1 FROM public.memberships AS m
-            WHERE m.club_id = memberships.club_id
-            AND m.user_id = auth.uid()
-            AND m.role IN ('admin', 'owner')
-            AND m.status = 'active'
-        )
-    );
+    USING (is_blocked = false);
 
 -- ============================================
--- EVENTS TABLE RLS
+-- TEACHER_DOCUMENTS TABLE RLS
 -- ============================================
+ALTER TABLE public.teacher_documents ENABLE ROW LEVEL SECURITY;
 
--- Enable RLS
-ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Service role can manage teacher_documents"
+    ON public.teacher_documents
+    FOR ALL
+    TO service_role
+    USING (true)
+    WITH CHECK (true);
 
--- Policy: Public events are viewable by everyone
-CREATE POLICY "Public events are viewable by everyone"
-    ON public.events
+CREATE POLICY "Authenticated users can view teacher_documents"
+    ON public.teacher_documents
     FOR SELECT
     TO authenticated
-    USING (
-        is_public = true
-        OR
-        -- Private events viewable by club members
-        EXISTS (
-            SELECT 1 FROM public.memberships
-            WHERE club_id = events.club_id
-            AND user_id = auth.uid()
-            AND status = 'active'
-        )
-    );
-
--- Policy: Club admins can create events
-CREATE POLICY "Club admins can create events"
-    ON public.events
-    FOR INSERT
-    TO authenticated
-    WITH CHECK (
-        auth.uid() = created_by
-        AND
-        EXISTS (
-            SELECT 1 FROM public.memberships
-            WHERE club_id = events.club_id
-            AND user_id = auth.uid()
-            AND role IN ('admin', 'owner')
-            AND status = 'active'
-        )
-    );
-
--- Policy: Club admins can update events
-CREATE POLICY "Club admins can update events"
-    ON public.events
-    FOR UPDATE
-    TO authenticated
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.memberships
-            WHERE club_id = events.club_id
-            AND user_id = auth.uid()
-            AND role IN ('admin', 'owner')
-            AND status = 'active'
-        )
-    );
-
--- Policy: Club admins can delete events
-CREATE POLICY "Club admins can delete events"
-    ON public.events
-    FOR DELETE
-    TO authenticated
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.memberships
-            WHERE club_id = events.club_id
-            AND user_id = auth.uid()
-            AND role IN ('admin', 'owner')
-            AND status = 'active'
-        )
-    );
+    USING (true);
 
 -- ============================================
--- EVENT_ATTENDEES TABLE RLS
+-- COVER_RULES TABLE RLS
 -- ============================================
+ALTER TABLE public.cover_rules ENABLE ROW LEVEL SECURITY;
 
--- Enable RLS
-ALTER TABLE public.event_attendees ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Service role can manage cover_rules"
+    ON public.cover_rules
+    FOR ALL
+    TO service_role
+    USING (true)
+    WITH CHECK (true);
 
--- Policy: Users can view attendees of events they can see
-CREATE POLICY "Users can view event attendees"
-    ON public.event_attendees
+CREATE POLICY "Authenticated users can view active cover_rules"
+    ON public.cover_rules
     FOR SELECT
     TO authenticated
-    USING (
-        -- User is the attendee
-        user_id = auth.uid()
-        OR
-        -- User can view the event
-        EXISTS (
-            SELECT 1 FROM public.events
-            WHERE id = event_attendees.event_id
-            AND (
-                is_public = true
-                OR
-                EXISTS (
-                    SELECT 1 FROM public.memberships
-                    WHERE club_id = events.club_id
-                    AND user_id = auth.uid()
-                    AND status = 'active'
-                )
-            )
-        )
-    );
-
--- Policy: Users can RSVP to events
-CREATE POLICY "Users can RSVP to events"
-    ON public.event_attendees
-    FOR INSERT
-    TO authenticated
-    WITH CHECK (
-        auth.uid() = user_id
-        AND
-        -- User can view the event
-        EXISTS (
-            SELECT 1 FROM public.events
-            WHERE id = event_attendees.event_id
-            AND (
-                is_public = true
-                OR
-                EXISTS (
-                    SELECT 1 FROM public.memberships
-                    WHERE club_id = events.club_id
-                    AND user_id = auth.uid()
-                    AND status = 'active'
-                )
-            )
-        )
-    );
-
--- Policy: Users can update their RSVP
-CREATE POLICY "Users can update their RSVP"
-    ON public.event_attendees
-    FOR UPDATE
-    TO authenticated
-    USING (auth.uid() = user_id)
-    WITH CHECK (auth.uid() = user_id);
-
--- Policy: Users can remove their RSVP
-CREATE POLICY "Users can remove their RSVP"
-    ON public.event_attendees
-    FOR DELETE
-    TO authenticated
-    USING (
-        auth.uid() = user_id
-        OR
-        -- Event organizers can remove attendees
-        EXISTS (
-            SELECT 1 FROM public.events e
-            JOIN public.memberships m ON m.club_id = e.club_id
-            WHERE e.id = event_attendees.event_id
-            AND m.user_id = auth.uid()
-            AND m.role IN ('admin', 'owner')
-            AND m.status = 'active'
-        )
-    );
+    USING (status = 'active');
 
 -- ============================================
--- STORAGE POLICIES
+-- COVER_OCCURRENCES TABLE RLS
 -- ============================================
--- Note: These need to be configured in Supabase Dashboard or via separate commands
+ALTER TABLE public.cover_occurrences ENABLE ROW LEVEL SECURITY;
 
--- Bucket for club logos, banners, and event images should be configured with:
--- - Public read access for all authenticated users
--- - Write access only for club admins/owners
--- - File size limits (e.g., 5MB for images)
--- - Allowed file types: image/jpeg, image/png, image/webp
+CREATE POLICY "Service role can manage cover_occurrences"
+    ON public.cover_occurrences
+    FOR ALL
+    TO service_role
+    USING (true)
+    WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can view cover_occurrences"
+    ON public.cover_occurrences
+    FOR SELECT
+    TO authenticated
+    USING (true);
+
+-- ============================================
+-- TEACHER_COVER_ASSIGNMENTS TABLE RLS
+-- ============================================
+ALTER TABLE public.teacher_cover_assignments ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Service role can manage teacher_cover_assignments"
+    ON public.teacher_cover_assignments
+    FOR ALL
+    TO service_role
+    USING (true)
+    WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can view teacher_cover_assignments"
+    ON public.teacher_cover_assignments
+    FOR SELECT
+    TO authenticated
+    USING (true);
+
+-- ============================================
+-- BROADCASTS TABLE RLS
+-- ============================================
+ALTER TABLE public.broadcasts ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Service role can manage broadcasts"
+    ON public.broadcasts
+    FOR ALL
+    TO service_role
+    USING (true)
+    WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can view broadcasts"
+    ON public.broadcasts
+    FOR SELECT
+    TO authenticated
+    USING (true);
+
+-- ============================================
+-- MESSAGES TABLE RLS
+-- ============================================
+ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Service role can manage messages"
+    ON public.messages
+    FOR ALL
+    TO service_role
+    USING (true)
+    WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can view messages"
+    ON public.messages
+    FOR SELECT
+    TO authenticated
+    USING (true);
+
+-- ============================================
+-- NOTES ON SECURITY
+-- ============================================
+-- 
+-- Current Setup:
+-- - All tables are protected by RLS
+-- - Only authenticated users can view records (with some status filters)
+-- - Only service_role (backend/admin) can modify data
+--
+-- Future Enhancements:
+-- - Add custom claims or JWT tokens to identify school admins
+-- - Create policies that allow school admins to manage their own school's data
+-- - Implement teacher authentication so teachers can update their own profiles
+-- - Add role-based access control (RBAC) for different user types
