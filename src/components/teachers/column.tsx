@@ -38,39 +38,50 @@ export const columns: ColumnDef<Teacher>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "first_name",
+    id: "first_name",
+    accessorFn: (row) => row.person_details?.first_name ?? "",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="First Name" />
     ),
   },
   {
-    accessorKey: "last_name",
+    id: "last_name",
+    accessorFn: (row) => row.person_details?.last_name ?? "",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Last Name" />
     ),
   },
   {
-    accessorKey: "email",
+    id: "email",
+    accessorFn: (row) => row.person_details?.email ?? "",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Email" />
     ),
   },
   {
-    accessorKey: "department",
+    id: "contact",
+    accessorFn: (row) => row.person_details?.contact ?? "",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Department" />
+      <DataTableColumnHeader column={column} title="Contact" />
     ),
   },
   {
-    accessorKey: "phone",
+    accessorKey: "primary_styles",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Phone" />
+      <DataTableColumnHeader column={column} title="Primary Styles" />
     ),
   },
   {
-    accessorKey: "school_id",
+    accessorKey: "secondary_styles",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="School ID" />
+      <DataTableColumnHeader column={column} title="Secondary Styles" />
+    ),
+  },
+  {
+    id: "is_blocked",
+    accessorFn: (row) => row.is_blocked ? "Blocked" : "Active",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
     ),
   },
   {

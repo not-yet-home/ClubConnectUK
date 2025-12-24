@@ -103,11 +103,11 @@ function RouteComponent() {
                             filename="teachers"
                           />
                           <DataTableFilter
-                            column={table.getColumn("department")}
-                            title="Department"
-                            options={Array.from(table.getColumn("department")?.getFacetedUniqueValues()?.keys() ?? []).map((value) => ({
-                                label: value,
-                                value: value,
+                            column={table.getColumn("primary_styles")}
+                            title="Primary Styles"
+                            options={Array.from(table.getColumn("primary_styles")?.getFacetedUniqueValues()?.keys() ?? []).map((value) => ({
+                                label: value ?? "N/A",
+                                value: value ?? "",
                               }))}
                           />
                         </div>

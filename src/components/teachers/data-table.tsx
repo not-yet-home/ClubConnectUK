@@ -9,7 +9,7 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  getFacetedRowModel,
+  getFacetedRowModel,  
   getFacetedUniqueValues,
   useReactTable,
   type Table as TanstackTable,

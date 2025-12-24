@@ -1,689 +1,346 @@
 -- Seed Data Migration
--- Provides initial test data for development
--- Author: ClubConnect Team
--- Created: 2025-01-01
--- 
--- NOTE: This migration creates test data.
--- In production, you may want to skip this migration.
+-- Updated for new schema: 2025-12-24
+-- Matches ERD: person_details, teachers, schools, clubs, cover_rules, cover_occurrences, 
+--              teacher_cover_assignments, documents, broadcasts, messages
+
+-- NOTE: For Supabase Cloud, create test users via Dashboard → Authentication → Users
+-- Test user commented out (only works on local Docker setup)
 
 -- ============================================
--- SAMPLE SCHOOLS (5 schools)
+-- SAMPLE PERSON DETAILS (for teachers)
 -- ============================================
-
-INSERT INTO public.schools (id, name, slug, address, postcode, city, phone, email, website_url, is_active)
+INSERT INTO public.person_details (id, first_name, middle_name, last_name, email, address, contact, image)
 VALUES
     (
-        '11111111-1111-1111-1111-111111111111'::uuid,
-        'Greenwood Academy',
-        'greenwood-academy',
-        '123 High Street',
-        'SW1A 1AA',
-        'London',
-        '020 7946 0958',
-        'info@greenwood.ac.uk',
-        'https://greenwood.ac.uk',
-        true
-    ),
-    (
-        '22222222-2222-2222-2222-222222222222'::uuid,
-        'St. Mary''s Secondary School',
-        'st-marys-secondary',
-        '45 Church Road',
-        'M1 1AD',
-        'Manchester',
-        '0161 496 0183',
-        'admin@stmarys.sch.uk',
-        'https://stmarys.sch.uk',
-        true
-    ),
-    (
-        '33333333-3333-3333-3333-333333333333'::uuid,
-        'Riverside High School',
-        'riverside-high',
-        '78 River Lane',
-        'EH1 1YZ',
-        'Edinburgh',
-        '0131 496 0234',
-        'contact@riverside.sch.uk',
-        'https://riverside.sch.uk',
-        true
-    ),
-    (
-        '44444444-4444-4444-4444-444444444444'::uuid,
-        'Oakwood Grammar School',
-        'oakwood-grammar',
-        '56 Park Avenue',
-        'B2 4QA',
-        'Birmingham',
-        '0121 496 0567',
-        'info@oakwood.sch.uk',
-        'https://oakwood.sch.uk',
-        true
-    ),
-    (
-        '55555555-5555-5555-5555-555555555555'::uuid,
-        'Hillside Community College',
-        'hillside-community',
-        '92 Valley Road',
-        'LS1 3AB',
-        'Leeds',
-        '0113 496 0789',
-        'admin@hillside.ac.uk',
-        'https://hillside.ac.uk',
-        true
-    );
-
--- ============================================
--- SAMPLE TEACHERS (20 teachers)
--- ============================================
-
-INSERT INTO public.teachers (id, school_id, first_name, last_name, email, phone, department, subject_specialization, is_active)
-VALUES
-    -- Greenwood Academy Teachers (5)
-    (
-        't1111111-1111-1111-1111-111111111111'::uuid,
-        '11111111-1111-1111-1111-111111111111'::uuid,
-        'Sarah',
-        'Johnson',
-        'sarah.johnson@greenwood.ac.uk',
-        '020 7946 0959',
-        'Science',
-        'Computer Science',
-        true
-    ),
-    (
-        't1111112-1111-1111-1111-111111111111'::uuid,
-        '11111111-1111-1111-1111-111111111111'::uuid,
+        'a0000001-0001-0001-0001-000000000001'::uuid,
+        'John',
         'Michael',
-        'Thompson',
-        'michael.thompson@greenwood.ac.uk',
-        '020 7946 0960',
-        'Physical Education',
-        'Football & Athletics',
-        true
+        'Smith',
+        'john.smith@example.com',
+        '10 Baker Street, London W1U 3BW',
+        '+44 7700 900001',
+        NULL
     ),
     (
-        't1111113-1111-1111-1111-111111111111'::uuid,
-        '11111111-1111-1111-1111-111111111111'::uuid,
-        'Emma',
-        'Davies',
-        'emma.davies@greenwood.ac.uk',
-        '020 7946 0961',
-        'Arts',
-        'Drama & Theatre',
-        true
+        'a0000002-0002-0002-0002-000000000002'::uuid,
+        'Sarah',
+        NULL,
+        'Johnson',
+        'sarah.johnson@example.com',
+        '25 Oxford Road, Manchester M1 5AN',
+        '+44 7700 900002',
+        NULL
     ),
     (
-        't1111114-1111-1111-1111-111111111111'::uuid,
-        '11111111-1111-1111-1111-111111111111'::uuid,
-        'Oliver',
-        'Harris',
-        'oliver.harris@greenwood.ac.uk',
-        '020 7946 0962',
-        'Music',
-        'Music Theory & Performance',
-        true
-    ),
-    (
-        't1111115-1111-1111-1111-111111111111'::uuid,
-        '11111111-1111-1111-1111-111111111111'::uuid,
-        'Sophia',
-        'Martinez',
-        'sophia.martinez@greenwood.ac.uk',
-        '020 7946 0963',
-        'Science',
-        'Chemistry',
-        true
-    ),
-    -- St. Mary's Teachers (4)
-    (
-        't2222221-2222-2222-2222-222222222222'::uuid,
-        '22222222-2222-2222-2222-222222222222'::uuid,
-        'James',
-        'Wilson',
-        'james.wilson@stmarys.sch.uk',
-        '0161 496 0184',
-        'Mathematics',
-        'Mathematics',
-        true
-    ),
-    (
-        't2222222-2222-2222-2222-222222222222'::uuid,
-        '22222222-2222-2222-2222-222222222222'::uuid,
-        'Lucy',
-        'Brown',
-        'lucy.brown@stmarys.sch.uk',
-        '0161 496 0185',
-        'Science',
-        'Environmental Science',
-        true
-    ),
-    (
-        't2222223-2222-2222-2222-222222222222'::uuid,
-        '22222222-2222-2222-2222-222222222222'::uuid,
-        'Thomas',
-        'Anderson',
-        'thomas.anderson@stmarys.sch.uk',
-        '0161 496 0186',
-        'Humanities',
-        'History',
-        true
-    ),
-    (
-        't2222224-2222-2222-2222-222222222222'::uuid,
-        '22222222-2222-2222-2222-222222222222'::uuid,
-        'Charlotte',
-        'Taylor',
-        'charlotte.taylor@stmarys.sch.uk',
-        '0161 496 0187',
-        'English',
-        'English Literature',
-        true
-    ),
-    -- Riverside Teachers (4)
-    (
-        't3333331-3333-3333-3333-333333333333'::uuid,
-        '33333333-3333-3333-3333-333333333333'::uuid,
+        'a0000003-0003-0003-0003-000000000003'::uuid,
         'David',
-        'McKenzie',
-        'david.mckenzie@riverside.sch.uk',
-        '0131 496 0235',
-        'Languages',
-        'Modern Languages',
-        true
-    ),
-    (
-        't3333332-3333-3333-3333-333333333333'::uuid,
-        '33333333-3333-3333-3333-333333333333'::uuid,
-        'Isabella',
-        'Campbell',
-        'isabella.campbell@riverside.sch.uk',
-        '0131 496 0236',
-        'Art & Design',
-        'Visual Arts',
-        true
-    ),
-    (
-        't3333333-3333-3333-3333-333333333333'::uuid,
-        '33333333-3333-3333-3333-333333333333'::uuid,
-        'William',
-        'Fraser',
-        'william.fraser@riverside.sch.uk',
-        '0131 496 0237',
-        'Physical Education',
-        'Rugby & Cricket',
-        true
-    ),
-    (
-        't3333334-3333-3333-3333-333333333333'::uuid,
-        '33333333-3333-3333-3333-333333333333'::uuid,
-        'Amelia',
-        'Robertson',
-        'amelia.robertson@riverside.sch.uk',
-        '0131 496 0238',
-        'Science',
-        'Biology',
-        true
-    ),
-    -- Oakwood Grammar Teachers (4)
-    (
-        't4444441-4444-4444-4444-444444444444'::uuid,
-        '44444444-4444-4444-4444-444444444444'::uuid,
-        'George',
-        'Clarke',
-        'george.clarke@oakwood.sch.uk',
-        '0121 496 0568',
-        'Mathematics',
-        'Advanced Mathematics',
-        true
-    ),
-    (
-        't4444442-4444-4444-4444-444444444444'::uuid,
-        '44444444-4444-4444-4444-444444444444'::uuid,
-        'Olivia',
-        'Wright',
-        'olivia.wright@oakwood.sch.uk',
-        '0121 496 0569',
-        'Science',
-        'Physics',
-        true
-    ),
-    (
-        't4444443-4444-4444-4444-444444444444'::uuid,
-        '44444444-4444-4444-4444-444444444444'::uuid,
-        'Harry',
-        'Bennett',
-        'harry.bennett@oakwood.sch.uk',
-        '0121 496 0570',
-        'Technology',
-        'Design & Technology',
-        true
-    ),
-    (
-        't4444444-4444-4444-4444-444444444444'::uuid,
-        '44444444-4444-4444-4444-444444444444'::uuid,
-        'Emily',
-        'Parker',
-        'emily.parker@oakwood.sch.uk',
-        '0121 496 0571',
-        'Geography',
-        'Geography',
-        true
-    ),
-    -- Hillside Community Teachers (3)
-    (
-        't5555551-5555-5555-5555-555555555555'::uuid,
-        '55555555-5555-5555-5555-555555555555'::uuid,
-        'Jack',
-        'Mitchell',
-        'jack.mitchell@hillside.ac.uk',
-        '0113 496 0790',
-        'Business Studies',
-        'Business & Economics',
-        true
-    ),
-    (
-        't5555552-5555-5555-5555-555555555555'::uuid,
-        '55555555-5555-5555-5555-555555555555'::uuid,
-        'Sophie',
-        'Roberts',
-        'sophie.roberts@hillside.ac.uk',
-        '0113 496 0791',
-        'Media Studies',
-        'Media & Communications',
-        true
-    ),
-    (
-        't5555553-5555-5555-5555-555555555555'::uuid,
-        '55555555-5555-5555-5555-555555555555'::uuid,
-        'Noah',
-        'Turner',
-        'noah.turner@hillside.ac.uk',
-        '0113 496 0792',
-        'ICT',
-        'Information Technology',
-        true
+        'James',
+        'Williams',
+        'david.williams@example.com',
+        '42 Royal Mile, Edinburgh EH1 2PB',
+        '+44 7700 900003',
+        NULL
     );
 
 -- ============================================
--- SAMPLE SCHOOL CLUBS (20 clubs)
+-- SAMPLE DOCUMENTS (Templates and Files)
 -- ============================================
-
-INSERT INTO public.school_clubs (id, school_id, name, slug, description, category, meeting_day, meeting_time, meeting_location, teacher_in_charge_id, is_active, member_count)
+INSERT INTO public.documents (id, type, filename, storage_path, title, description, status)
 VALUES
-    -- Greenwood Academy Clubs (5)
     (
-        'c1111111-1111-1111-1111-111111111111'::uuid,
-        '11111111-1111-1111-1111-111111111111'::uuid,
+        1,
+        'system_template',
+        'cover_invitation.html',
+        '/templates/cover_invitation.html',
+        'Cover Invitation Template',
+        'Standard email template for inviting teachers to cover sessions.',
+        'active'
+    ),
+    (
+        2,
+        'system_template',
+        'cover_confirmation.html',
+        '/templates/cover_confirmation.html',
+        'Cover Confirmation Template',
+        'Email template sent when a teacher confirms a cover assignment.',
+        'active'
+    ),
+    (
+        3,
+        'teacher_file',
+        'john_smith_cv.pdf',
+        '/teachers/a0000001-0001-0001-0001-000000000001/cv.pdf',
+        'John Smith CV',
+        'Teaching CV and qualifications.',
+        'active'
+    );
+
+-- ============================================
+-- SAMPLE SCHOOLS (3 schools)
+-- ============================================
+INSERT INTO public.schools (id, school_name, address, status)
+VALUES
+    (
+        'b0000001-0001-0001-0001-000000000001'::uuid,
+        'Greenwood Academy',
+        '123 High Street, London SW1A 1AA',
+        'active'
+    ),
+    (
+        'b0000002-0002-0002-0002-000000000002'::uuid,
+        'St. Mary''s Secondary',
+        '45 Church Road, Manchester M1 1AD',
+        'active'
+    ),
+    (
+        'b0000003-0003-0003-0003-000000000003'::uuid,
+        'Riverside High',
+        '78 River Lane, Edinburgh EH1 1YZ',
+        'active'
+    );
+
+-- ============================================
+-- SAMPLE CLUBS (for Greenwood Academy)
+-- ============================================
+INSERT INTO public.clubs (id, school_id, club_name, club_code)
+VALUES
+    (
+        'c0000001-0001-0001-0001-000000000001'::uuid,
+        'b0000001-0001-0001-0001-000000000001'::uuid,
         'Coding Club',
-        'coding-club',
-        'Learn programming, build websites, and create games. All skill levels welcome!',
-        'technology',
-        'Wednesday',
-        '15:30:00',
-        'Computer Lab, Room 12',
-        't1111111-1111-1111-1111-111111111111'::uuid,
-        true,
-        24
+        'CODE'
     ),
     (
-        'c1111112-1111-1111-1111-111111111111'::uuid,
-        '11111111-1111-1111-1111-111111111111'::uuid,
+        'c0000002-0002-0002-0002-000000000002'::uuid,
+        'b0000001-0001-0001-0001-000000000001'::uuid,
         'Football Team',
-        'football-team',
-        'School football team training and matches. Tryouts in September!',
-        'sports',
-        'Tuesday',
-        '16:00:00',
-        'Sports Field',
-        't1111112-1111-1111-1111-111111111111'::uuid,
-        true,
-        18
+        'FB'
     ),
     (
-        'c1111113-1111-1111-1111-111111111111'::uuid,
-        '11111111-1111-1111-1111-111111111111'::uuid,
+        'c0000003-0003-0003-0003-000000000003'::uuid,
+        'b0000001-0001-0001-0001-000000000001'::uuid,
         'Drama Club',
-        'drama-club',
-        'Act, direct, and produce amazing plays. Join us for weekly rehearsals!',
-        'arts',
-        'Thursday',
-        '15:45:00',
-        'School Theatre',
-        't1111113-1111-1111-1111-111111111111'::uuid,
-        true,
-        15
-    ),
-    (
-        'c1111114-1111-1111-1111-111111111111'::uuid,
-        '11111111-1111-1111-1111-111111111111'::uuid,
-        'Orchestra',
-        'orchestra',
-        'Play classical and contemporary music in our school orchestra.',
-        'arts',
-        'Monday',
-        '16:30:00',
-        'Music Room',
-        't1111114-1111-1111-1111-111111111111'::uuid,
-        true,
-        22
-    ),
-    (
-        'c1111115-1111-1111-1111-111111111111'::uuid,
-        '11111111-1111-1111-1111-111111111111'::uuid,
-        'Science Explorers',
-        'science-explorers',
-        'Hands-on experiments and science projects. Curious minds welcome!',
-        'academic',
-        'Friday',
-        '15:30:00',
-        'Science Lab 2',
-        't1111115-1111-1111-1111-111111111111'::uuid,
-        true,
-        19
-    ),
-    -- St. Mary's Clubs (4)
-    (
-        'c2222221-2222-2222-2222-222222222222'::uuid,
-        '22222222-2222-2222-2222-222222222222'::uuid,
-        'Math Challenge Club',
-        'math-challenge',
-        'Solve puzzles, compete in math competitions, and have fun with numbers!',
-        'academic',
-        'Monday',
-        '15:30:00',
-        'Room 8',
-        't2222221-2222-2222-2222-222222222222'::uuid,
-        true,
-        12
-    ),
-    (
-        'c2222222-2222-2222-2222-222222222222'::uuid,
-        '22222222-2222-2222-2222-222222222222'::uuid,
-        'Eco Warriors',
-        'eco-warriors',
-        'Environmental club focused on sustainability and protecting our planet.',
-        'volunteering',
-        'Friday',
-        '15:00:00',
-        'Science Block, Room 5',
-        't2222222-2222-2222-2222-222222222222'::uuid,
-        true,
-        20
-    ),
-    (
-        'c2222223-2222-2222-2222-222222222222'::uuid,
-        '22222222-2222-2222-2222-222222222222'::uuid,
-        'History Society',
-        'history-society',
-        'Explore historical events and visit museums. Perfect for history enthusiasts!',
-        'academic',
-        'Wednesday',
-        '16:00:00',
-        'Room 14',
-        't2222223-2222-2222-2222-222222222222'::uuid,
-        true,
-        14
-    ),
-    (
-        'c2222224-2222-2222-2222-222222222222'::uuid,
-        '22222222-2222-2222-2222-222222222222'::uuid,
-        'Book Club',
-        'book-club',
-        'Read and discuss great literature. New book each month!',
-        'academic',
-        'Thursday',
-        '15:45:00',
-        'Library',
-        't2222224-2222-2222-2222-222222222222'::uuid,
-        true,
-        16
-    ),
-    -- Riverside Clubs (4)
-    (
-        'c3333331-3333-3333-3333-333333333333'::uuid,
-        '33333333-3333-3333-3333-333333333333'::uuid,
-        'Language Society',
-        'language-society',
-        'Practice French, Spanish, and German with native speakers and cultural activities.',
-        'cultural',
-        'Wednesday',
-        '16:00:00',
-        'Language Lab',
-        't3333331-3333-3333-3333-333333333333'::uuid,
-        true,
-        16
-    ),
-    (
-        'c3333332-3333-3333-3333-333333333333'::uuid,
-        '33333333-3333-3333-3333-333333333333'::uuid,
-        'Art Club',
-        'art-club',
-        'Express yourself through painting, drawing, and sculpture.',
-        'arts',
-        'Tuesday',
-        '15:30:00',
-        'Art Studio',
-        't3333332-3333-3333-3333-333333333333'::uuid,
-        true,
-        18
-    ),
-    (
-        'c3333333-3333-3333-3333-333333333333'::uuid,
-        '33333333-3333-3333-3333-333333333333'::uuid,
-        'Rugby Team',
-        'rugby-team',
-        'Join our competitive rugby team. Training and matches every week.',
-        'sports',
-        'Thursday',
-        '16:30:00',
-        'Rugby Pitch',
-        't3333333-3333-3333-3333-333333333333'::uuid,
-        true,
-        25
-    ),
-    (
-        'c3333334-3333-3333-3333-333333333333'::uuid,
-        '33333333-3333-3333-3333-333333333333'::uuid,
-        'Biology Field Club',
-        'biology-field-club',
-        'Field trips and outdoor biology investigations.',
-        'academic',
-        'Friday',
-        '15:00:00',
-        'Biology Lab',
-        't3333334-3333-3333-3333-333333333333'::uuid,
-        true,
-        13
-    ),
-    -- Oakwood Grammar Clubs (4)
-    (
-        'c4444441-4444-4444-4444-444444444444'::uuid,
-        '44444444-4444-4444-4444-444444444444'::uuid,
-        'Chess Club',
-        'chess-club',
-        'Learn strategies and compete in tournaments. All levels from beginner to advanced.',
-        'academic',
-        'Monday',
-        '15:45:00',
-        'Common Room',
-        't4444441-4444-4444-4444-444444444444'::uuid,
-        true,
-        11
-    ),
-    (
-        'c4444442-4444-4444-4444-444444444444'::uuid,
-        '44444444-4444-4444-4444-444444444444'::uuid,
-        'Robotics Club',
-        'robotics-club',
-        'Build and program robots. Compete in regional robotics competitions.',
-        'technology',
-        'Wednesday',
-        '16:00:00',
-        'Tech Lab',
-        't4444443-4444-4444-4444-444444444444'::uuid,
-        true,
-        17
-    ),
-    (
-        'c4444443-4444-4444-4444-444444444444'::uuid,
-        '44444444-4444-4444-4444-444444444444'::uuid,
-        'Astronomy Society',
-        'astronomy-society',
-        'Stargazing sessions and learning about the cosmos.',
-        'academic',
-        'Tuesday',
-        '17:00:00',
-        'Astronomy Tower',
-        't4444442-4444-4444-4444-444444444444'::uuid,
-        true,
-        10
-    ),
-    (
-        'c4444444-4444-4444-4444-444444444444'::uuid,
-        '44444444-4444-4444-4444-444444444444'::uuid,
-        'Geography Explorers',
-        'geography-explorers',
-        'Field trips and exploration of geographical phenomena.',
-        'academic',
-        'Friday',
-        '15:30:00',
-        'Geography Room',
-        't4444444-4444-4444-4444-444444444444'::uuid,
-        true,
-        15
-    ),
-    -- Hillside Community Clubs (3)
-    (
-        'c5555551-5555-5555-5555-555555555555'::uuid,
-        '55555555-5555-5555-5555-555555555555'::uuid,
-        'Young Entrepreneurs',
-        'young-entrepreneurs',
-        'Start your own business ventures and learn entrepreneurship skills.',
-        'academic',
-        'Thursday',
-        '16:00:00',
-        'Business Studies Room',
-        't5555551-5555-5555-5555-555555555555'::uuid,
-        true,
-        14
-    ),
-    (
-        'c5555552-5555-5555-5555-555555555555'::uuid,
-        '55555555-5555-5555-5555-555555555555'::uuid,
-        'Photography Club',
-        'photography-club',
-        'Learn photography techniques and develop your creative eye.',
-        'arts',
-        'Monday',
-        '15:45:00',
-        'Media Studio',
-        't5555552-5555-5555-5555-555555555555'::uuid,
-        true,
-        12
-    ),
-    (
-        'c5555553-5555-5555-5555-555555555555'::uuid,
-        '55555555-5555-5555-5555-555555555555'::uuid,
-        'Gaming & eSports',
-        'gaming-esports',
-        'Competitive gaming and eSports tournaments. Strategy and teamwork!',
-        'technology',
-        'Wednesday',
-        '16:30:00',
-        'IT Suite',
-        't5555553-5555-5555-5555-555555555555'::uuid,
-        true,
-        21
+        'DRAMA'
     );
 
 -- ============================================
--- SAMPLE BULK MESSAGES
+-- SAMPLE TEACHERS
 -- ============================================
-
-INSERT INTO public.bulk_messages (id, school_id, subject, body, status, sent_at, sent_by, recipient_count, success_count, failed_count)
+INSERT INTO public.teachers (id, persons_details_id, documents_id, primary_styles, secondary_styles, general_notes, is_blocked)
 VALUES
     (
-        'm1111111-1111-1111-1111-111111111111'::uuid,
-        '11111111-1111-1111-1111-111111111111'::uuid,
-        'Welcome Back - Start of Term Reminder',
-        'Dear Teachers,
-
-Welcome back for the new term! Please ensure all club rosters are updated by Friday. Thank you for your continued dedication to our students.
-
-Best regards,
-Greenwood Academy Administration',
-        'sent',
-        NOW() - INTERVAL '5 days',
-        'admin@greenwood.ac.uk',
-        5,
-        5,
-        0
+        'd0000001-0001-0001-0001-000000000001'::uuid,
+        'a0000001-0001-0001-0001-000000000001'::uuid,
+        NULL,
+        'STEM, Computing',
+        'Mathematics',
+        'Experienced in coding clubs and robotics.',
+        false
     ),
     (
-        'm2222222-2222-2222-2222-222222222222'::uuid,
-        '22222222-2222-2222-2222-222222222222'::uuid,
-        'Parent-Teacher Evening - December 15th',
-        'Dear Staff,
-
-This is a reminder that Parent-Teacher evening is scheduled for December 15th from 4:00 PM to 7:00 PM. Please confirm your availability.
-
-Regards,
-St. Mary''s Administration',
-        'sent',
-        NOW() - INTERVAL '2 days',
-        'admin@stmarys.sch.uk',
-        4,
-        4,
-        0
+        'd0000002-0002-0002-0002-000000000002'::uuid,
+        'a0000002-0002-0002-0002-000000000002'::uuid,
+        NULL,
+        'Sports, PE',
+        'Health Education',
+        'Football coach with UEFA B license.',
+        false
     ),
     (
-        'm3333333-3333-3333-3333-333333333333'::uuid,
-        '33333333-3333-3333-3333-333333333333'::uuid,
-        'Club Activity Budget Approval',
-        'Dear Club Leaders,
-
-Your club activity budgets for this term have been approved. Please submit expense claims through the usual process.
-
-Thank you,
-Finance Department',
-        'draft',
+        'd0000003-0003-0003-0003-000000000003'::uuid,
+        'a0000003-0003-0003-0003-000000000003'::uuid,
         NULL,
-        NULL,
-        0,
-        0,
-        0
+        'Drama, Arts',
+        'English',
+        'Theatre director experience.',
+        false
     );
 
 -- ============================================
--- SAMPLE BULK MESSAGE RECIPIENTS
+-- SAMPLE TEACHER_DOCUMENTS (link teacher to documents)
 -- ============================================
-
--- Message 1 recipients (Greenwood welcome message - all 5 teachers)
-INSERT INTO public.bulk_message_recipients (bulk_message_id, teacher_id, status, sent_at)
+INSERT INTO public.teacher_documents (teacher_id, document_id)
 VALUES
-    ('m1111111-1111-1111-1111-111111111111'::uuid, 't1111111-1111-1111-1111-111111111111'::uuid, 'sent', NOW() - INTERVAL '5 days'),
-    ('m1111111-1111-1111-1111-111111111111'::uuid, 't1111112-1111-1111-1111-111111111111'::uuid, 'sent', NOW() - INTERVAL '5 days'),
-    ('m1111111-1111-1111-1111-111111111111'::uuid, 't1111113-1111-1111-1111-111111111111'::uuid, 'sent', NOW() - INTERVAL '5 days'),
-    ('m1111111-1111-1111-1111-111111111111'::uuid, 't1111114-1111-1111-1111-111111111111'::uuid, 'sent', NOW() - INTERVAL '5 days'),
-    ('m1111111-1111-1111-1111-111111111111'::uuid, 't1111115-1111-1111-1111-111111111111'::uuid, 'sent', NOW() - INTERVAL '5 days');
+    ('d0000001-0001-0001-0001-000000000001'::uuid, 3);
 
--- Message 2 recipients (St. Mary's parent-teacher evening - all 4 teachers)
-INSERT INTO public.bulk_message_recipients (bulk_message_id, teacher_id, status, sent_at)
+-- ============================================
+-- SAMPLE COVER RULES (Schedules)
+-- ============================================
+INSERT INTO public.cover_rules (id, school_id, club_id, frequency, day_of_week, start_time, end_time, status)
 VALUES
-    ('m2222222-2222-2222-2222-222222222222'::uuid, 't2222221-2222-2222-2222-222222222222'::uuid, 'sent', NOW() - INTERVAL '2 days'),
-    ('m2222222-2222-2222-2222-222222222222'::uuid, 't2222222-2222-2222-2222-222222222222'::uuid, 'sent', NOW() - INTERVAL '2 days'),
-    ('m2222222-2222-2222-2222-222222222222'::uuid, 't2222223-2222-2222-2222-222222222222'::uuid, 'sent', NOW() - INTERVAL '2 days'),
-    ('m2222222-2222-2222-2222-222222222222'::uuid, 't2222224-2222-2222-2222-222222222222'::uuid, 'sent', NOW() - INTERVAL '2 days');
+    -- Coding Club: Weekly on Wednesdays 15:30-16:30
+    (
+        'e0000001-0001-0001-0001-000000000001'::uuid,
+        'b0000001-0001-0001-0001-000000000001'::uuid,
+        'c0000001-0001-0001-0001-000000000001'::uuid,
+        'weekly',
+        'wednesday',
+        '15:30:00',
+        '16:30:00',
+        'active'
+    ),
+    -- Football: Bi-weekly on Tuesdays 16:00-17:30
+    (
+        'e0000002-0002-0002-0002-000000000002'::uuid,
+        'b0000001-0001-0001-0001-000000000001'::uuid,
+        'c0000002-0002-0002-0002-000000000002'::uuid,
+        'bi-weekly',
+        'tuesday',
+        '16:00:00',
+        '17:30:00',
+        'active'
+    );
 
 -- ============================================
--- HELPER COMMENTS
+-- SAMPLE COVER OCCURRENCES (Actual Sessions)
 -- ============================================
+INSERT INTO public.cover_occurrences (id, cover_rule_id, meeting_date, actual_start, actual_end, notes)
+VALUES
+    -- A session from last week for Coding Club
+    (
+        'f0000001-0001-0001-0001-000000000001'::uuid,
+        'e0000001-0001-0001-0001-000000000001'::uuid,
+        NOW() - INTERVAL '7 days',
+        '15:35:00',
+        '16:30:00',
+        'Started 5 mins late due to network issues.'
+    ),
+    -- Upcoming session for Football
+    (
+        'f0000002-0002-0002-0002-000000000002'::uuid,
+        'e0000002-0002-0002-0002-000000000002'::uuid,
+        NOW() + INTERVAL '3 days',
+        NULL,
+        NULL,
+        'Upcoming session, needs cover.'
+    );
 
-COMMENT ON TABLE public.schools IS 'Sample schools created for testing';
-COMMENT ON TABLE public.teachers IS 'Sample teachers created for testing';
-COMMENT ON TABLE public.school_clubs IS 'Sample school clubs created for testing';
-COMMENT ON TABLE public.bulk_messages IS 'Sample bulk messages created for testing';
+-- ============================================
+-- SAMPLE TEACHER COVER ASSIGNMENTS
+-- ============================================
+INSERT INTO public.teacher_cover_assignments (id, teacher_id, cover_occurrence_id, status, assigned_by, invited_at, response_at)
+VALUES
+    -- John Smith confirmed for past Coding Club session
+    (
+        'aa000001-0001-0001-0001-000000000001'::uuid,
+        'd0000001-0001-0001-0001-000000000001'::uuid,
+        'f0000001-0001-0001-0001-000000000001'::uuid,
+        'confirmed',
+        NULL,
+        NOW() - INTERVAL '10 days',
+        NOW() - INTERVAL '9 days'
+    ),
+    -- Sarah Johnson invited for upcoming Football session
+    (
+        'aa000002-0002-0002-0002-000000000002'::uuid,
+        'd0000002-0002-0002-0002-000000000002'::uuid,
+        'f0000002-0002-0002-0002-000000000002'::uuid,
+        'invited',
+        NULL,
+        NOW(),
+        NULL
+    );
 
--- Note: This seed data creates realistic UK schools with teachers, clubs, and messaging history
--- for development and testing purposes.
+-- ============================================
+-- SAMPLE BROADCASTS
+-- ============================================
+INSERT INTO public.broadcasts (id, template_id, assignment_id, subject, body, channel_used, recipients_count, status, sent_by_user_id)
+VALUES
+    (
+        'bb000001-0001-0001-0001-000000000001'::uuid,
+        1,
+        'aa000002-0002-0002-0002-000000000002'::uuid,
+        'Cover Request: Football Team - Tuesday',
+        'Dear Sarah, we have a cover opportunity for Football Team on Tuesday...',
+        'email',
+        1,
+        'completed',
+        NULL
+    );
+
+-- ============================================
+-- SAMPLE MESSAGES
+-- ============================================
+INSERT INTO public.messages (id, teacher_id, broadcast_id, document_id, channel, direction, subject, body, status, external_id)
+VALUES
+    (
+        'cc000001-0001-0001-0001-000000000001'::uuid,
+        'd0000002-0002-0002-0002-000000000002'::uuid,
+        'bb000001-0001-0001-0001-000000000001'::uuid,
+        NULL,
+        'email',
+        'outbound',
+        'Cover Request: Football Team - Tuesday',
+        'Dear Sarah, we have a cover opportunity for Football Team on Tuesday...',
+        'delivered',
+        'resend_abc123xyz'
+    );
+
+-- ============================================
+-- BULK SEED: 30 REALISTIC TEACHERS
+-- ============================================
+DO $$
+DECLARE
+    teacher_data jsonb := '[
+        {"first": "Emma", "last": "Thompson", "styles": "Ballet, Contemporary", "secondary": "Jazz"},
+        {"first": "James", "last": "Wilson", "styles": "Hip Hop, Street", "secondary": "Breakdance"},
+        {"first": "Olivia", "last": "Davies", "styles": "Piano, Music Theory", "secondary": "Singing"},
+        {"first": "Lucas", "last": "Brown", "styles": "Guitar, Bass", "secondary": "Drums"},
+        {"first": "Charlotte", "last": "Evans", "styles": "Drama, Acting", "secondary": "Public Speaking"},
+        {"first": "Liam", "last": "Thomas", "styles": "Football, Rugby", "secondary": "Athletics"},
+        {"first": "Sophia", "last": "Roberts", "styles": "Art, Painting", "secondary": "Sketching"},
+        {"first": "Benjamin", "last": "Walker", "styles": "Coding, Python", "secondary": "Web Design"},
+        {"first": "Mia", "last": "Wright", "styles": "Yoga, Pilates", "secondary": "Meditation"},
+        {"first": "William", "last": "Robinson", "styles": "Chess, Strategy", "secondary": "Maths"},
+        {"first": "Amelia", "last": "White", "styles": "Violin, Viola", "secondary": "Orchestra"},
+        {"first": "Alexander", "last": "Hall", "styles": "Basketball, Netball", "secondary": "Fitness"},
+        {"first": "Isabella", "last": "Green", "styles": "Pottery, Ceramics", "secondary": "Sculpture"},
+        {"first": "Henry", "last": "Edwards", "styles": "History, Classics", "secondary": "Debating"},
+        {"first": "Ava", "last": "Hughes", "styles": "Choir, Vocal", "secondary": "Musical Theatre"},
+        {"first": "Ethan", "last": "Turner", "styles": "Science, Biology", "secondary": "Chemistry"},
+        {"first": "Harper", "last": "Martin", "styles": "Dance, Tap", "secondary": "Modern"},
+        {"first": "Daniel", "last": "Lewis", "styles": "Cricket, Tennis", "secondary": "Badminton"},
+        {"first": "Evelyn", "last": "Wood", "styles": "French, Spanish", "secondary": "German"},
+        {"first": "Matthew", "last": "Harris", "styles": "Swimming, Water Polo", "secondary": "Lifeguarding"},
+        {"first": "Abigail", "last": "Clark", "styles": "Cooking, Nutrition", "secondary": "Baking"},
+        {"first": "Joseph", "last": "Cooper", "styles": "Photography, Media", "secondary": "Film"},
+        {"first": "Elizabeth", "last": "King", "styles": "Needlework, Textiles", "secondary": "Fashion"},
+        {"first": "David", "last": "Baker", "styles": "Woodwork, DT", "secondary": "Electronics"},
+        {"first": "Sofia", "last": "Patel", "styles": "Physics, Astronomy", "secondary": "Robotics"},
+        {"first": "Jackson", "last": "Moore", "styles": "Geography, Geology", "secondary": "Environment"},
+        {"first": "Grace", "last": "Lee", "styles": "Literature, Creative Writing", "secondary": "Poetry"},
+        {"first": "Sebastian", "last": "Scott", "styles": "Graphic Design, Illustrator", "secondary": "Animation"},
+        {"first": "Chloe", "last": "Young", "styles": "Gymnastics, Trampolining", "secondary": "Cheerleading"},
+        {"first": "Jack", "last": "Allen", "styles": "Martial Arts, Karate", "secondary": "Judo"}
+    ]';
+    item jsonb;
+    new_person_id uuid;
+BEGIN
+    FOR item IN SELECT * FROM jsonb_array_elements(teacher_data)
+    LOOP
+        new_person_id := gen_random_uuid();
+        
+        -- Insert Person
+        INSERT INTO public.person_details (id, first_name, last_name, email, address, contact, image)
+        VALUES (
+            new_person_id,
+            item->>'first',
+            item->>'last',
+            lower(item->>'first') || '.' || lower(item->>'last') || '@example.com',
+            '123 Seed Street, UK',
+            '+44 7700 900' || floor(random() * 900 + 100)::text,
+            NULL
+        );
+
+        -- Insert Teacher
+        INSERT INTO public.teachers (id, persons_details_id, primary_styles, secondary_styles, general_notes, is_blocked)
+        VALUES (
+            gen_random_uuid(),
+            new_person_id,
+            item->>'styles',
+            item->>'secondary',
+            'Auto-generated realistic seed teacher.',
+            false
+        );
+    END LOOP;
+END $$;

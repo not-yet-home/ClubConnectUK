@@ -1,15 +1,13 @@
 -- Initial Schema Migration
 -- Creates the core tables for ClubConnect UK
 -- Author: ClubConnect Team
--- Created: 2025-01-01
+-- Updated: 2025-12-24 to match ERD
 
 -- Note: Using gen_random_uuid() which is built-in to PostgreSQL 13+
--- No extensions needed!
 
 -- ============================================
 -- HELPER FUNCTIONS
 -- ============================================
--- Trigger to update updated_at timestamp
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -19,22 +17,70 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ============================================
+-- ENUMS
+-- ============================================
+CREATE TYPE public.school_status AS ENUM ('active', 'inactive', 'pending');
+CREATE TYPE public.day_of_week AS ENUM ('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday');
+CREATE TYPE public.frequency_type AS ENUM ('weekly', 'bi-weekly', 'monthly');
+CREATE TYPE public.cover_status AS ENUM ('active', 'inactive', 'cancelled');
+CREATE TYPE public.document_type AS ENUM ('teacher_file', 'system_template', 'sent_attachment');
+CREATE TYPE public.document_status AS ENUM ('active', 'archived', 'deleted');
+CREATE TYPE public.assignment_status AS ENUM ('invited', 'accepted', 'declined', 'pending', 'confirmed');
+CREATE TYPE public.broadcast_channel AS ENUM ('sms', 'email', 'all');
+CREATE TYPE public.broadcast_status AS ENUM ('draft', 'sending', 'completed', 'failed');
+CREATE TYPE public.message_channel AS ENUM ('sms', 'email');
+CREATE TYPE public.message_direction AS ENUM ('outbound', 'inbound');
+CREATE TYPE public.message_status AS ENUM ('sent', 'delivered', 'opened', 'replied', 'failed');
+
+-- ============================================
+-- PERSON_DETAILS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS public.person_details (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    first_name VARCHAR(255) NOT NULL,
+    middle_name VARCHAR(255),
+    last_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    address TEXT,
+    contact VARCHAR(100),
+    image TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+CREATE TRIGGER on_person_details_updated
+    BEFORE UPDATE ON public.person_details
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_updated_at();
+
+-- ============================================
+-- DOCUMENTS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS public.documents (
+    id BIGSERIAL PRIMARY KEY,
+    type public.document_type NOT NULL,
+    filename VARCHAR(255) NOT NULL,
+    storage_path VARCHAR(512) NOT NULL,
+    title VARCHAR(255),
+    description TEXT,
+    status public.document_status DEFAULT 'active' NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+CREATE TRIGGER on_documents_updated
+    BEFORE UPDATE ON public.documents
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_updated_at();
+
+-- ============================================
 -- SCHOOLS TABLE
 -- ============================================
--- Stores information about schools in the UK
-
 CREATE TABLE IF NOT EXISTS public.schools (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name TEXT NOT NULL,
-    slug TEXT UNIQUE NOT NULL,
+    school_name VARCHAR(255) NOT NULL,
     address TEXT,
-    postcode TEXT,
-    city TEXT,
-    phone TEXT,
-    email TEXT,
-    website_url TEXT,
-    logo_url TEXT,
-    is_active BOOLEAN DEFAULT true NOT NULL,
+    status public.school_status DEFAULT 'active' NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
@@ -45,21 +91,33 @@ CREATE TRIGGER on_schools_updated
     EXECUTE FUNCTION public.handle_updated_at();
 
 -- ============================================
--- TEACHERS TABLE
+-- CLUBS TABLE
 -- ============================================
--- Stores information about teachers
-
-CREATE TABLE IF NOT EXISTS public.teachers (
+CREATE TABLE IF NOT EXISTS public.clubs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     school_id UUID NOT NULL REFERENCES public.schools(id) ON DELETE CASCADE,
-    first_name TEXT NOT NULL,
-    last_name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    phone TEXT,
-    department TEXT,
-    subject_specialization TEXT,
-    avatar_url TEXT,
-    is_active BOOLEAN DEFAULT true NOT NULL,
+    club_name VARCHAR(255) NOT NULL,
+    club_code VARCHAR(50) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+CREATE TRIGGER on_clubs_updated
+    BEFORE UPDATE ON public.clubs
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_updated_at();
+
+-- ============================================
+-- TEACHERS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS public.teachers (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    persons_details_id UUID NOT NULL REFERENCES public.person_details(id) ON DELETE CASCADE,
+    documents_id UUID, -- Optional FK, can be null
+    primary_styles VARCHAR(255),
+    secondary_styles VARCHAR(255),
+    general_notes TEXT,
+    is_blocked BOOLEAN DEFAULT FALSE NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
@@ -70,129 +128,124 @@ CREATE TRIGGER on_teachers_updated
     EXECUTE FUNCTION public.handle_updated_at();
 
 -- ============================================
--- SCHOOL_CLUBS TABLE
+-- TEACHER_DOCUMENTS TABLE (Junction Table)
 -- ============================================
--- Stores information about school clubs and societies
-
-CREATE TABLE IF NOT EXISTS public.school_clubs (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    school_id UUID NOT NULL REFERENCES public.schools(id) ON DELETE CASCADE,
-    name TEXT NOT NULL,
-    slug TEXT NOT NULL,
-    description TEXT,
-    category TEXT NOT NULL CHECK (category IN ('sports', 'academic', 'arts', 'cultural', 'technology', 'social', 'volunteering', 'other')),
-    logo_url TEXT,
-    banner_url TEXT,
-    meeting_day TEXT,
-    meeting_time TIME,
-    meeting_location TEXT,
-    teacher_in_charge_id UUID REFERENCES public.teachers(id) ON DELETE SET NULL,
-    is_active BOOLEAN DEFAULT true NOT NULL,
-    member_count INTEGER DEFAULT 0 NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-    updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-    UNIQUE(school_id, slug)
+CREATE TABLE IF NOT EXISTS public.teacher_documents (
+    teacher_id UUID NOT NULL REFERENCES public.teachers(id) ON DELETE CASCADE,
+    document_id BIGINT NOT NULL REFERENCES public.documents(id) ON DELETE CASCADE,
+    PRIMARY KEY (teacher_id, document_id)
 );
 
-CREATE TRIGGER on_school_clubs_updated
-    BEFORE UPDATE ON public.school_clubs
-    FOR EACH ROW
-    EXECUTE FUNCTION public.handle_updated_at();
-
 -- ============================================
--- BULK_MESSAGES TABLE
+-- COVER_RULES TABLE
 -- ============================================
--- Stores bulk messages sent to teachers
-
-CREATE TYPE message_status AS ENUM ('draft', 'sent', 'scheduled', 'failed');
-
-CREATE TABLE IF NOT EXISTS public.bulk_messages (
+CREATE TABLE IF NOT EXISTS public.cover_rules (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     school_id UUID NOT NULL REFERENCES public.schools(id) ON DELETE CASCADE,
-    subject TEXT NOT NULL,
-    body TEXT NOT NULL,
-    status message_status DEFAULT 'draft' NOT NULL,
-    scheduled_for TIMESTAMPTZ,
-    sent_at TIMESTAMPTZ,
-    sent_by TEXT,
-    recipient_count INTEGER DEFAULT 0 NOT NULL,
-    success_count INTEGER DEFAULT 0 NOT NULL,
-    failed_count INTEGER DEFAULT 0 NOT NULL,
+    club_id UUID NOT NULL REFERENCES public.clubs(id) ON DELETE CASCADE,
+    frequency public.frequency_type NOT NULL DEFAULT 'weekly',
+    day_of_week public.day_of_week NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    status public.cover_status DEFAULT 'active' NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
-CREATE TRIGGER on_bulk_messages_updated
-    BEFORE UPDATE ON public.bulk_messages
+CREATE TRIGGER on_cover_rules_updated
+    BEFORE UPDATE ON public.cover_rules
     FOR EACH ROW
     EXECUTE FUNCTION public.handle_updated_at();
 
 -- ============================================
--- BULK_MESSAGE_RECIPIENTS TABLE
+-- COVER_OCCURRENCES TABLE
 -- ============================================
--- Tracks individual recipients of bulk messages
-
-CREATE TYPE recipient_status AS ENUM ('pending', 'sent', 'failed', 'bounced');
-
-CREATE TABLE IF NOT EXISTS public.bulk_message_recipients (
+CREATE TABLE IF NOT EXISTS public.cover_occurrences (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    bulk_message_id UUID NOT NULL REFERENCES public.bulk_messages(id) ON DELETE CASCADE,
-    teacher_id UUID NOT NULL REFERENCES public.teachers(id) ON DELETE CASCADE,
-    status recipient_status DEFAULT 'pending' NOT NULL,
-    sent_at TIMESTAMPTZ,
-    error_message TEXT,
+    cover_rule_id UUID NOT NULL REFERENCES public.cover_rules(id) ON DELETE CASCADE,
+    meeting_date TIMESTAMPTZ NOT NULL,
+    actual_start TIME,
+    actual_end TIME,
+    notes TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-    updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-    UNIQUE(bulk_message_id, teacher_id)
+    updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
-CREATE TRIGGER on_bulk_message_recipients_updated
-    BEFORE UPDATE ON public.bulk_message_recipients
+CREATE TRIGGER on_cover_occurrences_updated
+    BEFORE UPDATE ON public.cover_occurrences
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_updated_at();
+
+-- ============================================
+-- TEACHER_COVER_ASSIGNMENTS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS public.teacher_cover_assignments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    teacher_id UUID NOT NULL REFERENCES public.teachers(id) ON DELETE CASCADE,
+    cover_occurrence_id UUID NOT NULL REFERENCES public.cover_occurrences(id) ON DELETE CASCADE,
+    status public.assignment_status DEFAULT 'pending' NOT NULL,
+    assigned_by UUID, -- FK to a users table if it exists, otherwise just a reference
+    invited_at TIMESTAMPTZ,
+    response_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+-- ============================================
+-- BROADCASTS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS public.broadcasts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    template_id BIGINT REFERENCES public.documents(id) ON DELETE SET NULL,
+    assignment_id UUID REFERENCES public.teacher_cover_assignments(id) ON DELETE SET NULL,
+    subject VARCHAR(255),
+    body TEXT,
+    channel_used public.broadcast_channel NOT NULL,
+    recipients_count INTEGER DEFAULT 0 NOT NULL,
+    status public.broadcast_status DEFAULT 'draft' NOT NULL,
+    sent_by_user_id UUID, -- FK to a users table if it exists
+    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+-- ============================================
+-- MESSAGES TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS public.messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    teacher_id UUID NOT NULL REFERENCES public.teachers(id) ON DELETE CASCADE,
+    broadcast_id UUID REFERENCES public.broadcasts(id) ON DELETE SET NULL,
+    document_id BIGINT REFERENCES public.documents(id) ON DELETE SET NULL,
+    channel public.message_channel NOT NULL,
+    direction public.message_direction NOT NULL,
+    subject VARCHAR(255),
+    body TEXT,
+    status public.message_status DEFAULT 'sent' NOT NULL,
+    external_id VARCHAR(255), -- Twilio SID / Resend ID
+    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+CREATE TRIGGER on_messages_updated
+    BEFORE UPDATE ON public.messages
     FOR EACH ROW
     EXECUTE FUNCTION public.handle_updated_at();
 
 -- ============================================
 -- INDEXES
 -- ============================================
--- Performance optimization indexes
-
--- Schools
-CREATE INDEX idx_schools_slug ON public.schools(slug);
-CREATE INDEX idx_schools_active ON public.schools(is_active);
-CREATE INDEX idx_schools_city ON public.schools(city);
-
--- Teachers
-CREATE INDEX idx_teachers_school_id ON public.teachers(school_id);
-CREATE INDEX idx_teachers_email ON public.teachers(email);
-CREATE INDEX idx_teachers_department ON public.teachers(department);
-CREATE INDEX idx_teachers_active ON public.teachers(is_active);
-
--- School Clubs
-CREATE INDEX idx_school_clubs_school_id ON public.school_clubs(school_id);
-CREATE INDEX idx_school_clubs_slug ON public.school_clubs(slug);
-CREATE INDEX idx_school_clubs_category ON public.school_clubs(category);
-CREATE INDEX idx_school_clubs_active ON public.school_clubs(is_active);
-CREATE INDEX idx_school_clubs_teacher_in_charge ON public.school_clubs(teacher_in_charge_id);
-
--- Bulk Messages
-CREATE INDEX idx_bulk_messages_school_id ON public.bulk_messages(school_id);
-CREATE INDEX idx_bulk_messages_status ON public.bulk_messages(status);
-CREATE INDEX idx_bulk_messages_scheduled_for ON public.bulk_messages(scheduled_for);
-CREATE INDEX idx_bulk_messages_sent_at ON public.bulk_messages(sent_at);
-
--- Bulk Message Recipients
-CREATE INDEX idx_bulk_message_recipients_message_id ON public.bulk_message_recipients(bulk_message_id);
-CREATE INDEX idx_bulk_message_recipients_teacher_id ON public.bulk_message_recipients(teacher_id);
-CREATE INDEX idx_bulk_message_recipients_status ON public.bulk_message_recipients(status);
-
--- ============================================
--- COMMENTS
--- ============================================
--- Add helpful comments for documentation
-
-COMMENT ON TABLE public.schools IS 'Schools in the UK';
-COMMENT ON TABLE public.teachers IS 'Teaching staff at schools';
-COMMENT ON TABLE public.school_clubs IS 'School clubs and societies';
-COMMENT ON TABLE public.bulk_messages IS 'Bulk messages sent to teachers';
-COMMENT ON TABLE public.bulk_message_recipients IS 'Individual recipients of bulk messages';
-
+CREATE INDEX idx_person_details_last_name ON public.person_details(last_name);
+CREATE INDEX idx_schools_status ON public.schools(status);
+CREATE INDEX idx_clubs_school_id ON public.clubs(school_id);
+CREATE INDEX idx_teachers_person_id ON public.teachers(persons_details_id);
+CREATE INDEX idx_teacher_documents_teacher ON public.teacher_documents(teacher_id);
+CREATE INDEX idx_teacher_documents_document ON public.teacher_documents(document_id);
+CREATE INDEX idx_cover_rules_school_id ON public.cover_rules(school_id);
+CREATE INDEX idx_cover_rules_club_id ON public.cover_rules(club_id);
+CREATE INDEX idx_cover_occurrences_rule_id ON public.cover_occurrences(cover_rule_id);
+CREATE INDEX idx_cover_occurrences_date ON public.cover_occurrences(meeting_date);
+CREATE INDEX idx_teacher_cover_assignments_teacher ON public.teacher_cover_assignments(teacher_id);
+CREATE INDEX idx_teacher_cover_assignments_occurrence ON public.teacher_cover_assignments(cover_occurrence_id);
+CREATE INDEX idx_broadcasts_template ON public.broadcasts(template_id);
+CREATE INDEX idx_broadcasts_assignment ON public.broadcasts(assignment_id);
+CREATE INDEX idx_messages_teacher ON public.messages(teacher_id);
+CREATE INDEX idx_messages_broadcast ON public.messages(broadcast_id);
+CREATE INDEX idx_messages_status ON public.messages(status);
