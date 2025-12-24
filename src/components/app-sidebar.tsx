@@ -65,7 +65,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             <span className="text-sm font-bold">CC</span>
                         </div>
                         <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-                            <span className="text-sm font-semibold">ClubConnect</span>
+                            <span className="text-sm font-semibold">Dance & Arts</span>
                             <span className="text-xs text-muted-foreground">UK Platform</span>
                         </div>
                     </div>

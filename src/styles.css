@@ -26,6 +26,8 @@ code {
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.141 0.005 285.823);
   --primary: #e4b859;
+  --primary-light: #F0E0AA;
+  --primary-dark: #AA934C;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: #f2ede5;
   --secondary-foreground: oklch(96.419% 0.05365 114.225);
@@ -64,6 +66,8 @@ code {
   --popover: oklch(0.141 0.005 285.823);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.985 0 0);
+  --primary-light: #F0E0AA;
+  --primary-dark: #AA934C;
   --primary-foreground: oklch(0.21 0.006 285.885);
   --secondary: oklch(0.274 0.006 286.033);
   --secondary-foreground: oklch(0.985 0 0);
