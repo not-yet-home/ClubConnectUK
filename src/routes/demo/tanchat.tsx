@@ -11,7 +11,7 @@ import { DefaultChatTransport } from 'ai'
 
 import type { UIMessage } from 'ai'
 
-import GuitarRecommendation from '@/components/example-GuitarRecommendation'
+import GuitarRecommendation from '@/features/ai/components/GuitarRecommendation'
 
 import './tanchat.css'
 
@@ -63,11 +63,10 @@ function Messages({ messages }: { messages: Array<UIMessage> }) {
         {messages.map(({ id, role, parts }) => (
           <div
             key={id}
-            className={`p-4 ${
-              role === 'assistant'
+            className={`p-4 ${role === 'assistant'
                 ? 'bg-gradient-to-r from-orange-500/5 to-red-600/5'
                 : 'bg-transparent'
-            }`}
+              }`}
           >
             <div className="flex items-start gap-4 max-w-3xl mx-auto w-full">
               {role === 'assistant' ? (

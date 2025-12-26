@@ -1,242 +1,356 @@
--- Comprehensive Seed Data for Local Development
--- This file provides realistic test data for development
--- Run this with: supabase db reset (for local) or via SQL editor in Supabase dashboard
+-- Seed Data Migration
+-- Updated for new schema: 2025-12-24
+-- Matches ERD: person_details, teachers, schools, clubs, cover_rules, cover_occurrences, 
+--              teacher_cover_assignments, documents, broadcasts, messages
+
+-- NOTE: For Supabase Cloud, create test users via Dashboard → Authentication → Users
+-- Test user commented out (only works on local Docker setup)
 
 -- ============================================
--- NOTES
+-- SAMPLE PERSON DETAILS (for teachers)
 -- ============================================
--- 1. User IDs below are examples - you'll need to create actual users in Supabase Auth
--- 2. After creating users, update the UUIDs in this file to match
--- 3. Run this after the migrations have been applied
-
--- ============================================
--- HOW TO USE
--- ============================================
--- Option 1: Create users in Supabase Dashboard first, then run this
--- Option 2: Modify the UUIDs below to match your test users
--- Option 3: Comment out the profile/membership sections and just use clubs/events
-
--- ============================================
--- SAMPLE USER PROFILES
--- ============================================
--- Note: These assume you've created users in Supabase Auth with these IDs
--- Create users in Dashboard → Authentication → Users first!
-
--- Example user IDs (replace with your actual user IDs):
--- User 1: admin@clubconnect.uk
--- User 2: alice@example.com  
--- User 3: bob@example.com
-
--- Uncomment and update IDs once you've created users:
-/*
-UPDATE public.profiles
-SET 
-    full_name = 'Admin User',
-    university = 'University of Example',
-    course = 'Computer Science',
-    graduation_year = 2026,
-    bio = 'Platform administrator and tech enthusiast'
-WHERE email = 'admin@clubconnect.uk';
-
-UPDATE public.profiles
-SET 
-    full_name = 'Alice Johnson',
-    university = 'University of Example',
-    course = 'Business Management',
-    graduation_year = 2025,
-    bio = 'Love organizing events and meeting new people!'
-WHERE email = 'alice@example.com';
-
-UPDATE public.profiles
-SET 
-    full_name = 'Bob Smith',
-    university = 'University of Example',
-    course = 'Theatre Arts',
-    graduation_year = 2027,
-    bio = 'Actor, director, and drama enthusiast'
-WHERE email = 'bob@example.com';
-*/
-
--- ============================================
--- MORE SAMPLE CLUBS
--- ============================================
-
-INSERT INTO public.clubs (name, slug, description, category, contact_email, is_active, social_links)
+INSERT INTO public.person_details (id, first_name, middle_name, last_name, email, address, contact, image)
 VALUES
     (
-        'Photography Club',
-        'photography-club',
-        'Capture moments, share techniques, and explore photography together. Weekly photo walks and workshops.',
-        'arts',
-        'photo@university.ac.uk',
-        true,
-        '{"instagram": "photo_club_uni", "website": "https://photoclub.example.com"}'::jsonb
+        'a0000001-0001-0001-0001-000000000001'::uuid,
+        'John',
+        'Michael',
+        'Smith',
+        'john.smith@example.com',
+        '10 Baker Street, London W1U 3BW',
+        '+44 7700 900001',
+        NULL
     ),
     (
-        'Debate Society',
-        'debate-society',
-        'Sharpen your public speaking and critical thinking skills through weekly debates and competitions.',
-        'academic',
-        'debate@university.ac.uk',
-        true,
-        '{"twitter": "uni_debate"}'::jsonb
+        'a0000002-0002-0002-0002-000000000002'::uuid,
+        'Sarah',
+        NULL,
+        'Johnson',
+        'sarah.johnson@example.com',
+        '25 Oxford Road, Manchester M1 5AN',
+        '+44 7700 900002',
+        NULL
     ),
     (
-        'Yoga & Wellness',
-        'yoga-wellness',
-        'Free weekly yoga sessions for students. All levels welcome, mats provided!',
-        'sports',
-        'yoga@university.ac.uk',
-        true,
-        '{"facebook": "UniYogaWellness"}'::jsonb
-    ),
-    (
-        'Chess Club',
-        'chess-club',
-        'Play, learn, and compete. From beginners to tournament players, everyone is welcome.',
-        'social',
-        'chess@university.ac.uk',
-        true,
-        '{}'::jsonb
-    ),
-    (
-        'Robotics Society',
-        'robotics-society',
-        'Build robots, participate in competitions, and explore the world of automation and AI.',
-        'technology',
-        'robotics@university.ac.uk',
-        true,
-        '{"youtube": "UniRobotics"}'::jsonb
+        'a0000003-0003-0003-0003-000000000003'::uuid,
+        'David',
+        'James',
+        'Williams',
+        'david.williams@example.com',
+        '42 Royal Mile, Edinburgh EH1 2PB',
+        '+44 7700 900003',
+        NULL
     );
 
 -- ============================================
--- ADDITIONAL EVENTS
+-- SAMPLE DOCUMENTS (Templates and Files)
 -- ============================================
-
-INSERT INTO public.events (club_id, title, description, event_type, status, location, is_online, meeting_url, start_time, end_time, capacity, is_public)
-SELECT 
-    c.id,
-    'Photography Walk: City Streets',
-    'Explore the city with your camera. Meet at the main entrance.',
-    'social',
-    'published',
-    'City Centre',
-    false,
-    NULL,
-    NOW() + INTERVAL '6 days' + INTERVAL '10 hours',
-    NOW() + INTERVAL '6 days' + INTERVAL '13 hours',
-    20,
-    true
-FROM public.clubs c WHERE c.slug = 'photography-club';
-
-INSERT INTO public.events (club_id, title, description, event_type, status, location, is_online, meeting_url, start_time, end_time, capacity, is_public)
-SELECT 
-    c.id,
-    'Inter-University Debate Championship',
-    'Our team competes in the regional finals. Come support us!',
-    'competition',
-    'published',
-    'University Hall',
-    true,
-    'https://meet.example.com/debate-finals',
-    NOW() + INTERVAL '20 days' + INTERVAL '14 hours',
-    NOW() + INTERVAL '20 days' + INTERVAL '18 hours',
-    100,
-    true
-FROM public.clubs c WHERE c.slug = 'debate-society';
-
-INSERT INTO public.events (club_id, title, description, event_type, status, location, is_online, meeting_url, start_time, end_time, is_public)
-SELECT 
-    c.id,
-    'Sunset Yoga Session',
-    'Relax and unwind with an outdoor yoga session at sunset.',
-    'meeting',
-    'published',
-    'University Green',
-    false,
-    NULL,
-    NOW() + INTERVAL '4 days' + INTERVAL '18 hours',
-    NOW() + INTERVAL '4 days' + INTERVAL '19 hours' + INTERVAL '30 minutes',
-    true
-FROM public.clubs c WHERE c.slug = 'yoga-wellness';
-
-INSERT INTO public.events (club_id, title, description, event_type, status, location, is_online, meeting_url, start_time, end_time, capacity, is_public)
-SELECT 
-    c.id,
-    'Chess Tournament Qualifier',
-    'Compete for a spot in the national championship. £5 entry fee.',
-    'competition',
-    'published',
-    'Student Union Games Room',
-    false,
-    NULL,
-    NOW() + INTERVAL '15 days' + INTERVAL '13 hours',
-    NOW() + INTERVAL '15 days' + INTERVAL '18 hours',
-    32,
-    true
-FROM public.clubs c WHERE c.slug = 'chess-club';
-
-INSERT INTO public.events (club_id, title, description, event_type, status, location, is_online, meeting_url, start_time, end_time, capacity, is_public)
-SELECT 
-    c.id,
-    'Build Your First Robot',
-    'Beginner-friendly workshop. No experience required!',
-    'workshop',
-    'published',
-    'Engineering Lab 3',
-    false,
-    NULL,
-    NOW() + INTERVAL '8 days' + INTERVAL '15 hours',
-    NOW() + INTERVAL '8 days' + INTERVAL '18 hours',
-    25,
-    true
-FROM public.clubs c WHERE c.slug = 'robotics-society';
+INSERT INTO public.documents (id, type, filename, storage_path, title, description, status)
+VALUES
+    (
+        1,
+        'system_template',
+        'cover_invitation.html',
+        '/templates/cover_invitation.html',
+        'Cover Invitation Template',
+        'Standard email template for inviting teachers to cover sessions.',
+        'active'
+    ),
+    (
+        2,
+        'system_template',
+        'cover_confirmation.html',
+        '/templates/cover_confirmation.html',
+        'Cover Confirmation Template',
+        'Email template sent when a teacher confirms a cover assignment.',
+        'active'
+    ),
+    (
+        3,
+        'teacher_file',
+        'john_smith_cv.pdf',
+        '/teachers/a0000001-0001-0001-0001-000000000001/cv.pdf',
+        'John Smith CV',
+        'Teaching CV and qualifications.',
+        'active'
+    );
 
 -- ============================================
--- SAMPLE MEMBERSHIPS
+-- SAMPLE SCHOOLS (3 schools)
 -- ============================================
--- Uncomment and update user_id values once you have real users
-
-/*
--- Make admin@clubconnect.uk an owner of Computer Science Society
-INSERT INTO public.memberships (club_id, user_id, role, status)
-SELECT c.id, 'your-user-uuid-here'::uuid, 'owner', 'active'
-FROM public.clubs c WHERE c.slug = 'computer-science-society';
-
--- Add some member memberships
-INSERT INTO public.memberships (club_id, user_id, role, status)
-SELECT c.id, 'another-user-uuid'::uuid, 'member', 'active'
-FROM public.clubs c WHERE c.slug IN ('football-club', 'drama-society', 'photography-club');
-*/
-
--- ============================================
--- SAMPLE EVENT ATTENDEES
--- ============================================
--- Uncomment once you have real users
-
-/*
--- RSVP to some events
-INSERT INTO public.event_attendees (event_id, user_id, status)
-SELECT e.id, 'your-user-uuid-here'::uuid, 'going'
-FROM public.events e 
-WHERE e.title IN ('Hackathon 2025', 'Introduction to React Workshop')
-LIMIT 2;
-*/
+INSERT INTO public.schools (id, school_name, address, status)
+VALUES
+    (
+        'b0000001-0001-0001-0001-000000000001'::uuid,
+        'Greenwood Academy',
+        '123 High Street, London SW1A 1AA',
+        'active'
+    ),
+    (
+        'b0000002-0002-0002-0002-000000000002'::uuid,
+        'St. Mary''s Secondary',
+        '45 Church Road, Manchester M1 1AD',
+        'active'
+    ),
+    (
+        'b0000003-0003-0003-0003-000000000003'::uuid,
+        'Riverside High',
+        '78 River Lane, Edinburgh EH1 1YZ',
+        'active'
+    );
 
 -- ============================================
--- VERIFICATION QUERIES
+-- SAMPLE CLUBS (for Greenwood Academy)
 -- ============================================
--- Run these to verify your seed data
+INSERT INTO public.clubs (id, school_id, club_name, club_code, description, members_count, status)
+VALUES
+    (
+        'c0000001-0001-0001-0001-000000000001'::uuid,
+        'b0000001-0001-0001-0001-000000000001'::uuid,
+        'Coding Club',
+        'CODE',
+        'Learn programming fundamentals, build projects, and explore robotics.',
+        24,
+        'active'
+    ),
+    (
+        'c0000002-0002-0002-0002-000000000002'::uuid,
+        'b0000001-0001-0001-0001-000000000001'::uuid,
+        'Football Team',
+        'FB',
+        'School football team training and matches.',
+        32,
+        'active'
+    ),
+    (
+        'c0000003-0003-0003-0003-000000000003'::uuid,
+        'b0000001-0001-0001-0001-000000000001'::uuid,
+        'Drama Club',
+        'DRAMA',
+        'Theatre productions, acting workshops, and public speaking.',
+        18,
+        'active'
+    );
 
--- Count clubs by category
--- SELECT category, COUNT(*) as club_count FROM public.clubs GROUP BY category ORDER BY club_count DESC;
 
--- List upcoming events
--- SELECT c.name as club, e.title, e.start_time, e.capacity, e.attendee_count 
--- FROM public.events e 
--- JOIN public.clubs c ON c.id = e.club_id 
--- WHERE e.start_time > NOW() 
--- ORDER BY e.start_time;
+-- ============================================
+-- SAMPLE TEACHERS
+-- ============================================
+INSERT INTO public.teachers (id, persons_details_id, documents_id, primary_styles, secondary_styles, general_notes, is_blocked)
+VALUES
+    (
+        'd0000001-0001-0001-0001-000000000001'::uuid,
+        'a0000001-0001-0001-0001-000000000001'::uuid,
+        NULL,
+        'STEM, Computing',
+        'Mathematics',
+        'Experienced in coding clubs and robotics.',
+        false
+    ),
+    (
+        'd0000002-0002-0002-0002-000000000002'::uuid,
+        'a0000002-0002-0002-0002-000000000002'::uuid,
+        NULL,
+        'Sports, PE',
+        'Health Education',
+        'Football coach with UEFA B license.',
+        false
+    ),
+    (
+        'd0000003-0003-0003-0003-000000000003'::uuid,
+        'a0000003-0003-0003-0003-000000000003'::uuid,
+        NULL,
+        'Drama, Arts',
+        'English',
+        'Theatre director experience.',
+        false
+    );
 
--- Show club member counts
--- SELECT name, member_count FROM public.clubs ORDER BY member_count DESC;
+-- ============================================
+-- SAMPLE TEACHER_DOCUMENTS (link teacher to documents)
+-- ============================================
+INSERT INTO public.teacher_documents (teacher_id, document_id)
+VALUES
+    ('d0000001-0001-0001-0001-000000000001'::uuid, 3);
+
+-- ============================================
+-- SAMPLE COVER RULES (Schedules)
+-- ============================================
+INSERT INTO public.cover_rules (id, school_id, club_id, frequency, day_of_week, start_time, end_time, status)
+VALUES
+    -- Coding Club: Weekly on Wednesdays 15:30-16:30
+    (
+        'e0000001-0001-0001-0001-000000000001'::uuid,
+        'b0000001-0001-0001-0001-000000000001'::uuid,
+        'c0000001-0001-0001-0001-000000000001'::uuid,
+        'weekly',
+        'wednesday',
+        '15:30:00',
+        '16:30:00',
+        'active'
+    ),
+    -- Football: Bi-weekly on Tuesdays 16:00-17:30
+    (
+        'e0000002-0002-0002-0002-000000000002'::uuid,
+        'b0000001-0001-0001-0001-000000000001'::uuid,
+        'c0000002-0002-0002-0002-000000000002'::uuid,
+        'bi-weekly',
+        'tuesday',
+        '16:00:00',
+        '17:30:00',
+        'active'
+    );
+
+-- ============================================
+-- SAMPLE COVER OCCURRENCES (Actual Sessions)
+-- ============================================
+INSERT INTO public.cover_occurrences (id, cover_rule_id, meeting_date, actual_start, actual_end, notes)
+VALUES
+    -- A session from last week for Coding Club
+    (
+        'f0000001-0001-0001-0001-000000000001'::uuid,
+        'e0000001-0001-0001-0001-000000000001'::uuid,
+        NOW() - INTERVAL '7 days',
+        '15:35:00',
+        '16:30:00',
+        'Started 5 mins late due to network issues.'
+    ),
+    -- Upcoming session for Football
+    (
+        'f0000002-0002-0002-0002-000000000002'::uuid,
+        'e0000002-0002-0002-0002-000000000002'::uuid,
+        NOW() + INTERVAL '3 days',
+        NULL,
+        NULL,
+        'Upcoming session, needs cover.'
+    );
+
+-- ============================================
+-- SAMPLE TEACHER COVER ASSIGNMENTS
+-- ============================================
+INSERT INTO public.teacher_cover_assignments (id, teacher_id, cover_occurrence_id, status, assigned_by, invited_at, response_at)
+VALUES
+    -- John Smith confirmed for past Coding Club session
+    (
+        'aa000001-0001-0001-0001-000000000001'::uuid,
+        'd0000001-0001-0001-0001-000000000001'::uuid,
+        'f0000001-0001-0001-0001-000000000001'::uuid,
+        'confirmed',
+        NULL,
+        NOW() - INTERVAL '10 days',
+        NOW() - INTERVAL '9 days'
+    ),
+    -- Sarah Johnson invited for upcoming Football session
+    (
+        'aa000002-0002-0002-0002-000000000002'::uuid,
+        'd0000002-0002-0002-0002-000000000002'::uuid,
+        'f0000002-0002-0002-0002-000000000002'::uuid,
+        'invited',
+        NULL,
+        NOW(),
+        NULL
+    );
+
+-- ============================================
+-- SAMPLE BROADCASTS
+-- ============================================
+INSERT INTO public.broadcasts (id, template_id, assignment_id, subject, body, channel_used, recipients_count, status, sent_by_user_id)
+VALUES
+    (
+        'bb000001-0001-0001-0001-000000000001'::uuid,
+        1,
+        'aa000002-0002-0002-0002-000000000002'::uuid,
+        'Cover Request: Football Team - Tuesday',
+        'Dear Sarah, we have a cover opportunity for Football Team on Tuesday...',
+        'email',
+        1,
+        'completed',
+        NULL
+    );
+
+-- ============================================
+-- SAMPLE MESSAGES
+-- ============================================
+INSERT INTO public.messages (id, teacher_id, broadcast_id, document_id, channel, direction, subject, body, status, external_id)
+VALUES
+    (
+        'cc000001-0001-0001-0001-000000000001'::uuid,
+        'd0000002-0002-0002-0002-000000000002'::uuid,
+        'bb000001-0001-0001-0001-000000000001'::uuid,
+        NULL,
+        'email',
+        'outbound',
+        'Cover Request: Football Team - Tuesday',
+        'Dear Sarah, we have a cover opportunity for Football Team on Tuesday...',
+        'delivered',
+        'resend_abc123xyz'
+    );
+
+-- ============================================
+-- BULK SEED: 30 REALISTIC TEACHERS
+-- ============================================
+DO $$
+DECLARE
+    teacher_data jsonb := '[
+        {"first": "Emma", "last": "Thompson", "styles": "Ballet, Contemporary", "secondary": "Jazz"},
+        {"first": "James", "last": "Wilson", "styles": "Hip Hop, Street", "secondary": "Breakdance"},
+        {"first": "Olivia", "last": "Davies", "styles": "Piano, Music Theory", "secondary": "Singing"},
+        {"first": "Lucas", "last": "Brown", "styles": "Guitar, Bass", "secondary": "Drums"},
+        {"first": "Charlotte", "last": "Evans", "styles": "Drama, Acting", "secondary": "Public Speaking"},
+        {"first": "Liam", "last": "Thomas", "styles": "Football, Rugby", "secondary": "Athletics"},
+        {"first": "Sophia", "last": "Roberts", "styles": "Art, Painting", "secondary": "Sketching"},
+        {"first": "Benjamin", "last": "Walker", "styles": "Coding, Python", "secondary": "Web Design"},
+        {"first": "Mia", "last": "Wright", "styles": "Yoga, Pilates", "secondary": "Meditation"},
+        {"first": "William", "last": "Robinson", "styles": "Chess, Strategy", "secondary": "Maths"},
+        {"first": "Amelia", "last": "White", "styles": "Violin, Viola", "secondary": "Orchestra"},
+        {"first": "Alexander", "last": "Hall", "styles": "Basketball, Netball", "secondary": "Fitness"},
+        {"first": "Isabella", "last": "Green", "styles": "Pottery, Ceramics", "secondary": "Sculpture"},
+        {"first": "Henry", "last": "Edwards", "styles": "History, Classics", "secondary": "Debating"},
+        {"first": "Ava", "last": "Hughes", "styles": "Choir, Vocal", "secondary": "Musical Theatre"},
+        {"first": "Ethan", "last": "Turner", "styles": "Science, Biology", "secondary": "Chemistry"},
+        {"first": "Harper", "last": "Martin", "styles": "Dance, Tap", "secondary": "Modern"},
+        {"first": "Daniel", "last": "Lewis", "styles": "Cricket, Tennis", "secondary": "Badminton"},
+        {"first": "Evelyn", "last": "Wood", "styles": "French, Spanish", "secondary": "German"},
+        {"first": "Matthew", "last": "Harris", "styles": "Swimming, Water Polo", "secondary": "Lifeguarding"},
+        {"first": "Abigail", "last": "Clark", "styles": "Cooking, Nutrition", "secondary": "Baking"},
+        {"first": "Joseph", "last": "Cooper", "styles": "Photography, Media", "secondary": "Film"},
+        {"first": "Elizabeth", "last": "King", "styles": "Needlework, Textiles", "secondary": "Fashion"},
+        {"first": "David", "last": "Baker", "styles": "Woodwork, DT", "secondary": "Electronics"},
+        {"first": "Sofia", "last": "Patel", "styles": "Physics, Astronomy", "secondary": "Robotics"},
+        {"first": "Jackson", "last": "Moore", "styles": "Geography, Geology", "secondary": "Environment"},
+        {"first": "Grace", "last": "Lee", "styles": "Literature, Creative Writing", "secondary": "Poetry"},
+        {"first": "Sebastian", "last": "Scott", "styles": "Graphic Design, Illustrator", "secondary": "Animation"},
+        {"first": "Chloe", "last": "Young", "styles": "Gymnastics, Trampolining", "secondary": "Cheerleading"},
+        {"first": "Jack", "last": "Allen", "styles": "Martial Arts, Karate", "secondary": "Judo"}
+    ]';
+    item jsonb;
+    new_person_id uuid;
+BEGIN
+    FOR item IN SELECT * FROM jsonb_array_elements(teacher_data)
+    LOOP
+        new_person_id := gen_random_uuid();
+        
+        -- Insert Person
+        INSERT INTO public.person_details (id, first_name, last_name, email, address, contact, image)
+        VALUES (
+            new_person_id,
+            item->>'first',
+            item->>'last',
+            lower(item->>'first') || '.' || lower(item->>'last') || '@example.com',
+            '123 Seed Street, UK',
+            '+44 7700 900' || floor(random() * 900 + 100)::text,
+            NULL
+        );
+
+        -- Insert Teacher
+        INSERT INTO public.teachers (id, persons_details_id, primary_styles, secondary_styles, general_notes, is_blocked)
+        VALUES (
+            gen_random_uuid(),
+            new_person_id,
+            item->>'styles',
+            item->>'secondary',
+            'Auto-generated realistic seed teacher.',
+            false
+        );
+    END LOOP;
+END $$;

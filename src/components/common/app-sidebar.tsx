@@ -1,12 +1,14 @@
 import * as React from 'react'
 import {
-    LayoutDashboard,
-    Users,
-    Settings,
-} from 'lucide-react'
-
-import { NavMain } from '@/components/nav-main'
-import { NavUser } from '@/components/nav-user'
+    DashboardSquare01Icon,
+    SentIcon,
+    TeachingIcon,
+    UserGroupIcon
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { ICON_SIZES } from '@/constants/sizes'
+import { NavMain } from '@/components/common/nav-main'
+import { NavUser } from '@/components/common/nav-user'
 import {
     Sidebar,
     SidebarContent,
@@ -25,21 +27,27 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
             title: 'Dashboard',
             url: '/dashboard',
-            icon: LayoutDashboard,
+            icon: () => <HugeiconsIcon icon={DashboardSquare01Icon} className={ICON_SIZES.md} />,
             isActive: false,
         },
         {
-            title: 'Users',
-            url: '/users',
-            icon: Users,
+            title: 'Teachers',
+            url: '/teachers/teacher-list',
+            icon: () => <HugeiconsIcon icon={TeachingIcon} className={ICON_SIZES.md} />,
             isActive: false,
         },
         {
-            title: 'Settings',
-            url: '/settings',
-            icon: Settings,
+            title: 'Clubs',
+            url: '/clubs/club-list',
+            icon: () => <HugeiconsIcon icon={UserGroupIcon} className={ICON_SIZES.md} />,
             isActive: false,
         },
+        {
+            title: 'Broadcasts',
+            url: '/stepper',
+            icon: () => <HugeiconsIcon icon={SentIcon} className={ICON_SIZES.md} />,
+            isActive: false,
+        }
     ]
 
     const userData = {
@@ -52,12 +60,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
                 <SidebarGroup>
-                    <div className="flex items-center gap-2 px-2 py-2">
+                    <div className="flex items-center gap-2">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                             <span className="text-sm font-bold">CC</span>
                         </div>
                         <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-                            <span className="text-sm font-semibold">ClubConnect</span>
+                            <span className="text-sm font-semibold">Dance & Arts</span>
                             <span className="text-xs text-muted-foreground">UK Platform</span>
                         </div>
                     </div>
