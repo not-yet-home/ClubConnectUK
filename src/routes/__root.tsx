@@ -21,6 +21,8 @@ interface MyRouterContext {
   queryClient: QueryClient
 }
 
+import { NotFound } from '@/components/common/not-found'
+
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
     meta: [
@@ -44,6 +46,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   }),
 
   component: RootDocument,
+  notFoundComponent: NotFound,
 })
 
 function RootDocument() {
@@ -59,6 +62,7 @@ function RootDocument() {
       </head>
       <body>
         <Outlet />
+        {/* Devtools disabled
         <TanStackDevtools
           config={{
             position: 'bottom-right',
@@ -72,6 +76,7 @@ function RootDocument() {
             StoreDevtools,
           ]}
         />
+        */}
         <Scripts />
       </body>
     </html>
