@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { AppHeader } from '@/components/app-header'
+import { AppHeader } from '@/components/common/app-header'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/hooks/use-auth'
 import { Activity, Users, TrendingUp, DollarSign } from 'lucide-react'

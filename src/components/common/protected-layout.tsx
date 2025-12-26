@@ -1,5 +1,5 @@
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
-import { AppSidebar } from '@/components/app-sidebar'
+import { AppSidebar } from './app-sidebar'
 
 interface ProtectedLayoutProps {
     children: React.ReactNode

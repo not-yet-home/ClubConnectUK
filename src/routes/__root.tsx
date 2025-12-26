@@ -11,7 +11,7 @@ import { useEffect } from 'react'
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
 import StoreDevtools from '../lib/demo-store-devtools'
-import { initializeAuth } from '../lib/auth.store'
+import { initializeAuth } from '@/features/auth/store'
 
 import appCss from '../styles.css?url'
 

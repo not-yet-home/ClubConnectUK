@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase.client"
+import { supabase } from "@/services/supabase"
 import { useQuery } from "@tanstack/react-query"
 import type { Club, CoverRule, CoverOccurrence } from "@/types/club.types"
 
@@ -81,7 +81,7 @@ export function useClubUpcomingMeetings(clubId: string) {
             if (rulesError) throw rulesError
             if (!rules || rules.length === 0) return []
 
-            const ruleIds = rules.map(r => r.id)
+            const ruleIds = rules.map((r: { id: string }) => r.id)
 
             // Then fetch occurrences for these rules
             const { data, error } = await supabase

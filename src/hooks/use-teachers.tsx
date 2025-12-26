@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase.client"
+import { supabase } from "@/services/supabase"
 import { useQuery } from "@tanstack/react-query"
 
 export default function useTeachers() {

@@ -1,15 +1,14 @@
 import * as React from 'react'
 import {
     DashboardSquare01Icon,
-    Settings01Icon,
     SentIcon,
     TeachingIcon,
     UserGroupIcon
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ICON_SIZES } from '@/constants/sizes'
-import { NavMain } from '@/components/nav-main'
-import { NavUser } from '@/components/nav-user'
+import { NavMain } from '@/components/common/nav-main'
+import { NavUser } from '@/components/common/nav-user'
 import {
     Sidebar,
     SidebarContent,

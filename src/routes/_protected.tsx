@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
-import { ProtectedLayout } from '@/components/protected-layout'
-import { authStore } from '@/lib/auth.store'
+import { ProtectedLayout } from '@/components/common/protected-layout'
+import { authStore } from '@/features/auth/store'
 
 export const Route = createFileRoute('/_protected')({
     beforeLoad: async () => {

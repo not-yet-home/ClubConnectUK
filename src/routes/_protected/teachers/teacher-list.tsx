@@ -1,16 +1,16 @@
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { createFileRoute } from '@tanstack/react-router'
-import { AppHeader } from '@/components/app-header'
+import { AppHeader } from '@/components/common/app-header'
 import useTeachers from '@/hooks/use-teachers'
-import { DataTable } from '@/components/teachers/data-table'
-import { columns } from '@/components/teachers/column'
+import { DataTable } from '@/features/teachers/components/data-table'
+import { columns } from '@/features/teachers/components/column'
 import { DataTableToolbar, DataTableFilter, DataTableShowEntries, DataTableSearch, DataTableExport } from "@/components/ui/data-table-components"
 import { Button } from '@/components/ui/button'
 import { ICON_SIZES } from '@/constants/sizes'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Add01Icon } from '@hugeicons/core-free-icons'
-import { TeacherFormSheet } from '@/components/teachers/teacher-form-sheet'
-import { DeleteTeacherDialog } from '@/components/teachers/delete-teacher-dialog'
+import { TeacherFormSheet } from '@/features/teachers/components/teacher-form-sheet'
+import { DeleteTeacherDialog } from '@/features/teachers/components/delete-teacher-dialog'
 import { useState } from 'react'
 import { Teacher } from '@/types/teacher.types'
 
@@ -74,9 +74,9 @@ function RouteComponent() {
               </section>
             </CardHeader>
             <CardContent>
-              <DataTable 
-                columns={columns} 
-                data={teachers ?? []} 
+              <DataTable
+                columns={columns}
+                data={teachers ?? []}
                 onRowClick={handleRowClick}
                 meta={{
                   onEdit: handleEditTeacher,
@@ -106,9 +106,9 @@ function RouteComponent() {
                             column={table.getColumn("primary_styles")}
                             title="Primary Styles"
                             options={Array.from(table.getColumn("primary_styles")?.getFacetedUniqueValues()?.keys() ?? []).map((value) => ({
-                                label: value ?? "N/A",
-                                value: value ?? "",
-                              }))}
+                              label: value ?? "N/A",
+                              value: value ?? "",
+                            }))}
                           />
                         </div>
                       </div>
@@ -116,7 +116,7 @@ function RouteComponent() {
                   </DataTableToolbar>
                 )}
                 globalFilterPlaceholder="Search teachers..."
-                />
+              />
             </CardContent>
           </div>
         </div>

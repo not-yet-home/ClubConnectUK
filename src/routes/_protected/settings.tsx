@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { AppHeader } from '@/components/app-header'
+import { AppHeader } from '@/components/common/app-header'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export const Route = createFileRoute('/_protected/settings')({
