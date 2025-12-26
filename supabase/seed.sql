@@ -102,26 +102,36 @@ VALUES
 -- ============================================
 -- SAMPLE CLUBS (for Greenwood Academy)
 -- ============================================
-INSERT INTO public.clubs (id, school_id, club_name, club_code)
+INSERT INTO public.clubs (id, school_id, club_name, club_code, description, members_count, status)
 VALUES
     (
         'c0000001-0001-0001-0001-000000000001'::uuid,
         'b0000001-0001-0001-0001-000000000001'::uuid,
         'Coding Club',
-        'CODE'
+        'CODE',
+        'Learn programming fundamentals, build projects, and explore robotics.',
+        24,
+        'active'
     ),
     (
         'c0000002-0002-0002-0002-000000000002'::uuid,
         'b0000001-0001-0001-0001-000000000001'::uuid,
         'Football Team',
-        'FB'
+        'FB',
+        'School football team training and matches.',
+        32,
+        'active'
     ),
     (
         'c0000003-0003-0003-0003-000000000003'::uuid,
         'b0000001-0001-0001-0001-000000000001'::uuid,
         'Drama Club',
-        'DRAMA'
+        'DRAMA',
+        'Theatre productions, acting workshops, and public speaking.',
+        18,
+        'active'
     );
+
 
 -- ============================================
 -- SAMPLE TEACHERS

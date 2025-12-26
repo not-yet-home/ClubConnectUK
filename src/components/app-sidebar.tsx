@@ -3,7 +3,8 @@ import {
     DashboardSquare01Icon,
     Settings01Icon,
     SentIcon,
-    TeachingIcon
+    TeachingIcon,
+    UserGroupIcon
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ICON_SIZES } from '@/constants/sizes'
@@ -37,9 +38,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             isActive: false,
         },
         {
-            title: 'Settings',
-            url: '/settings',
-            icon: () => <HugeiconsIcon icon={Settings01Icon} className={ICON_SIZES.md} />,
+            title: 'Clubs',
+            url: '/clubs/club-list',
+            icon: () => <HugeiconsIcon icon={UserGroupIcon} className={ICON_SIZES.md} />,
             isActive: false,
         },
         {

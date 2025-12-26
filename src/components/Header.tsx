@@ -1,5 +1,4 @@
 import { Link } from '@tanstack/react-router'
-import TanChatAIAssistant from './example-AIAssistant.tsx'
 import { useState } from 'react'
 import {
   ChevronDown,
@@ -16,6 +15,7 @@ import {
 } from 'lucide-react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { MenuIcon } from '@hugeicons/core-free-icons'
+import TanChatAIAssistant from './example-AIAssistant.tsx'
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
