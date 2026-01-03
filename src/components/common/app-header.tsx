@@ -7,7 +7,6 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
-import { Separator } from '@/components/ui/separator'
 
 interface AppHeaderProps {
     breadcrumbs?: {
@@ -18,9 +17,7 @@ interface AppHeaderProps {
 
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     return (
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
-            <SidebarTrigger />
-            <Separator orientation="vertical" className="h-6" />
+        <header className="flex h-14 shrink-0 items-center gap-2 bg-background rounded-tl-md rounded-tr-md border-b border-border px-4">            <SidebarTrigger />
             <Breadcrumb>
                 <BreadcrumbList>
                     {breadcrumbs.map((crumb, index) => (

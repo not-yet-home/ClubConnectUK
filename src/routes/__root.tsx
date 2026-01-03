@@ -11,7 +11,7 @@ import { useEffect } from 'react'
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
 import StoreDevtools from '../lib/demo-store-devtools'
-import { initializeAuth } from '../lib/auth.store'
+import { initializeAuth } from '@/features/auth/store'
 
 import appCss from '../styles.css?url'
 
@@ -20,6 +20,8 @@ import type { QueryClient } from '@tanstack/react-query'
 interface MyRouterContext {
   queryClient: QueryClient
 }
+
+import { NotFound } from '@/components/common/not-found'
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
@@ -44,6 +46,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   }),
 
   component: RootDocument,
+  notFoundComponent: NotFound,
 })
 
 function RootDocument() {
@@ -59,6 +62,7 @@ function RootDocument() {
       </head>
       <body>
         <Outlet />
+        {/* Devtools disabled
         <TanStackDevtools
           config={{
             position: 'bottom-right',
@@ -72,6 +76,7 @@ function RootDocument() {
             StoreDevtools,
           ]}
         />
+        */}
         <Scripts />
       </body>
     </html>
