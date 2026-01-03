@@ -1,12 +1,16 @@
 import { useNavigate } from '@tanstack/react-router'
 
-import { showAIAssistant } from './example-AIAssistant'
+import { showAIAssistant } from './AIAssistant'
 
-import guitars from '../data/example-guitars'
+import guitars from '@/data/example-guitars'
+
+// Add type/interface if not available or just use explicit any for now to pass build
+// But better to infer or import type.
+// Looking at file content will decide.
 
 export default function GuitarRecommendation({ id }: { id: string }) {
   const navigate = useNavigate()
-  const guitar = guitars.find((guitar) => guitar.id === +id)
+  const guitar = guitars.find((g: any) => g.id === id)
   if (!guitar) {
     return null
   }

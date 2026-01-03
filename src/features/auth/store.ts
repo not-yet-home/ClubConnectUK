@@ -1,7 +1,7 @@
 import { Store } from '@tanstack/store'
 import type { User } from '@supabase/supabase-js'
-import { supabase } from './supabase.client'
-import type { AuthState, LoginCredentials, AuthError } from './auth.types'
+import { supabase } from '@/services/supabase'
+import type { AuthState, LoginCredentials, AuthError } from './types'
 
 const initialState: AuthState = {
     user: null,

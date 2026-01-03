@@ -1,5 +1,5 @@
-import { type LucideIcon } from 'lucide-react'
-import { Link, useMatchRoute } from '@tanstack/react-router'
+
+import { Link, useLocation } from '@tanstack/react-router'
 
 import {
   SidebarMenu,
@@ -13,16 +13,16 @@ export function NavMain({
   items: {
     title: string
     url: string
-    icon?: LucideIcon
+    icon?: React.ComponentType
     isActive?: boolean
   }[]
 }) {
-  const matchRoute = useMatchRoute()
+  const location = useLocation()
 
   return (
     <SidebarMenu>
       {items.map((item) => {
-        const isActive = !!matchRoute({ to: item.url, fuzzy: true })
+        const isActive = location.pathname.startsWith(item.url)
 
         return (
           <SidebarMenuItem key={item.title}>
