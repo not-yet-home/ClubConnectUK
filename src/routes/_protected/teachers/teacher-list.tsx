@@ -1,6 +1,6 @@
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { createFileRoute } from '@tanstack/react-router'
-import { AppHeader } from '@/components/common/app-header'
+import { PageLayout } from '@/components/common/page-layout'
 import useTeachers from '@/hooks/use-teachers'
 import { DataTable } from '@/features/teachers/components/data-table'
 import { columns } from '@/features/teachers/components/column'
@@ -131,8 +131,7 @@ function RouteComponent() {
 
   return (
     <>
-      <AppHeader breadcrumbs={[{ label: 'Teachers' }]} />
-      <main className="flex-1 overflow-auto p-6 bg-background">
+      <PageLayout breadcrumbs={[{ label: 'Teachers' }]}>
         <div className="mx-auto space-y-6">
           <div>
             <CardHeader className="flex flex-row justify-between items-center">
@@ -195,7 +194,7 @@ function RouteComponent() {
             </CardContent>
           </div>
         </div>
-      </main>
+      </PageLayout>
 
       {/* View Sheet - for viewing teacher details */}
       <TeacherViewSheet

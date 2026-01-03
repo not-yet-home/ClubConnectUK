@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { AppHeader } from '@/components/common/app-header'
+import { PageLayout } from '@/components/common/page-layout'
 import { useClubs } from '@/hooks/use-clubs'
 import { DataTable } from '@/features/clubs/components/data-table'
 import { columns } from '@/features/clubs/components/column'
@@ -57,20 +57,18 @@ function RouteComponent() {
   if (isLoading) {
     return (
       <>
-        <AppHeader breadcrumbs={[{ label: 'Clubs' }]} />
-        <main className="flex-1 overflow-auto p-6 bg-background">
+        <PageLayout breadcrumbs={[{ label: 'Clubs' }]}>
           <div className="mx-auto space-y-6">
             <p>Loading clubs...</p>
           </div>
-        </main>
+        </PageLayout>
       </>
     )
   }
 
   return (
     <>
-      <AppHeader breadcrumbs={[{ label: 'Clubs' }]} />
-      <main className="flex-1 overflow-auto p-6 bg-background">
+      <PageLayout breadcrumbs={[{ label: 'Clubs' }]}>
         <div className="mx-auto space-y-6">
           <div>
             <CardHeader className="flex flex-row justify-between items-center">
@@ -144,7 +142,7 @@ function RouteComponent() {
             </CardContent>
           </div>
         </div>
-      </main>
+      </PageLayout>
       <ClubFormDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
