@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { AppHeader } from '@/components/common/app-header'
+import { PageLayout } from '@/components/common/page-layout'
 import { useClub, useClubCoverRules, useClubUpcomingMeetings } from '@/hooks/use-clubs'
 import { Button } from '@/components/ui/button'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -24,27 +24,21 @@ function RouteComponent() {
 
   if (clubLoading) {
     return (
-      <>
-        <AppHeader breadcrumbs={[{ label: 'Clubs', href: '/_protected/clubs/club-list' }, { label: 'Loading...' }]} />
-        <main className="flex-1 overflow-auto p-6 bg-background">
-          <p>Loading club details...</p>
-        </main>
-      </>
+      <PageLayout breadcrumbs={[{ label: 'Clubs', href: '/_protected/clubs/club-list' }, { label: 'Loading...' }]}>
+        <p>Loading club details...</p>
+      </PageLayout>
     )
   }
 
   if (!club) {
     return (
-      <>
-        <AppHeader breadcrumbs={[{ label: 'Clubs', href: '/_protected/clubs/club-list' }, { label: 'Not Found' }]} />
-        <main className="flex-1 overflow-auto p-6 bg-background">
-          <p>Club not found.</p>
-          <Button onClick={handleBack} variant="outline" className="mt-4">
-            <HugeiconsIcon icon={ArrowLeft02Icon} className={ICON_SIZES.md} />
-            Back to Clubs
-          </Button>
-        </main>
-      </>
+      <PageLayout breadcrumbs={[{ label: 'Clubs', href: '/_protected/clubs/club-list' }, { label: 'Not Found' }]}>
+        <p>Club not found.</p>
+        <Button onClick={handleBack} variant="outline" className="mt-4">
+          <HugeiconsIcon icon={ArrowLeft02Icon} className={ICON_SIZES.md} />
+          Back to Clubs
+        </Button>
+      </PageLayout>
     )
   }
 

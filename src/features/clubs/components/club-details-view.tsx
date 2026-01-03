@@ -10,7 +10,7 @@ import { Edit02Icon, ArrowLeft02Icon, Clock01Icon, UserMultiple02Icon, Settings0
 import { ICON_SIZES } from "@/constants/sizes"
 import { CoverRulesManager } from "./cover-rules-manager"
 import { ClubFormDialog } from "./club-form-dialog"
-import { AppHeader } from "@/components/common/app-header"
+import { PageLayout } from "@/components/common/page-layout"
 
 interface ClubDetailsViewProps {
     club: Club
@@ -49,8 +49,10 @@ export function ClubDetailsView({
 
     return (
         <>
-            <AppHeader breadcrumbs={[{ label: 'Clubs', href: '/_protected/clubs/club-list' }, { label: club.club_name }]} />
-            <main className="flex-1 overflow-auto p-6 lg:p-10 bg-background space-y-8">
+            <PageLayout
+                breadcrumbs={[{ label: 'Clubs', href: '/_protected/clubs/club-list' }, { label: club.club_name }]}
+                className="lg:p-10 space-y-8"
+            >
                 {/* Top Actions */}
                 <div className="mx-auto max-w-6xl">
                     <Button onClick={handleBack} variant="ghost" size="sm" className="-ml-3 mb-8 text-muted-foreground">
@@ -166,7 +168,7 @@ export function ClubDetailsView({
                         </div>
                     </div>
                 </div>
-            </main>
+            </PageLayout>
 
             <ClubFormDialog
                 open={isEditClubOpen}
