@@ -62,6 +62,7 @@ function RootDocument() {
       </head>
       <body>
         <Outlet />
+        {/* <Toaster richColors position="top-right" /> */}
         {/* Devtools disabled
         <TanStackDevtools
           config={{
