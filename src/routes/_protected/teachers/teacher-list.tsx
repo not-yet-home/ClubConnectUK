@@ -10,9 +10,12 @@ import { ICON_SIZES } from '@/constants/sizes'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Add01Icon } from '@hugeicons/core-free-icons'
 import { TeacherFormSheet } from '@/features/teachers/components/teacher-form-sheet'
+import { TeacherViewSheet } from '@/features/teachers/components/teacher-view-sheet'
 import { DeleteTeacherDialog } from '@/features/teachers/components/delete-teacher-dialog'
 import { useState } from 'react'
 import { Teacher } from '@/types/teacher.types'
+import { useCreateTeacher, useUpdateTeacher, useDeleteTeacher } from '@/features/teachers/api/mutations'
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/_protected/teachers/teacher-list')({
   component: RouteComponent,
@@ -20,38 +23,110 @@ export const Route = createFileRoute('/_protected/teachers/teacher-list')({
 
 function RouteComponent() {
   const { data: teachers } = useTeachers();
-  const [sheetOpen, setSheetOpen] = useState(false)
+  const [formSheetOpen, setFormSheetOpen] = useState(false)
+  const [viewSheetOpen, setViewSheetOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null)
+  const [isFromViewSheet, setIsFromViewSheet] = useState(false)
+
+  // Mutation hooks
+  const createTeacher = useCreateTeacher()
+  const updateTeacher = useUpdateTeacher()
+  const deleteTeacher = useDeleteTeacher()
 
   const handleAddTeacher = () => {
     setSelectedTeacher(null)
-    setSheetOpen(true)
+    setIsFromViewSheet(false)
+    setFormSheetOpen(true)
   }
 
   const handleEditTeacher = (teacher: Teacher) => {
     setSelectedTeacher(teacher)
-    setSheetOpen(true)
+    setIsFromViewSheet(viewSheetOpen) // Track if we came from view sheet
+    setViewSheetOpen(false)
+    setFormSheetOpen(true)
+  }
+
+  const handleCancelEdit = () => {
+    // If we came from view sheet, return to it
+    if (isFromViewSheet && selectedTeacher) {
+      setFormSheetOpen(false)
+      setViewSheetOpen(true)
+    } else {
+      setFormSheetOpen(false)
+    }
   }
 
   const handleDeleteTeacher = (teacher: Teacher) => {
     setSelectedTeacher(teacher)
+    setViewSheetOpen(false)
     setDeleteDialogOpen(true)
   }
 
   const handleRowClick = (teacher: Teacher) => {
     setSelectedTeacher(teacher)
-    setSheetOpen(true)
+    setViewSheetOpen(true)
   }
 
-  const handleSaveTeacher = (teacher: Partial<Teacher>) => {
-    // TODO: Implement API call to save teacher
-    console.log('Saving teacher:', teacher)
+  const handleSaveTeacher = async (teacherData: Partial<Teacher>) => {
+    try {
+      if (selectedTeacher) {
+        // Update existing teacher
+        await updateTeacher.mutateAsync({
+          id: selectedTeacher.id,
+          persons_details_id: selectedTeacher.persons_details_id,
+          first_name: teacherData.person_details?.first_name ?? undefined,
+          last_name: teacherData.person_details?.last_name ?? undefined,
+          email: teacherData.person_details?.email ?? undefined,
+          contact: teacherData.person_details?.contact ?? undefined,
+          address: teacherData.person_details?.address ?? undefined,
+          primary_styles: teacherData.primary_styles ?? undefined,
+          secondary_styles: teacherData.secondary_styles ?? undefined,
+          general_notes: teacherData.general_notes ?? undefined,
+        })
+      } else {
+        // Create new teacher
+        await createTeacher.mutateAsync({
+          first_name: teacherData.person_details?.first_name ?? '',
+          last_name: teacherData.person_details?.last_name ?? '',
+          email: teacherData.person_details?.email ?? undefined,
+          contact: teacherData.person_details?.contact ?? undefined,
+          address: teacherData.person_details?.address ?? undefined,
+          primary_styles: teacherData.primary_styles ?? undefined,
+          secondary_styles: teacherData.secondary_styles ?? undefined,
+          general_notes: teacherData.general_notes ?? undefined,
+        })
+      }
+
+      // After save, return to view sheet if we came from there
+      if (isFromViewSheet && selectedTeacher) {
+        setViewSheetOpen(true)
+      }
+
+      toast.success(selectedTeacher ? 'Teacher updated successfully' : 'Teacher created successfully')
+    } catch (error) {
+      console.error('Error saving teacher:', error)
+      toast.error('Failed to save teacher', {
+        description: error instanceof Error ? error.message : 'An unexpected error occurred',
+      })
+    }
   }
 
-  const handleConfirmDelete = (teacher: Teacher) => {
-    // TODO: Implement API call to delete teacher
-    console.log('Deleting teacher:', teacher)
+  const handleConfirmDelete = async (teacher: Teacher) => {
+    try {
+      await deleteTeacher.mutateAsync({
+        teacherId: teacher.id,
+        personsDetailsId: teacher.persons_details_id,
+      })
+      setDeleteDialogOpen(false)
+      setSelectedTeacher(null)
+      toast.success('Teacher deleted successfully')
+    } catch (error) {
+      console.error('Error deleting teacher:', error)
+      toast.error('Failed to delete teacher', {
+        description: error instanceof Error ? error.message : 'An unexpected error occurred',
+      })
+    }
   }
 
   return (
@@ -68,7 +143,7 @@ function RouteComponent() {
                 </CardDescription>
               </section>
               <section>
-                <Button onClick={handleAddTeacher}>
+                <Button onClick={handleAddTeacher} disabled={createTeacher.isPending}>
                   <HugeiconsIcon icon={Add01Icon} className={ICON_SIZES.lg} />
                   Add Teacher</Button>
               </section>
@@ -122,11 +197,23 @@ function RouteComponent() {
         </div>
       </main>
 
+      {/* View Sheet - for viewing teacher details */}
+      <TeacherViewSheet
+        open={viewSheetOpen}
+        onOpenChange={setViewSheetOpen}
+        teacher={selectedTeacher}
+        onEdit={handleEditTeacher}
+        onDelete={handleDeleteTeacher}
+      />
+
+      {/* Form Sheet - for add/edit operations */}
       <TeacherFormSheet
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
+        open={formSheetOpen}
+        onOpenChange={setFormSheetOpen}
         teacher={selectedTeacher}
         onSave={handleSaveTeacher}
+        onCancel={handleCancelEdit}
+        isEditMode={isFromViewSheet}
       />
 
       <DeleteTeacherDialog
@@ -138,3 +225,6 @@ function RouteComponent() {
     </>
   )
 }
+
+
+
