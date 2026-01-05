@@ -18,6 +18,7 @@ import { Route as DemoStoreRouteImport } from './routes/demo/store'
 import { Route as ProtectedStepperRouteImport } from './routes/_protected/stepper'
 import { Route as ProtectedSettingsRouteImport } from './routes/_protected/settings'
 import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
+import { Route as ProtectedCoversRouteImport } from './routes/_protected/covers'
 import { Route as ExampleGuitarsIndexRouteImport } from './routes/example.guitars/index'
 import { Route as ExampleGuitarsGuitarIdRouteImport } from './routes/example.guitars/$guitarId'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
@@ -76,6 +77,11 @@ const ProtectedSettingsRoute = ProtectedSettingsRouteImport.update({
 const ProtectedDashboardRoute = ProtectedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedCoversRoute = ProtectedCoversRouteImport.update({
+  id: '/covers',
+  path: '/covers',
   getParentRoute: () => ProtectedRoute,
 } as any)
 const ExampleGuitarsIndexRoute = ExampleGuitarsIndexRouteImport.update({
@@ -157,6 +163,7 @@ const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/covers': typeof ProtectedCoversRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/settings': typeof ProtectedSettingsRoute
   '/stepper': typeof ProtectedStepperRoute
@@ -182,6 +189,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/covers': typeof ProtectedCoversRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/settings': typeof ProtectedSettingsRoute
   '/stepper': typeof ProtectedStepperRoute
@@ -209,6 +217,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_protected': typeof ProtectedRouteWithChildren
+  '/_protected/covers': typeof ProtectedCoversRoute
   '/_protected/dashboard': typeof ProtectedDashboardRoute
   '/_protected/settings': typeof ProtectedSettingsRoute
   '/_protected/stepper': typeof ProtectedStepperRoute
@@ -236,6 +245,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/covers'
     | '/dashboard'
     | '/settings'
     | '/stepper'
@@ -261,6 +271,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/covers'
     | '/dashboard'
     | '/settings'
     | '/stepper'
@@ -287,6 +298,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_protected'
+    | '/_protected/covers'
     | '/_protected/dashboard'
     | '/_protected/settings'
     | '/_protected/stepper'
@@ -395,6 +407,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof ProtectedDashboardRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/covers': {
+      id: '/_protected/covers'
+      path: '/covers'
+      fullPath: '/covers'
+      preLoaderRoute: typeof ProtectedCoversRouteImport
       parentRoute: typeof ProtectedRoute
     }
     '/example/guitars/': {
@@ -506,6 +525,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface ProtectedRouteChildren {
+  ProtectedCoversRoute: typeof ProtectedCoversRoute
   ProtectedDashboardRoute: typeof ProtectedDashboardRoute
   ProtectedSettingsRoute: typeof ProtectedSettingsRoute
   ProtectedStepperRoute: typeof ProtectedStepperRoute
@@ -515,6 +535,7 @@ interface ProtectedRouteChildren {
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
+  ProtectedCoversRoute: ProtectedCoversRoute,
   ProtectedDashboardRoute: ProtectedDashboardRoute,
   ProtectedSettingsRoute: ProtectedSettingsRoute,
   ProtectedStepperRoute: ProtectedStepperRoute,

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import {
+    Calendar04Icon,
     DashboardSquare01Icon,
     SentIcon,
     TeachingIcon,
@@ -28,6 +29,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             title: 'Dashboard',
             url: '/dashboard',
             icon: () => <HugeiconsIcon icon={DashboardSquare01Icon} className={ICON_SIZES.md} />,
+            isActive: false,
+        },
+        {
+            title: 'Covers',
+            url: '/covers',
+            icon: () => <HugeiconsIcon icon={Calendar04Icon} className={ICON_SIZES.md} />,
             isActive: false,
         },
         {
