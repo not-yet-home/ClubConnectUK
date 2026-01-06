@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 interface EventDetailsPanelProps {
     occurrence: CoverOccurrence | null;
@@ -26,8 +27,13 @@ export function EventDetailsPanel({ occurrence, onClose }: EventDetailsPanelProp
 
     const { cover_rule } = occurrence;
     const clubName = cover_rule?.club?.club_name || 'Unknown Club';
-    const schoolName = 'St. Mary\'s Primary'; // Mock for now or from relation
-    const teacherName = 'Mr. Smith'; // Mock or from assignment
+    const schoolName = cover_rule?.school?.school_name || 'Unknown School';
+
+    // Get assigned teacher from the assignments array
+    const assignedTeacher = occurrence.assignments?.[0]?.teacher;
+    const teacherName = assignedTeacher
+        ? `${assignedTeacher.person_details.first_name} ${assignedTeacher.person_details.last_name}`
+        : 'Unassigned';
 
     return (
         <div className="h-full bg-white border-l border-gray-100 flex flex-col shadow-xl shadow-gray-100/50 z-10 w-[400px]">
@@ -57,7 +63,9 @@ export function EventDetailsPanel({ occurrence, onClose }: EventDetailsPanelProp
                     </div>
                     <div className="flex items-center gap-3 text-gray-700">
                         <User className="w-5 h-5 text-gray-400" />
-                        <span className="font-medium">{teacherName}</span>
+                        <span className={cn("font-medium", !assignedTeacher && "text-orange-500 italic")}>
+                            {teacherName}
+                        </span>
                     </div>
                 </div>
 

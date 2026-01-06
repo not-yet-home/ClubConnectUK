@@ -103,27 +103,30 @@ export function CalendarView({ events, onSelectEvent }: CalendarViewProps) {
 
     // Custom Event Component
     const EventComponent = ({ event }: any) => {
-        // Find the # of remaining spots or something if needed. 
-        // For now just title and count bubble if we had one.
+        const occ = event.resource as CoverOccurrence;
+        const teacher = occ.assignments?.[0]?.teacher;
+        const teacherName = teacher ? `${teacher.person_details.first_name[0]}${teacher.person_details.last_name[0]}` : null;
+
         return (
-            <div className="flex justify-between items-center text-xs h-full w-full px-1">
+            <div className="flex justify-between items-center text-[10px] h-full w-full px-1">
                 <span className="truncate font-medium">{event.title}</span>
-                {/* Mock count bubble */}
-                <span className="bg-gray-700/20 text-[10px] rounded-full px-1.5 min-w-[1.25rem] text-center">
-                    {Math.floor(Math.random() * 10) + 5}
-                </span>
+                {teacherName && (
+                    <span className="bg-white/40 rounded px-1 ml-1 font-bold">
+                        {teacherName}
+                    </span>
+                )}
             </div>
         )
     }
 
     return (
-        <div className="h-full bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+        <div className="h-full bg-white rounded-lg border border-gray-100 overflow-hidden">
             <Calendar
                 localizer={localizer}
                 events={calendarEvents}
                 startAccessor="start"
                 endAccessor="end"
-                style={{ height: 'calc(100vh - 200px)' }} // Adjust based on layout
+                style={{ height: '100%' }} // Fill parent container
                 view={view}
                 onView={setView}
                 date={date}
@@ -139,14 +142,6 @@ export function CalendarView({ events, onSelectEvent }: CalendarViewProps) {
                 }}
                 onSelectEvent={(event: any) => onSelectEvent(event.resource)}
             />
-            {/* Legend */}
-            {/*<div className="mt-6 flex items-center gap-6 justify-center text-sm text-gray-500 border-t pt-4">
-                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-gray-200"></div> Ungenerated</div>
-                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-orange-200"></div> Unassigned</div>
-                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-blue-200"></div> Assigned</div>
-                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-green-200"></div> Confirmed</div>
-                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-red-200"></div> Cancelled</div>
-            </div>*/}
         </div>
     );
 }

@@ -25,6 +25,23 @@ export function useClubs() {
     })
 }
 
+// Fetch clubs by school ID
+export function useClubsBySchool(schoolId: string) {
+    return useQuery({
+        queryKey: ['clubs', 'school', schoolId],
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .from('clubs')
+                .select('*')
+                .eq('school_id', schoolId)
+                .order('club_name', { ascending: true })
+            if (error) throw error
+            return data as Club[]
+        },
+        enabled: !!schoolId
+    })
+}
+
 // Fetch a single club by ID
 export function useClub(clubId: string) {
     return useQuery({

@@ -51,7 +51,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         },
         {
             title: 'Broadcasts',
-            url: '/stepper',
+            url: '/broadcast',
             icon: () => <HugeiconsIcon icon={SentIcon} className={ICON_SIZES.md} />,
             isActive: false,
         }

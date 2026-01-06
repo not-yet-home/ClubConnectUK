@@ -1,3 +1,5 @@
+import { Teacher } from './teacher.types'
+
 // Club-related type definitions
 
 export type ClubStatus = 'active' | 'inactive' | 'cancelled'
@@ -55,6 +57,7 @@ export interface CoverOccurrence {
   created_at: string
   updated_at: string
   cover_rule?: CoverRule
+  assignments?: TeacherCoverAssignment[]
 }
 
 export interface TeacherCoverAssignment {
@@ -66,4 +69,5 @@ export interface TeacherCoverAssignment {
   invited_at?: string | null
   response_at?: string | null
   created_at: string
+  teacher?: Teacher
 }
