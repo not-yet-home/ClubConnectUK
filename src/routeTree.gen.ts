@@ -15,7 +15,6 @@ import { Route as DemoIndexRouteImport } from './routes/demo/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoTanchatRouteImport } from './routes/demo/tanchat'
 import { Route as DemoStoreRouteImport } from './routes/demo/store'
-import { Route as ProtectedStepperRouteImport } from './routes/_protected/stepper'
 import { Route as ProtectedSettingsRouteImport } from './routes/_protected/settings'
 import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
 import { Route as ProtectedCoversRouteImport } from './routes/_protected/covers'
@@ -66,11 +65,6 @@ const DemoStoreRoute = DemoStoreRouteImport.update({
   id: '/demo/store',
   path: '/demo/store',
   getParentRoute: () => rootRouteImport,
-} as any)
-const ProtectedStepperRoute = ProtectedStepperRouteImport.update({
-  id: '/stepper',
-  path: '/stepper',
-  getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedSettingsRoute = ProtectedSettingsRouteImport.update({
   id: '/settings',
@@ -185,7 +179,6 @@ export interface FileRoutesByFullPath {
   '/covers': typeof ProtectedCoversRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/settings': typeof ProtectedSettingsRoute
-  '/stepper': typeof ProtectedStepperRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanchat': typeof DemoTanchatRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -213,7 +206,6 @@ export interface FileRoutesByTo {
   '/covers': typeof ProtectedCoversRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/settings': typeof ProtectedSettingsRoute
-  '/stepper': typeof ProtectedStepperRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanchat': typeof DemoTanchatRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -244,7 +236,6 @@ export interface FileRoutesById {
   '/_protected/covers': typeof ProtectedCoversRoute
   '/_protected/dashboard': typeof ProtectedDashboardRoute
   '/_protected/settings': typeof ProtectedSettingsRoute
-  '/_protected/stepper': typeof ProtectedStepperRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanchat': typeof DemoTanchatRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -275,7 +266,6 @@ export interface FileRouteTypes {
     | '/covers'
     | '/dashboard'
     | '/settings'
-    | '/stepper'
     | '/demo/store'
     | '/demo/tanchat'
     | '/demo/tanstack-query'
@@ -303,7 +293,6 @@ export interface FileRouteTypes {
     | '/covers'
     | '/dashboard'
     | '/settings'
-    | '/stepper'
     | '/demo/store'
     | '/demo/tanchat'
     | '/demo/tanstack-query'
@@ -333,7 +322,6 @@ export interface FileRouteTypes {
     | '/_protected/covers'
     | '/_protected/dashboard'
     | '/_protected/settings'
-    | '/_protected/stepper'
     | '/demo/store'
     | '/demo/tanchat'
     | '/demo/tanstack-query'
@@ -421,13 +409,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/demo/store'
       preLoaderRoute: typeof DemoStoreRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_protected/stepper': {
-      id: '/_protected/stepper'
-      path: '/stepper'
-      fullPath: '/stepper'
-      preLoaderRoute: typeof ProtectedStepperRouteImport
-      parentRoute: typeof ProtectedRoute
     }
     '/_protected/settings': {
       id: '/_protected/settings'
@@ -597,7 +578,6 @@ interface ProtectedRouteChildren {
   ProtectedCoversRoute: typeof ProtectedCoversRoute
   ProtectedDashboardRoute: typeof ProtectedDashboardRoute
   ProtectedSettingsRoute: typeof ProtectedSettingsRoute
-  ProtectedStepperRoute: typeof ProtectedStepperRoute
   ProtectedClubsClubIdRoute: typeof ProtectedClubsClubIdRoute
   ProtectedClubsClubListRoute: typeof ProtectedClubsClubListRoute
   ProtectedTeachersTeacherListRoute: typeof ProtectedTeachersTeacherListRoute
@@ -608,7 +588,6 @@ const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedCoversRoute: ProtectedCoversRoute,
   ProtectedDashboardRoute: ProtectedDashboardRoute,
   ProtectedSettingsRoute: ProtectedSettingsRoute,
-  ProtectedStepperRoute: ProtectedStepperRoute,
   ProtectedClubsClubIdRoute: ProtectedClubsClubIdRoute,
   ProtectedClubsClubListRoute: ProtectedClubsClubListRoute,
   ProtectedTeachersTeacherListRoute: ProtectedTeachersTeacherListRoute,
