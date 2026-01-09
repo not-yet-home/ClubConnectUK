@@ -12,7 +12,7 @@ import remarkGfm from 'remark-gfm'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 
-import GuitarRecommendation from './example-GuitarRecommendation'
+import GuitarRecommendation from './GuitarRecommendation'
 
 import type { UIMessage } from 'ai'
 
@@ -41,11 +41,10 @@ function Messages({ messages }: { messages: Array<UIMessage> }) {
       {messages.map(({ id, role, parts }) => (
         <div
           key={id}
-          className={`py-3 ${
-            role === 'assistant'
+          className={`py-3 ${role === 'assistant'
               ? 'bg-gradient-to-r from-orange-500/5 to-red-600/5'
               : 'bg-transparent'
-          }`}
+            }`}
         >
           {parts.map((part) => {
             if (part.type === 'text') {

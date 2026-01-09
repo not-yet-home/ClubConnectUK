@@ -1,7 +1,4 @@
 import { Link } from '@tanstack/react-router'
-
-import TanChatAIAssistant from './example-AIAssistant.tsx'
-
 import { useState } from 'react'
 import {
   ChevronDown,
@@ -9,7 +6,6 @@ import {
   Globe,
   Guitar,
   Home,
-  Menu,
   MessagesSquare,
   Network,
   SquareFunction,
@@ -17,6 +13,9 @@ import {
   Store,
   X,
 } from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { MenuIcon } from '@hugeicons/core-free-icons'
+import TanChatAIAssistant from './example-AIAssistant.tsx'
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
@@ -32,7 +31,7 @@ export default function Header() {
           className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
           aria-label="Open menu"
         >
-          <Menu size={24} />
+          <HugeiconsIcon icon={MenuIcon} size={24} />
         </button>
         <h1 className="ml-4 text-xl font-semibold">
           <Link to="/">

@@ -15,10 +15,13 @@ import { Route as DemoIndexRouteImport } from './routes/demo/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoTanchatRouteImport } from './routes/demo/tanchat'
 import { Route as DemoStoreRouteImport } from './routes/demo/store'
-import { Route as ProtectedUsersRouteImport } from './routes/_protected/users'
+import { Route as ProtectedStepperRouteImport } from './routes/_protected/stepper'
 import { Route as ProtectedSettingsRouteImport } from './routes/_protected/settings'
 import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
+import { Route as ProtectedCoversRouteImport } from './routes/_protected/covers'
+import { Route as ProtectedBroadcastRouteImport } from './routes/_protected/broadcast'
 import { Route as ExampleGuitarsIndexRouteImport } from './routes/example.guitars/index'
+import { Route as ProtectedBroadcastIndexRouteImport } from './routes/_protected/broadcast/index'
 import { Route as ExampleGuitarsGuitarIdRouteImport } from './routes/example.guitars/$guitarId'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
@@ -26,6 +29,10 @@ import { Route as DemoSentryTestingRouteImport } from './routes/demo/sentry.test
 import { Route as DemoApiTqTodosRouteImport } from './routes/demo/api.tq-todos'
 import { Route as DemoApiTanchatRouteImport } from './routes/demo/api.tanchat'
 import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
+import { Route as ProtectedTeachersTeacherListRouteImport } from './routes/_protected/teachers/teacher-list'
+import { Route as ProtectedClubsClubListRouteImport } from './routes/_protected/clubs/club-list'
+import { Route as ProtectedClubsClubIdRouteImport } from './routes/_protected/clubs/$clubId'
+import { Route as ProtectedBroadcastNewRouteImport } from './routes/_protected/broadcast/new'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
 import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
@@ -60,9 +67,9 @@ const DemoStoreRoute = DemoStoreRouteImport.update({
   path: '/demo/store',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProtectedUsersRoute = ProtectedUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
+const ProtectedStepperRoute = ProtectedStepperRouteImport.update({
+  id: '/stepper',
+  path: '/stepper',
   getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedSettingsRoute = ProtectedSettingsRouteImport.update({
@@ -75,10 +82,25 @@ const ProtectedDashboardRoute = ProtectedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const ProtectedCoversRoute = ProtectedCoversRouteImport.update({
+  id: '/covers',
+  path: '/covers',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedBroadcastRoute = ProtectedBroadcastRouteImport.update({
+  id: '/broadcast',
+  path: '/broadcast',
+  getParentRoute: () => ProtectedRoute,
+} as any)
 const ExampleGuitarsIndexRoute = ExampleGuitarsIndexRouteImport.update({
   id: '/example/guitars/',
   path: '/example/guitars/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedBroadcastIndexRoute = ProtectedBroadcastIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProtectedBroadcastRoute,
 } as any)
 const ExampleGuitarsGuitarIdRoute = ExampleGuitarsGuitarIdRouteImport.update({
   id: '/example/guitars/$guitarId',
@@ -115,6 +137,27 @@ const DemoApiNamesRoute = DemoApiNamesRouteImport.update({
   path: '/demo/api/names',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProtectedTeachersTeacherListRoute =
+  ProtectedTeachersTeacherListRouteImport.update({
+    id: '/teachers/teacher-list',
+    path: '/teachers/teacher-list',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedClubsClubListRoute = ProtectedClubsClubListRouteImport.update({
+  id: '/clubs/club-list',
+  path: '/clubs/club-list',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedClubsClubIdRoute = ProtectedClubsClubIdRouteImport.update({
+  id: '/clubs/$clubId',
+  path: '/clubs/$clubId',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedBroadcastNewRoute = ProtectedBroadcastNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => ProtectedBroadcastRoute,
+} as any)
 const DemoStartSsrIndexRoute = DemoStartSsrIndexRouteImport.update({
   id: '/demo/start/ssr/',
   path: '/demo/start/ssr/',
@@ -138,13 +181,19 @@ const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/broadcast': typeof ProtectedBroadcastRouteWithChildren
+  '/covers': typeof ProtectedCoversRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/settings': typeof ProtectedSettingsRoute
-  '/users': typeof ProtectedUsersRoute
+  '/stepper': typeof ProtectedStepperRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanchat': typeof DemoTanchatRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo': typeof DemoIndexRoute
+  '/broadcast/new': typeof ProtectedBroadcastNewRoute
+  '/clubs/$clubId': typeof ProtectedClubsClubIdRoute
+  '/clubs/club-list': typeof ProtectedClubsClubListRoute
+  '/teachers/teacher-list': typeof ProtectedTeachersTeacherListRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tanchat': typeof DemoApiTanchatRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -152,6 +201,7 @@ export interface FileRoutesByFullPath {
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/example/guitars/$guitarId': typeof ExampleGuitarsGuitarIdRoute
+  '/broadcast/': typeof ProtectedBroadcastIndexRoute
   '/example/guitars': typeof ExampleGuitarsIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
@@ -160,13 +210,18 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/covers': typeof ProtectedCoversRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/settings': typeof ProtectedSettingsRoute
-  '/users': typeof ProtectedUsersRoute
+  '/stepper': typeof ProtectedStepperRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanchat': typeof DemoTanchatRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo': typeof DemoIndexRoute
+  '/broadcast/new': typeof ProtectedBroadcastNewRoute
+  '/clubs/$clubId': typeof ProtectedClubsClubIdRoute
+  '/clubs/club-list': typeof ProtectedClubsClubListRoute
+  '/teachers/teacher-list': typeof ProtectedTeachersTeacherListRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tanchat': typeof DemoApiTanchatRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -174,6 +229,7 @@ export interface FileRoutesByTo {
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/example/guitars/$guitarId': typeof ExampleGuitarsGuitarIdRoute
+  '/broadcast': typeof ProtectedBroadcastIndexRoute
   '/example/guitars': typeof ExampleGuitarsIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
@@ -184,13 +240,19 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_protected': typeof ProtectedRouteWithChildren
+  '/_protected/broadcast': typeof ProtectedBroadcastRouteWithChildren
+  '/_protected/covers': typeof ProtectedCoversRoute
   '/_protected/dashboard': typeof ProtectedDashboardRoute
   '/_protected/settings': typeof ProtectedSettingsRoute
-  '/_protected/users': typeof ProtectedUsersRoute
+  '/_protected/stepper': typeof ProtectedStepperRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/tanchat': typeof DemoTanchatRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/': typeof DemoIndexRoute
+  '/_protected/broadcast/new': typeof ProtectedBroadcastNewRoute
+  '/_protected/clubs/$clubId': typeof ProtectedClubsClubIdRoute
+  '/_protected/clubs/club-list': typeof ProtectedClubsClubListRoute
+  '/_protected/teachers/teacher-list': typeof ProtectedTeachersTeacherListRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tanchat': typeof DemoApiTanchatRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -198,6 +260,7 @@ export interface FileRoutesById {
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/example/guitars/$guitarId': typeof ExampleGuitarsGuitarIdRoute
+  '/_protected/broadcast/': typeof ProtectedBroadcastIndexRoute
   '/example/guitars/': typeof ExampleGuitarsIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
@@ -208,13 +271,19 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/broadcast'
+    | '/covers'
     | '/dashboard'
     | '/settings'
-    | '/users'
+    | '/stepper'
     | '/demo/store'
     | '/demo/tanchat'
     | '/demo/tanstack-query'
     | '/demo'
+    | '/broadcast/new'
+    | '/clubs/$clubId'
+    | '/clubs/club-list'
+    | '/teachers/teacher-list'
     | '/demo/api/names'
     | '/demo/api/tanchat'
     | '/demo/api/tq-todos'
@@ -222,6 +291,7 @@ export interface FileRouteTypes {
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/example/guitars/$guitarId'
+    | '/broadcast/'
     | '/example/guitars'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
@@ -230,13 +300,18 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/covers'
     | '/dashboard'
     | '/settings'
-    | '/users'
+    | '/stepper'
     | '/demo/store'
     | '/demo/tanchat'
     | '/demo/tanstack-query'
     | '/demo'
+    | '/broadcast/new'
+    | '/clubs/$clubId'
+    | '/clubs/club-list'
+    | '/teachers/teacher-list'
     | '/demo/api/names'
     | '/demo/api/tanchat'
     | '/demo/api/tq-todos'
@@ -244,6 +319,7 @@ export interface FileRouteTypes {
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/example/guitars/$guitarId'
+    | '/broadcast'
     | '/example/guitars'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
@@ -253,13 +329,19 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_protected'
+    | '/_protected/broadcast'
+    | '/_protected/covers'
     | '/_protected/dashboard'
     | '/_protected/settings'
-    | '/_protected/users'
+    | '/_protected/stepper'
     | '/demo/store'
     | '/demo/tanchat'
     | '/demo/tanstack-query'
     | '/demo/'
+    | '/_protected/broadcast/new'
+    | '/_protected/clubs/$clubId'
+    | '/_protected/clubs/club-list'
+    | '/_protected/teachers/teacher-list'
     | '/demo/api/names'
     | '/demo/api/tanchat'
     | '/demo/api/tq-todos'
@@ -267,6 +349,7 @@ export interface FileRouteTypes {
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/example/guitars/$guitarId'
+    | '/_protected/broadcast/'
     | '/example/guitars/'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
@@ -339,11 +422,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStoreRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_protected/users': {
-      id: '/_protected/users'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof ProtectedUsersRouteImport
+    '/_protected/stepper': {
+      id: '/_protected/stepper'
+      path: '/stepper'
+      fullPath: '/stepper'
+      preLoaderRoute: typeof ProtectedStepperRouteImport
       parentRoute: typeof ProtectedRoute
     }
     '/_protected/settings': {
@@ -360,12 +443,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedDashboardRouteImport
       parentRoute: typeof ProtectedRoute
     }
+    '/_protected/covers': {
+      id: '/_protected/covers'
+      path: '/covers'
+      fullPath: '/covers'
+      preLoaderRoute: typeof ProtectedCoversRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/broadcast': {
+      id: '/_protected/broadcast'
+      path: '/broadcast'
+      fullPath: '/broadcast'
+      preLoaderRoute: typeof ProtectedBroadcastRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
     '/example/guitars/': {
       id: '/example/guitars/'
       path: '/example/guitars'
       fullPath: '/example/guitars'
       preLoaderRoute: typeof ExampleGuitarsIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_protected/broadcast/': {
+      id: '/_protected/broadcast/'
+      path: '/'
+      fullPath: '/broadcast/'
+      preLoaderRoute: typeof ProtectedBroadcastIndexRouteImport
+      parentRoute: typeof ProtectedBroadcastRoute
     }
     '/example/guitars/$guitarId': {
       id: '/example/guitars/$guitarId'
@@ -416,6 +520,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoApiNamesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_protected/teachers/teacher-list': {
+      id: '/_protected/teachers/teacher-list'
+      path: '/teachers/teacher-list'
+      fullPath: '/teachers/teacher-list'
+      preLoaderRoute: typeof ProtectedTeachersTeacherListRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/clubs/club-list': {
+      id: '/_protected/clubs/club-list'
+      path: '/clubs/club-list'
+      fullPath: '/clubs/club-list'
+      preLoaderRoute: typeof ProtectedClubsClubListRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/clubs/$clubId': {
+      id: '/_protected/clubs/$clubId'
+      path: '/clubs/$clubId'
+      fullPath: '/clubs/$clubId'
+      preLoaderRoute: typeof ProtectedClubsClubIdRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/broadcast/new': {
+      id: '/_protected/broadcast/new'
+      path: '/new'
+      fullPath: '/broadcast/new'
+      preLoaderRoute: typeof ProtectedBroadcastNewRouteImport
+      parentRoute: typeof ProtectedBroadcastRoute
+    }
     '/demo/start/ssr/': {
       id: '/demo/start/ssr/'
       path: '/demo/start/ssr'
@@ -447,16 +579,39 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ProtectedBroadcastRouteChildren {
+  ProtectedBroadcastNewRoute: typeof ProtectedBroadcastNewRoute
+  ProtectedBroadcastIndexRoute: typeof ProtectedBroadcastIndexRoute
+}
+
+const ProtectedBroadcastRouteChildren: ProtectedBroadcastRouteChildren = {
+  ProtectedBroadcastNewRoute: ProtectedBroadcastNewRoute,
+  ProtectedBroadcastIndexRoute: ProtectedBroadcastIndexRoute,
+}
+
+const ProtectedBroadcastRouteWithChildren =
+  ProtectedBroadcastRoute._addFileChildren(ProtectedBroadcastRouteChildren)
+
 interface ProtectedRouteChildren {
+  ProtectedBroadcastRoute: typeof ProtectedBroadcastRouteWithChildren
+  ProtectedCoversRoute: typeof ProtectedCoversRoute
   ProtectedDashboardRoute: typeof ProtectedDashboardRoute
   ProtectedSettingsRoute: typeof ProtectedSettingsRoute
-  ProtectedUsersRoute: typeof ProtectedUsersRoute
+  ProtectedStepperRoute: typeof ProtectedStepperRoute
+  ProtectedClubsClubIdRoute: typeof ProtectedClubsClubIdRoute
+  ProtectedClubsClubListRoute: typeof ProtectedClubsClubListRoute
+  ProtectedTeachersTeacherListRoute: typeof ProtectedTeachersTeacherListRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
+  ProtectedBroadcastRoute: ProtectedBroadcastRouteWithChildren,
+  ProtectedCoversRoute: ProtectedCoversRoute,
   ProtectedDashboardRoute: ProtectedDashboardRoute,
   ProtectedSettingsRoute: ProtectedSettingsRoute,
-  ProtectedUsersRoute: ProtectedUsersRoute,
+  ProtectedStepperRoute: ProtectedStepperRoute,
+  ProtectedClubsClubIdRoute: ProtectedClubsClubIdRoute,
+  ProtectedClubsClubListRoute: ProtectedClubsClubListRoute,
+  ProtectedTeachersTeacherListRoute: ProtectedTeachersTeacherListRoute,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
