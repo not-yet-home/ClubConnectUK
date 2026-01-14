@@ -1,15 +1,13 @@
 
-import { useState, useMemo } from 'react';
-import { Calendar, dateFnsLocalizer, View, Views } from 'react-big-calendar';
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
-import startOfWeek from 'date-fns/startOfWeek';
-import getDay from 'date-fns/getDay';
-import enUS from 'date-fns/locale/en-US';
+import { useMemo, useState } from 'react';
+import { Calendar, Views, dateFnsLocalizer } from 'react-big-calendar';
+import { format, getDay, parse, startOfWeek } from 'date-fns';
+import { enUS } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { CoverOccurrence } from '@/types/club.types';
-import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import type { View } from 'react-big-calendar';
+import type { CoverOccurrence } from '@/types/club.types';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
 // Setup the localizer
@@ -26,7 +24,7 @@ const localizer = dateFnsLocalizer({
 });
 
 interface CalendarViewProps {
-    events: CoverOccurrence[];
+    events: Array<CoverOccurrence>;
     onSelectEvent: (event: CoverOccurrence) => void;
 }
 

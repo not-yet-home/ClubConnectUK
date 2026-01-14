@@ -1,6 +1,6 @@
-import { supabase } from "@/services/supabase"
 import { useQuery } from "@tanstack/react-query"
 import type { CoverOccurrence } from "@/types/club.types"
+import { supabase } from "@/services/supabase"
 
 interface UseCoverOccurrencesParams {
     schoolId?: string;
@@ -54,9 +54,9 @@ export function useCoverOccurrences({ schoolId, startDate, endDate }: UseCoverOc
 
             // Filter out null cover_rules if filtering by schoolId failed to prune them in SQL
             // (Supabase/PostgREST nested filtering behavior can sometimes return rows with null relations)
-            const filteredData = data.filter((occ: CoverOccurrence) => occ.cover_rule !== null)
+            const filteredData = data.filter((occ: CoverOccurrence) => !!occ.cover_rule)
 
-            return filteredData as CoverOccurrence[]
+            return filteredData as Array<CoverOccurrence>
         }
     })
 }

@@ -1,7 +1,20 @@
 "use client"
 
 import * as React from "react"
-import { Teacher } from "@/types/teacher.types"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+    Calendar03Icon,
+    Call02Icon,
+    Clock01Icon,
+    Delete02Icon,
+    Edit02Icon,
+    File02Icon,
+    Location01Icon,
+    Mail01Icon,
+    SentIcon,
+    Tag01Icon,
+} from "@hugeicons/core-free-icons"
+import type { Teacher } from "@/types/teacher.types"
 import {
     Sheet,
     SheetContent,
@@ -11,19 +24,6 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
-import { HugeiconsIcon } from "@hugeicons/react"
-import {
-    Mail01Icon,
-    Call02Icon,
-    Location01Icon,
-    Calendar03Icon,
-    Edit02Icon,
-    Delete02Icon,
-    SentIcon,
-    Clock01Icon,
-    File02Icon,
-    Tag01Icon,
-} from "@hugeicons/core-free-icons"
 import { ICON_SIZES } from "@/constants/sizes"
 
 // Type for hugeicons icons
@@ -52,8 +52,8 @@ interface TeacherViewSheetProps {
     onEdit: (teacher: Teacher) => void
     onDelete: (teacher: Teacher) => void
     // Future props for API data
-    upcomingSessions?: UpcomingSession[]
-    documents?: TeacherDocument[]
+    upcomingSessions?: Array<UpcomingSession>
+    documents?: Array<TeacherDocument>
 }
 
 // Empty state component for sections with no data
@@ -117,7 +117,7 @@ export function TeacherViewSheet({
 
     const personDetails = teacher.person_details
     const fullName = `${personDetails.first_name} ${personDetails.last_name}`
-    const initials = `${personDetails.first_name?.[0] ?? ""}${personDetails.last_name?.[0] ?? ""}`.toUpperCase()
+    const initials = `${personDetails.first_name[0] || ""}${personDetails.last_name[0] || ""}`.toUpperCase()
     const teacherId = `#T-${teacher.id.slice(0, 4).toUpperCase()}`
 
     // Parse styles from comma-separated strings

@@ -1,7 +1,7 @@
 import { Store } from '@tanstack/store'
 import type { User } from '@supabase/supabase-js'
+import type { AuthError, AuthState, LoginCredentials } from './types'
 import { supabase } from '@/services/supabase'
-import type { AuthState, LoginCredentials, AuthError } from './types'
 
 const initialState: AuthState = {
     user: null,
@@ -25,10 +25,10 @@ export async function initializeAuth() {
         }))
 
         // Listen for auth changes
-        supabase.auth.onAuthStateChange((_event: any, session: any) => {
+        supabase.auth.onAuthStateChange((_event: any, newSession: any) => {
             authStore.setState(() => ({
-                user: session?.user ?? null,
-                isAuthenticated: !!session?.user,
+                user: newSession?.user ?? null,
+                isAuthenticated: !!newSession?.user,
                 isLoading: false,
             }))
         })

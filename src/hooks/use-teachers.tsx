@@ -1,5 +1,5 @@
-import { supabase } from "@/services/supabase"
 import { useQuery } from "@tanstack/react-query"
+import { supabase } from "@/services/supabase"
 
 export default function useTeachers() {
     return useQuery({

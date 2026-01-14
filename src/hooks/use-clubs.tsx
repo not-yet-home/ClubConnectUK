@@ -1,6 +1,6 @@
-import { supabase } from "@/services/supabase"
 import { useQuery } from "@tanstack/react-query"
-import type { Club, CoverRule, CoverOccurrence } from "@/types/club.types"
+import type { Club, CoverOccurrence, CoverRule } from "@/types/club.types"
+import { supabase } from "@/services/supabase"
 
 // Fetch all clubs with their associated school
 export function useClubs() {
@@ -20,7 +20,7 @@ export function useClubs() {
                 `)
                 .order('club_name', { ascending: true })
             if (error) throw error
-            return data as Club[]
+            return data as Array<Club>
         }
     })
 }
@@ -36,7 +36,7 @@ export function useClubsBySchool(schoolId: string) {
                 .eq('school_id', schoolId)
                 .order('club_name', { ascending: true })
             if (error) throw error
-            return data as Club[]
+            return data as Array<Club>
         },
         enabled: !!schoolId
     })
@@ -78,7 +78,7 @@ export function useClubCoverRules(clubId: string) {
                 .eq('club_id', clubId)
                 .order('day_of_week', { ascending: true })
             if (error) throw error
-            return data as CoverRule[]
+            return data as Array<CoverRule>
         },
         enabled: !!clubId
     })
@@ -120,7 +120,7 @@ export function useClubUpcomingMeetings(clubId: string) {
                 .limit(10)
 
             if (error) throw error
-            return data as CoverOccurrence[]
+            return data as Array<CoverOccurrence>
         },
         enabled: !!clubId
     })

@@ -1,12 +1,15 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
+import { cva } from "class-variance-authority"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { PanelLeftIcon } from "@hugeicons/core-free-icons"
+import type { VariantProps } from "class-variance-authority";
 import {
   ICON_SIZES,
   SIDEBAR_WIDTH,
   SIDEBAR_WIDTH_ICON,
   SIDEBAR_WIDTH_MOBILE,
 } from "@/constants/sizes"
-import { cva, type VariantProps } from "class-variance-authority"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -26,8 +29,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { HugeiconsIcon }from "@hugeicons/react"
-import { PanelLeftIcon } from "@hugeicons/core-free-icons"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -91,7 +92,7 @@ function SidebarProvider({
 
   // Helper to toggle the sidebar.
   const toggleSidebar = React.useCallback(() => {
-    return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open)
+    return isMobile ? setOpenMobile((prev) => !prev) : setOpen((prev) => !prev)
   }, [isMobile, setOpen, setOpenMobile])
 
   // Adds a keyboard shortcut to toggle the sidebar.

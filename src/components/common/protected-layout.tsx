@@ -1,5 +1,5 @@
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { AppSidebar } from './app-sidebar'
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { Toaster } from '@/components/ui/sonner'
 
 interface ProtectedLayoutProps {

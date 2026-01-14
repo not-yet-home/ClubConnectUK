@@ -1,8 +1,8 @@
-import { BroadcastFormState } from "../../hooks/use-broadcast-form"
+import { Clock, CreditCard, Send, Users } from "lucide-react"
+import type { BroadcastFormState } from "../../hooks/use-broadcast-form"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { Send, Users, CreditCard, Clock } from "lucide-react"
 
 interface StepReviewProps {
     formData: BroadcastFormState

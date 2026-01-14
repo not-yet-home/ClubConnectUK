@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Check, PlusCircle } from "lucide-react"
-import { type Column } from "@tanstack/react-table"
+import type {Column} from "@tanstack/react-table";
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -31,7 +31,7 @@ interface FilterOption {
 interface DataTableFilterProps<TData, TValue> {
   column?: Column<TData, TValue>
   title: string
-  options: FilterOption[]
+  options: Array<FilterOption>
   selectedValues?: Set<string>
   onSelectionChange?: (values: Set<string>) => void
 }
@@ -50,7 +50,7 @@ function DataTableFilter<TData, TValue>({
   // Use column filter values if available, otherwise use external state
   const facets = column?.getFacetedUniqueValues()
   const selectedValues = externalSelectedValues ?? 
-    new Set(column?.getFilterValue() as string[] | undefined)
+    new Set(column?.getFilterValue() as Array<string> | undefined)
 
   const handleSelect = (value: string) => {
     const newSelectedValues = new Set(selectedValues)
