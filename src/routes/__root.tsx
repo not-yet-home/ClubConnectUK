@@ -4,15 +4,8 @@ import {
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
 import { useEffect } from 'react'
-
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
-
-import StoreDevtools from '../lib/demo-store-devtools'
 import { initializeAuth } from '@/features/auth/store'
-
 import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
@@ -62,22 +55,6 @@ function RootDocument() {
       </head>
       <body>
         <Outlet />
-        {/* <Toaster richColors position="top-right" /> */}
-        {/* Devtools disabled
-        <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            TanStackQueryDevtools,
-            StoreDevtools,
-          ]}
-        />
-        */}
         <Scripts />
       </body>
     </html>
