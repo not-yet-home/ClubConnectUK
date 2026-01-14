@@ -7,6 +7,8 @@ import { StepCompose } from '@/features/broadcast/components/create-flow/StepCom
 import { StepReview } from '@/features/broadcast/components/create-flow/StepReview'
 import { useBroadcastForm } from '@/features/broadcast/hooks/use-broadcast-form'
 import { toast } from 'sonner'
+import useTeachers from '@/hooks/use-teachers'
+import { useSendBroadcast } from '@/features/broadcast/hooks/use-broadcasts'
 
 export const Route = createFileRoute('/_protected/broadcast/new')({
   component: BroadcastNewPage,
@@ -31,12 +33,39 @@ function BroadcastNewPage() {
     // In real app, save to DB
   }
 
+  const { data: teachers } = useTeachers()
+  const sendBroadcast = useSendBroadcast()
+
   const handleSubmit = async () => {
-    // Just mock submission for now
-    toast.success("Broadcast sent!", {
-      description: `Sent to ${state.selectedTeachers.length} recipients.`
+    if (!state.selectedTeachers.length) {
+      toast.error("No recipients selected")
+      return
+    }
+
+    const recipients = teachers
+      ?.filter(t => state.selectedTeachers.includes(t.id))
+      .map(t => t.person_details?.email)
+      .filter((email): email is string => !!email) || []
+
+    if (recipients.length === 0) {
+      toast.error("Selected teachers have no valid email addresses")
+      return
+    }
+
+    const promise = sendBroadcast.mutateAsync({
+      subject: state.subject,
+      message: state.message,
+      recipients: recipients,
     })
-    navigate({ to: '/broadcast' })
+
+    toast.promise(promise, {
+      loading: 'Sending broadcast...',
+      success: () => {
+        navigate({ to: '/broadcast' })
+        return `Broadcast sent to ${recipients.length} recipients`
+      },
+      error: 'Failed to send broadcast'
+    })
   }
 
   return (
