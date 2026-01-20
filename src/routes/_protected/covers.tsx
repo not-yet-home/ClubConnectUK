@@ -1,17 +1,17 @@
 
 import { createFileRoute } from '@tanstack/react-router';
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Add01Icon } from '@hugeicons/core-free-icons';
+import type { CoverOccurrence } from '@/types/club.types';
 import { CalendarView } from '@/features/covers/components/calendar-view';
 import { EventDetailsPanel } from '@/features/covers/components/event-details-panel';
-import { CoverOccurrence } from '@/types/club.types';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { PageLayout } from '@/components/common/page-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTableToolbar, DataTableToolbarLeft, DataTableToolbarRight } from '@/components/ui/data-table-components';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { Add01Icon } from '@hugeicons/core-free-icons';
 import { ICON_SIZES } from '@/constants/sizes';
 import {
     Select,

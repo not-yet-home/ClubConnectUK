@@ -1,20 +1,20 @@
 import {
-  Outlet,
   HeadContent,
+  Outlet,
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
 import { useEffect } from 'react'
-import { initializeAuth } from '@/features/auth/store'
 import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
+import { initializeAuth } from '@/features/auth/store'
+
+import { NotFound } from '@/components/common/not-found'
 
 interface MyRouterContext {
   queryClient: QueryClient
 }
-
-import { NotFound } from '@/components/common/not-found'
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({

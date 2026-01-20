@@ -14,10 +14,10 @@ import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
-    SidebarHeader,
-    SidebarRail,
     SidebarGroup,
     SidebarGroupLabel,
+    SidebarHeader,
+    SidebarRail,
 } from '@/components/ui/sidebar'
 import { useAuth } from '@/hooks/use-auth'
 

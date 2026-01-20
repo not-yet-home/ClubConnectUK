@@ -10,12 +10,12 @@ import {
 export function NavMain({
   items,
 }: {
-  items: {
+  items: Array<{
     title: string
     url: string
     icon?: React.ComponentType
     isActive?: boolean
-  }[]
+  }>
 }) {
   const location = useLocation()
 

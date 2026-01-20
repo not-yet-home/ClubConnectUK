@@ -9,10 +9,10 @@ import {
 } from '@/components/ui/breadcrumb'
 
 interface AppHeaderProps {
-    breadcrumbs?: {
+    breadcrumbs?: Array<{
         label: string
         href?: string
-    }[]
+    }>
 }
 
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {

@@ -1,6 +1,6 @@
 import { useStore } from '@tanstack/react-store'
-import { authStore, login, logout } from '@/features/auth/store'
 import type { LoginCredentials } from '@/features/auth/types'
+import { authStore, login, logout } from '@/features/auth/store'
 
 export function useAuth() {
     const authState = useStore(authStore)

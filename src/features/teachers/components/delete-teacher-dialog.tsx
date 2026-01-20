@@ -1,5 +1,6 @@
 "use client"
 
+import type { Teacher } from "@/types/teacher.types"
 import {
   Dialog,
   DialogContent,
@@ -9,7 +10,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Teacher } from "@/types/teacher.types"
 
 interface DeleteTeacherDialogProps {
   open: boolean

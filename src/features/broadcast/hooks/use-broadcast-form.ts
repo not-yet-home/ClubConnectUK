@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 export interface BroadcastFormState {
     step: number
-    selectedTeachers: string[]
+    selectedTeachers: Array<string>
     channels: {
         email: boolean
         whatsapp: boolean
@@ -10,7 +10,7 @@ export interface BroadcastFormState {
     template: string
     subject: string
     message: string
-    selectedCovers: string[]
+    selectedCovers: Array<string>
 }
 
 export const useBroadcastForm = () => {
@@ -41,7 +41,7 @@ export const useBroadcastForm = () => {
         })
     }
 
-    const selectAllTeachers = (teacherIds: string[]) => {
+    const selectAllTeachers = (teacherIds: Array<string>) => {
         setState(prev => ({ ...prev, selectedTeachers: teacherIds }))
     }
 

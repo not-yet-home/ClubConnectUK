@@ -1,14 +1,14 @@
 "use client"
-import { Club } from "@/types/club.types"
-import { ColumnDef } from "@tanstack/react-table"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Delete02Icon, Edit02Icon, ViewIcon } from "@hugeicons/core-free-icons"
+import type { ColumnDef } from "@tanstack/react-table"
+import type { Club } from "@/types/club.types"
 import { DataTableColumnHeader } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { Edit02Icon, Delete02Icon, ViewIcon } from "@hugeicons/core-free-icons"
 import { ICON_SIZES } from "@/constants/sizes"
 import { Badge } from "@/components/ui/badge"
 
-export const columns: ColumnDef<Club>[] = [
+export const columns: Array<ColumnDef<Club>> = [
   {
     id: "select",
     header: ({ table }) => (
@@ -71,7 +71,7 @@ export const columns: ColumnDef<Club>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const status = row.getValue("status") as string
+      const status = row.getValue("status")
       return (
         <Badge variant={status === "active" ? "default" : "secondary"}>
           {status}

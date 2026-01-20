@@ -1,7 +1,19 @@
-import { useState, useMemo } from "react"
-import { ColumnDef, RowSelectionState } from "@tanstack/react-table"
+import { useMemo, useState } from "react"
+import { X } from "lucide-react"
+import {
+    flexRender,
+    getCoreRowModel,
+    getFacetedRowModel,
+    getFacetedUniqueValues,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    useReactTable
+} from "@tanstack/react-table"
+import type { ColumnDef, ColumnFiltersState, RowSelectionState, SortingState } from "@tanstack/react-table"
+import type { BroadcastFormState } from "../../hooks/use-broadcast-form"
+import type { Teacher } from "@/types/teacher.types"
 import useTeachers from "@/hooks/use-teachers"
-import { BroadcastFormState } from "../../hooks/use-broadcast-form"
 import { Button } from "@/components/ui/button"
 import {
     Sheet,
@@ -12,32 +24,20 @@ import {
     SheetTrigger
 } from "@/components/ui/sheet"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Teacher } from "@/types/teacher.types"
-import { X } from "lucide-react"
-import { DataTableColumnHeader } from "@/components/ui/table"
 import {
+    DataTableColumnHeader,
+    DataTablePagination,
     Table,
     TableBody,
     TableCell,
     TableHead,
-    TableHeader,
-    TableRow,
+    TableHeader, TableRow
 } from "@/components/ui/table"
-import {
-    useReactTable,
-    getCoreRowModel,
-    getFilteredRowModel,
-    getPaginationRowModel,
-    getSortedRowModel,
-    getFacetedRowModel,
-    getFacetedUniqueValues,
-    flexRender,
-    SortingState,
-    ColumnFiltersState
-} from "@tanstack/react-table"
+
+
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
-import { DataTablePagination } from "@/components/ui/table"
+
 import { DataTableFilter } from "@/components/ui/data-table-components"
 
 interface StepAudienceProps {
@@ -56,7 +56,7 @@ export function StepAudience({ formData, updateField, onNext }: StepAudienceProp
     const rowSelection: RowSelectionState = useMemo(() => {
         const selection: RowSelectionState = {}
         if (teachers) {
-            teachers.forEach((teacher, index) => {
+            teachers.forEach((teacher: Teacher, index: number) => {
                 if (formData.selectedTeachers.includes(teacher.id)) {
                     selection[index] = true
                 }
@@ -75,12 +75,12 @@ export function StepAudience({ formData, updateField, onNext }: StepAudienceProp
             const selectedIds = Object.entries(newSelection)
                 .filter(([_, isSelected]) => isSelected)
                 .map(([index]) => teachers[parseInt(index)]?.id)
-                .filter(Boolean) as string[]
+                .filter(Boolean) as Array<string>
             updateField('selectedTeachers', selectedIds)
         }
     }
 
-    const columns: ColumnDef<Teacher>[] = useMemo(() => [
+    const columns: Array<ColumnDef<Teacher>> = useMemo(() => [
         {
             id: "select",
             header: ({ table }) => (
@@ -102,7 +102,7 @@ export function StepAudience({ formData, updateField, onNext }: StepAudienceProp
         },
         {
             id: "teacher",
-            accessorFn: (row) => `${row.person_details?.first_name ?? ""} ${row.person_details?.last_name ?? ""}`,
+            accessorFn: (row) => `${row.person_details.first_name} ${row.person_details.last_name}`,
             header: ({ column }) => <DataTableColumnHeader column={column} title="Teacher" />,
             cell: ({ row }) => {
                 const teacher = row.original
@@ -110,15 +110,15 @@ export function StepAudience({ formData, updateField, onNext }: StepAudienceProp
                     <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
                             <AvatarFallback>
-                                {teacher.person_details?.first_name?.[0] ?? 'T'}
-                                {teacher.person_details?.last_name?.[0] ?? ''}
+                                {teacher.person_details.first_name[0] || 'T'}
+                                {teacher.person_details.last_name[0] || ''}
                             </AvatarFallback>
                         </Avatar>
                         <div>
                             <p className="font-medium text-zinc-900">
-                                {teacher.person_details?.first_name} {teacher.person_details?.last_name}
+                                {teacher.person_details.first_name} {teacher.person_details.last_name}
                             </p>
-                            <p className="text-xs text-zinc-400">{teacher.person_details?.email ?? 'No email'}</p>
+                            <p className="text-xs text-zinc-400">{(teacher.person_details.email as string) || 'No email'}</p>
                         </div>
                     </div>
                 )
@@ -130,7 +130,7 @@ export function StepAudience({ formData, updateField, onNext }: StepAudienceProp
             header: ({ column }) => <DataTableColumnHeader column={column} title="Primary Style" />,
             cell: ({ row }) => (
                 <span className="inline-flex items-center px-2 py-1 rounded bg-zinc-100 text-zinc-700 text-xs font-medium border border-zinc-200">
-                    {row.original.primary_styles ?? 'N/A'}
+                    {(row.original.primary_styles as string) || 'N/A'}
                 </span>
             ),
         },
@@ -142,8 +142,8 @@ export function StepAudience({ formData, updateField, onNext }: StepAudienceProp
                 const isBlocked = row.original.is_blocked
                 return (
                     <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${isBlocked
-                            ? 'bg-red-100 text-red-700 border border-red-200'
-                            : 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+                        ? 'bg-red-100 text-red-700 border border-red-200'
+                        : 'bg-emerald-100 text-emerald-700 border border-emerald-200'
                         }`}>
                         {isBlocked ? 'Blocked' : 'Active'}
                     </span>
@@ -152,7 +152,7 @@ export function StepAudience({ formData, updateField, onNext }: StepAudienceProp
         },
         {
             id: "contact",
-            accessorFn: (row) => row.person_details?.contact ?? "",
+            accessorFn: (row) => (row.person_details.contact as string) || "",
             header: ({ column }) => <DataTableColumnHeader column={column} title="Contact" />,
         },
     ], [])
@@ -180,7 +180,7 @@ export function StepAudience({ formData, updateField, onNext }: StepAudienceProp
     })
 
     const selectedCount = formData.selectedTeachers.length
-    const selectedTeacherObjects = teachers?.filter(t => formData.selectedTeachers.includes(t.id)) ?? []
+    const selectedTeacherObjects = teachers?.filter((t: Teacher) => formData.selectedTeachers.includes(t.id)) ?? []
 
     const removeTeacher = (teacherId: string) => {
         updateField('selectedTeachers', formData.selectedTeachers.filter(id => id !== teacherId))
@@ -201,9 +201,9 @@ export function StepAudience({ formData, updateField, onNext }: StepAudienceProp
                         {selectedCount > 0 && (
                             <div className="flex items-center gap-2">
                                 <div className="flex items-center -space-x-2">
-                                    {selectedTeacherObjects.slice(0, 3).map(t => (
+                                    {selectedTeacherObjects.slice(0, 3).map((t: Teacher) => (
                                         <div key={t.id} className="w-7 h-7 rounded-full bg-zinc-100 text-zinc-600 flex items-center justify-center text-[10px] font-medium ring-2 ring-white">
-                                            {t.person_details?.first_name?.[0]}{t.person_details?.last_name?.[0]}
+                                            {t.person_details.first_name[0]}{t.person_details.last_name[0]}
                                         </div>
                                     ))}
                                     {selectedCount > 3 && (
@@ -235,21 +235,21 @@ export function StepAudience({ formData, updateField, onNext }: StepAudienceProp
                                 <div className="h-[calc(100vh-120px)] mt-4 pr-4 overflow-y-auto">
                                     <div className="space-y-2">
                                         {selectedCount === 0 && <p className="text-sm text-muted-foreground">No teachers selected.</p>}
-                                        {selectedTeacherObjects.map(teacher => (
+                                        {selectedTeacherObjects.map((teacher: Teacher) => (
                                             <div key={teacher.id} className="flex items-center justify-between gap-3 p-3 rounded-lg border bg-zinc-50">
                                                 <div className="flex items-center gap-3">
                                                     <Avatar className="h-8 w-8">
                                                         <AvatarFallback>
-                                                            {teacher.person_details?.first_name?.[0] ?? 'T'}
-                                                            {teacher.person_details?.last_name?.[0] ?? ''}
+                                                            {teacher.person_details.first_name[0] || 'T'}
+                                                            {teacher.person_details.last_name[0] || ''}
                                                         </AvatarFallback>
                                                     </Avatar>
                                                     <div>
                                                         <div className="text-sm font-medium">
-                                                            {teacher.person_details?.first_name} {teacher.person_details?.last_name}
+                                                            {teacher.person_details.first_name} {teacher.person_details.last_name}
                                                         </div>
                                                         <div className="text-xs text-muted-foreground">
-                                                            {teacher.person_details?.email ?? 'No email'}
+                                                            {(teacher.person_details.email as string) || 'No email'}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -284,7 +284,7 @@ export function StepAudience({ formData, updateField, onNext }: StepAudienceProp
                     <DataTableFilter
                         column={table.getColumn("primary_styles")}
                         title="Primary Styles"
-                        options={Array.from(table.getColumn("primary_styles")?.getFacetedUniqueValues()?.keys() ?? []).map((value) => ({
+                        options={Array.from(table.getColumn("primary_styles")?.getFacetedUniqueValues().keys() ?? []).map((value) => ({
                             label: value ?? "N/A",
                             value: value ?? "",
                         }))}
@@ -293,7 +293,7 @@ export function StepAudience({ formData, updateField, onNext }: StepAudienceProp
                     <DataTableFilter
                         column={table.getColumn("status")}
                         title="Status"
-                        options={Array.from(table.getColumn("status")?.getFacetedUniqueValues()?.keys() ?? []).map((value) => ({
+                        options={Array.from(table.getColumn("status")?.getFacetedUniqueValues().keys() ?? []).map((value) => ({
                             label: value ?? "N/A",
                             value: value ?? "",
                         }))}
@@ -320,7 +320,7 @@ export function StepAudience({ formData, updateField, onNext }: StepAudienceProp
                                 ))}
                             </TableHeader>
                             <TableBody>
-                                {table.getRowModel().rows?.length ? (
+                                {table.getRowModel().rows.length ? (
                                     table.getRowModel().rows.map((row) => (
                                         <TableRow
                                             key={row.id}

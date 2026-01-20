@@ -1,13 +1,16 @@
 "use client"
 
 import * as React from "react"
+import { toast } from "sonner"
+import { format } from "date-fns"
+import type { CoverFrequency, DayOfWeek } from "@/types/club.types"
 import {
     Sheet,
     SheetContent,
     SheetDescription,
+    SheetFooter,
     SheetHeader,
     SheetTitle,
-    SheetFooter,
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -23,10 +26,7 @@ import { Separator } from "@/components/ui/separator"
 import { useSchools } from "@/hooks/use-schools"
 import { useClubsBySchool } from "@/hooks/use-clubs"
 import useTeachers from "@/hooks/use-teachers"
-import { CoverFrequency, DayOfWeek } from "@/types/club.types"
 import { useCreateFullCoverRequest } from "@/features/covers/api/mutations"
-import { toast } from "sonner"
-import { format } from "date-fns"
 
 interface CoverRequestSheetProps {
     open: boolean

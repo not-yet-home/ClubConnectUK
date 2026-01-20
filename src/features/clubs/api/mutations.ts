@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '@/services/supabase'
 import type { Club, CoverRule } from '@/types/club.types'
+import { supabase } from '@/services/supabase'
 
 // --- Club Mutations ---
 

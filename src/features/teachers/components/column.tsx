@@ -1,14 +1,14 @@
 "use client"
-import { Teacher } from "@/types/teacher.types"
-import { ColumnDef } from "@tanstack/react-table"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Delete02Icon, Edit02Icon } from "@hugeicons/core-free-icons"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip"
+import type { ColumnDef } from "@tanstack/react-table"
+import type { Teacher } from "@/types/teacher.types"
 import { DataTableColumnHeader } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { Edit02Icon, Delete02Icon } from "@hugeicons/core-free-icons"
 import { ICON_SIZES } from "@/constants/sizes"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip"
 
-export const columns: ColumnDef<Teacher>[] = [
+export const columns: Array<ColumnDef<Teacher>> = [
   {
     id: "select",
     header: ({ table }) => (
@@ -39,28 +39,28 @@ export const columns: ColumnDef<Teacher>[] = [
   },
   {
     id: "first_name",
-    accessorFn: (row) => row.person_details?.first_name ?? "",
+    accessorFn: (row) => row.person_details.first_name,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="First Name" />
     ),
   },
   {
     id: "last_name",
-    accessorFn: (row) => row.person_details?.last_name ?? "",
+    accessorFn: (row) => row.person_details.last_name,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Last Name" />
     ),
   },
   {
     id: "email",
-    accessorFn: (row) => row.person_details?.email ?? "",
+    accessorFn: (row) => (row.person_details.email as string) || "",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Email" />
     ),
   },
   {
     id: "contact",
-    accessorFn: (row) => row.person_details?.contact ?? "",
+    accessorFn: (row) => (row.person_details.contact as string) || "",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Contact" />
     ),
@@ -103,15 +103,15 @@ export const columns: ColumnDef<Teacher>[] = [
                 size="icon-sm"
                 onClick={(e) => {
                   e.stopPropagation()
-              meta?.onEdit?.(teacher)
-            }}
-          >
-            <HugeiconsIcon icon={Edit02Icon} className={ICON_SIZES.md} />
-          </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Edit Teacher</p>
-          </TooltipContent>
+                  meta?.onEdit?.(teacher)
+                }}
+              >
+                <HugeiconsIcon icon={Edit02Icon} className={ICON_SIZES.md} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Edit Teacher</p>
+            </TooltipContent>
           </Tooltip>
           <Button
             variant="ghost"

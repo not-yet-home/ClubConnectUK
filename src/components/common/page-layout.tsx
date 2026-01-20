@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils'
 
 interface PageLayoutProps {
     children: React.ReactNode
-    breadcrumbs?: { label: string; href?: string }[]
+    breadcrumbs?: Array<{ label: string; href?: string }>
     className?: string
 }
 
