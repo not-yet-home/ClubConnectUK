@@ -11,6 +11,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import { initializeAuth } from '@/features/auth/store'
 
 import { NotFound } from '@/components/common/not-found'
+import { ProgressBar } from '@/components/common/progress-bar'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -43,7 +44,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 })
 
 function RootDocument() {
-  // Initialize authentication on app startup
   useEffect(() => {
     initializeAuth()
   }, [])
@@ -54,6 +54,7 @@ function RootDocument() {
         <HeadContent />
       </head>
       <body>
+        <ProgressBar />
         <Outlet />
         <Scripts />
       </body>
