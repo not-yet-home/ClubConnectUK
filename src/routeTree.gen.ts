@@ -11,10 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DemoIndexRouteImport } from './routes/demo/index'
-import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
-import { Route as DemoTanchatRouteImport } from './routes/demo/tanchat'
-import { Route as DemoStoreRouteImport } from './routes/demo/store'
 import { Route as ProtectedSettingsRouteImport } from './routes/_protected/settings'
 import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
 import { Route as ProtectedCoversRouteImport } from './routes/_protected/covers'
@@ -32,26 +28,6 @@ const ProtectedRoute = ProtectedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoIndexRoute = DemoIndexRouteImport.update({
-  id: '/demo/',
-  path: '/demo/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
-  id: '/demo/tanstack-query',
-  path: '/demo/tanstack-query',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoTanchatRoute = DemoTanchatRouteImport.update({
-  id: '/demo/tanchat',
-  path: '/demo/tanchat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoStoreRoute = DemoStoreRouteImport.update({
-  id: '/demo/store',
-  path: '/demo/store',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProtectedSettingsRoute = ProtectedSettingsRouteImport.update({
@@ -107,10 +83,6 @@ export interface FileRoutesByFullPath {
   '/covers': typeof ProtectedCoversRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/settings': typeof ProtectedSettingsRoute
-  '/demo/store': typeof DemoStoreRoute
-  '/demo/tanchat': typeof DemoTanchatRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/demo': typeof DemoIndexRoute
   '/broadcast/new': typeof ProtectedBroadcastNewRoute
   '/clubs/$clubId': typeof ProtectedClubsClubIdRoute
   '/clubs/club-list': typeof ProtectedClubsClubListRoute
@@ -122,7 +94,6 @@ export interface FileRoutesByTo {
   '/covers': typeof ProtectedCoversRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/settings': typeof ProtectedSettingsRoute
-  '/stepper': typeof ProtectedStepperRoute
   '/broadcast/new': typeof ProtectedBroadcastNewRoute
   '/clubs/$clubId': typeof ProtectedClubsClubIdRoute
   '/clubs/club-list': typeof ProtectedClubsClubListRoute
@@ -137,7 +108,6 @@ export interface FileRoutesById {
   '/_protected/covers': typeof ProtectedCoversRoute
   '/_protected/dashboard': typeof ProtectedDashboardRoute
   '/_protected/settings': typeof ProtectedSettingsRoute
-  '/_protected/stepper': typeof ProtectedStepperRoute
   '/_protected/broadcast/new': typeof ProtectedBroadcastNewRoute
   '/_protected/clubs/$clubId': typeof ProtectedClubsClubIdRoute
   '/_protected/clubs/club-list': typeof ProtectedClubsClubListRoute
@@ -152,7 +122,6 @@ export interface FileRouteTypes {
     | '/covers'
     | '/dashboard'
     | '/settings'
-    | '/stepper'
     | '/broadcast/new'
     | '/clubs/$clubId'
     | '/clubs/club-list'
@@ -164,7 +133,6 @@ export interface FileRouteTypes {
     | '/covers'
     | '/dashboard'
     | '/settings'
-    | '/stepper'
     | '/broadcast/new'
     | '/clubs/$clubId'
     | '/clubs/club-list'
@@ -178,7 +146,6 @@ export interface FileRouteTypes {
     | '/_protected/covers'
     | '/_protected/dashboard'
     | '/_protected/settings'
-    | '/_protected/stepper'
     | '/_protected/broadcast/new'
     | '/_protected/clubs/$clubId'
     | '/_protected/clubs/club-list'
@@ -206,13 +173,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_protected/stepper': {
-      id: '/_protected/stepper'
-      path: '/stepper'
-      fullPath: '/stepper'
-      preLoaderRoute: typeof ProtectedStepperRouteImport
-      parentRoute: typeof ProtectedRoute
     }
     '/_protected/settings': {
       id: '/_protected/settings'
