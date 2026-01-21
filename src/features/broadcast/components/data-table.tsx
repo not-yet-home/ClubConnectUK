@@ -1,32 +1,35 @@
 import * as React from "react"
 import { useState } from "react"
 import {
-    ColumnDef,
-    ColumnFiltersState,
-    SortingState,
     flexRender,
     getCoreRowModel,
+    getFacetedRowModel,
+    getFacetedUniqueValues,
     getFilteredRowModel,
     getPaginationRowModel,
     getSortedRowModel,
-    getFacetedRowModel,
-    getFacetedUniqueValues,
-    useReactTable,
-    type Table as TanstackTable,
+    useReactTable
+
 } from "@tanstack/react-table"
+import type {
+    ColumnDef,
+    ColumnFiltersState,
+    SortingState, Table as TanstackTable
+} from "@tanstack/react-table";
+
 import {
+    DataTablePagination,
     Table,
     TableBody,
     TableCell,
     TableHead,
     TableHeader,
     TableRow,
-    DataTablePagination,
 } from "@/components/ui/table"
 
 interface DataTableProps<TData, TValue> {
-    columns: ColumnDef<TData, TValue>[]
-    data: TData[]
+    columns: Array<ColumnDef<TData, TValue>>
+    data: Array<TData>
     toolbar?: (table: TanstackTable<TData>) => React.ReactNode
     globalFilterPlaceholder?: string
     onRowClick?: (row: TData) => void
@@ -94,7 +97,7 @@ export function DataTable<TData, TValue>({
                         ))}
                     </TableHeader>
                     <TableBody>
-                        {table.getRowModel().rows?.length ? (
+                        {table.getRowModel().rows.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
                                     key={row.id}

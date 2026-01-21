@@ -1,4 +1,5 @@
-import { BroadcastFormState } from "../../hooks/use-broadcast-form"
+import { AlertCircle, Mail, MessageCircle } from "lucide-react"
+import type { BroadcastFormState } from "../../hooks/use-broadcast-form"
 import { Button } from "@/components/ui/button"
 // import { Switch } from "@/components/ui/switch" // Not available
 import { Checkbox } from "@/components/ui/checkbox"
@@ -13,7 +14,6 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Card } from "@/components/ui/card"
-import { Mail, MessageCircle, AlertCircle } from "lucide-react"
 
 interface StepComposeProps {
     formData: BroadcastFormState

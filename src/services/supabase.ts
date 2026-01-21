@@ -13,12 +13,12 @@ const createMockClient = (reason: string) => {
     console.warn(`⚠️ ${reason}`)
     return {
         auth: {
-            getSession: async () => ({ data: { session: null }, error: null }),
-            signInWithPassword: async () => ({
+            getSession: () => ({ data: { session: null }, error: null }),
+            signInWithPassword: () => ({
                 data: { user: null, session: null },
                 error: { message: reason, code: 'not_configured' }
             }),
-            signOut: async () => ({ error: null }),
+            signOut: () => ({ error: null }),
             onAuthStateChange: () => {
                 return {
                     data: { subscription: { unsubscribe: () => { } } }

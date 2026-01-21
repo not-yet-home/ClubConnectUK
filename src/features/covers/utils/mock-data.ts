@@ -1,6 +1,7 @@
 
-import { addDays, subDays, startOfWeek, addMinutes } from 'date-fns';
-import { CoverOccurrence, CoverRule, TeacherCoverAssignment } from '@/types/club.types';
+import { addDays, addMinutes, startOfWeek, subDays } from 'date-fns';
+import type { CoverOccurrence, CoverRule} from '@/types/club.types';
+import { TeacherCoverAssignment } from '@/types/club.types';
 
 const MOCK_TEACHERS = [
     { id: 't1', name: 'Mr. Smith', subject: 'Math' },
@@ -16,9 +17,9 @@ const MOCK_CLUBS = [
     { id: 'c4', name: 'Dance Class', color: 'bg-pink-100 text-pink-700 border-pink-200' },
 ];
 
-export const generateMockCovers = (baseDate: Date = new Date()): CoverOccurrence[] => {
+export const generateMockCovers = (baseDate: Date = new Date()): Array<CoverOccurrence> => {
     const start = startOfWeek(baseDate, { weekStartsOn: 1 }); // Monday
-    const covers: CoverOccurrence[] = [];
+    const covers: Array<CoverOccurrence> = [];
 
     // Helper to create a cover
     const createCover = (

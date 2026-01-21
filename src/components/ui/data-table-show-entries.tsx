@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils"
 interface DataTableShowEntriesProps {
   pageSize: number
   onPageSizeChange: (size: number) => void
-  options?: number[]
+  options?: Array<number>
   className?: string
 }
 

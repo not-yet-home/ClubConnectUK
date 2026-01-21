@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import type { PersonDetails, Teacher } from '@/types/teacher.types'
 import { supabase } from '@/services/supabase'
-import type { Teacher, PersonDetails } from '@/types/teacher.types'
 
 // --- Teacher Mutations ---
 

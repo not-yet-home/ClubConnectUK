@@ -1,9 +1,9 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { ArrowLeft02Icon } from '@hugeicons/core-free-icons'
 import { PageLayout } from '@/components/common/page-layout'
 import { useClub, useClubCoverRules, useClubUpcomingMeetings } from '@/hooks/use-clubs'
 import { Button } from '@/components/ui/button'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { ArrowLeft02Icon } from '@hugeicons/core-free-icons'
 import { ICON_SIZES } from '@/constants/sizes'
 import { ClubDetailsView } from '@/features/clubs/components/club-details-view'
 

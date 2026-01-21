@@ -1,16 +1,16 @@
 import { useState } from 'react'
-import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Add01Icon } from '@hugeicons/core-free-icons'
+import type { Club } from '@/types/club.types'
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageLayout } from '@/components/common/page-layout'
 import { useClubs } from '@/hooks/use-clubs'
 import { DataTable } from '@/features/clubs/components/data-table'
 import { columns } from '@/features/clubs/components/column'
-import { DataTableToolbar, DataTableFilter, DataTableShowEntries, DataTableSearch, DataTableExport } from "@/components/ui/data-table-components"
+import { DataTableExport, DataTableFilter, DataTableSearch, DataTableShowEntries, DataTableToolbar } from "@/components/ui/data-table-components"
 import { Button } from '@/components/ui/button'
 import { ICON_SIZES } from '@/constants/sizes'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { Add01Icon } from '@hugeicons/core-free-icons'
-import type { Club } from '@/types/club.types'
 import { ClubFormDialog } from '@/features/clubs/components/club-form-dialog'
 import { useDeleteClub } from '@/features/clubs/api/mutations'
 
@@ -100,7 +100,7 @@ function RouteComponent() {
                     <section className="flex flex-1 flex-col justify-between items-center gap-2">
                       <div className="flex w-full items-end justify-end ">
                         <DataTableSearch
-                          value={(table.getState().globalFilter as string) ?? ""}
+                          value={(table.getState().globalFilter as string)}
                           onChange={(value) => table.setGlobalFilter(value)}
                           placeholder="Search clubs..."
                         />
@@ -127,7 +127,7 @@ function RouteComponent() {
                           <DataTableFilter
                             column={table.getColumn("school")}
                             title="School"
-                            options={Array.from(table.getColumn("school")?.getFacetedUniqueValues()?.keys() ?? []).map((value) => ({
+                            options={Array.from(table.getColumn("school")?.getFacetedUniqueValues().keys() ?? []).map((value) => ({
                               label: value ?? "N/A",
                               value: value ?? "",
                             }))}

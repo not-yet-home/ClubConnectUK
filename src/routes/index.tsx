@@ -1,7 +1,6 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Lock } from 'lucide-react'
-
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'

@@ -1,6 +1,6 @@
-import { supabase } from "@/services/supabase"
 import { useQuery } from "@tanstack/react-query"
 import type { School } from "@/types/club.types"
+import { supabase } from "@/services/supabase"
 
 export function useSchools() {
     return useQuery({
@@ -12,7 +12,7 @@ export function useSchools() {
                 .eq('status', 'active')
                 .order('school_name', { ascending: true })
             if (error) throw error
-            return data as School[]
+            return data as Array<School>
         }
     })
 }

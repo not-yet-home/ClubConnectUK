@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { Activity, DollarSign, TrendingUp, Users } from 'lucide-react'
 import { AppHeader } from '@/components/common/app-header'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/hooks/use-auth'
-import { Activity, Users, TrendingUp, DollarSign } from 'lucide-react'
 
 export const Route = createFileRoute('/_protected/dashboard')({
     component: DashboardPage,

@@ -4,9 +4,9 @@ import { useQuery, useMutation } from '@tanstack/react-query'
 export const useBroadcasts = () => {
     return useQuery({
         queryKey: ['broadcasts'],
-        queryFn: async (): Promise<Broadcast[]> => {
+        queryFn: (): Promise<Array<Broadcast>> => {
             // Return empty array as requested
-            return []
+            return Promise.resolve([])
         },
     })
 }

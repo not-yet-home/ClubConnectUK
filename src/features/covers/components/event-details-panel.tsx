@@ -1,7 +1,7 @@
 
-import { CoverOccurrence } from '@/types/club.types';
 import { format } from 'date-fns';
-import { X, Calendar as CalendarIcon, Clock, User, CheckCircle2 } from 'lucide-react';
+import { Calendar as CalendarIcon, CheckCircle2, Clock, User, X } from 'lucide-react';
+import type { CoverOccurrence } from '@/types/club.types';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';

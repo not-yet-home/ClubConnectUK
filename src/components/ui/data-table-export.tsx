@@ -12,10 +12,10 @@ import { cn } from "@/lib/utils"
 type ExportFormat = "csv" | "xlsx" | "pdf"
 
 interface DataTableExportProps<TData> {
-  data: TData[]
+  data: Array<TData>
   filename?: string
-  onExport?: (format: ExportFormat, data: TData[]) => void
-  formats?: ExportFormat[]
+  onExport?: (format: ExportFormat, data: Array<TData>) => void
+  formats?: Array<ExportFormat>
   className?: string
 }
 
@@ -84,7 +84,7 @@ function DataTableExport<TData>({
 /**
  * Default CSV export helper function
  */
-function exportToCsv<TData>(data: TData[], filename: string) {
+function exportToCsv<TData>(data: Array<TData>, filename: string) {
   if (data.length === 0) return
 
   const firstRow = data[0]
