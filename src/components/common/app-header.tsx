@@ -17,7 +17,7 @@ interface AppHeaderProps {
 
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     return (
-        <header className="flex h-14 shrink-0 items-center gap-2 bg-background rounded-tl-md rounded-tr-md border-b border-border px-4">            <SidebarTrigger />
+        <header className="flex sticky top-0 z-50 h-14 shrink-0 items-center gap-2 bg-background rounded-tl-md rounded-tr-md border-b border-border px-4">            <SidebarTrigger />
             <Breadcrumb>
                 <BreadcrumbList>
                     {breadcrumbs.map((crumb, index) => (
