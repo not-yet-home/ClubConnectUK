@@ -5,29 +5,34 @@ import type { CoverOccurrence } from '@/types/club.types'
 export const useDashboardStats = () => {
   return useQuery({
     queryKey: ['dashboard-stats'],
+    staleTime: 5 * 60 * 1000, // 5 minutes
     queryFn: async () => {
-      const [clubsCount, teachersCount, messagesStats] =
-        await Promise.all([
-          supabase.from('clubs').select('*', { count: 'exact', head: true }),
-          supabase
-            .from('cover_occurrences')
-            .select('id', { count: 'exact', head: true }),
+      const [clubsCount, teachersCount, messagesStats] = await Promise.all([
+        supabase.from('clubs').select('*', { count: 'exact', head: true }),
+        supabase
+          .from('cover_occurrences')
+          .select('id', { count: 'exact', head: true }),
 
-          // Active Teachers
-          supabase
-            .from('teachers')
-            .select('*', { count: 'exact', head: true })
-            .eq('is_blocked', false),
+        supabase
+          .from('teachers')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_blocked', false),
 
-          // Message Success Rate (Last 30 days)
-          supabase
-            .from('messages')
-            .select('status', { count: 'exact' })
-            .gte(
-              'created_at',
-              new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-            ),
-        ])
+        supabase
+          .from('messages')
+          .select('status', { count: 'exact' })
+          .gte(
+            'created_at',
+            new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+          ),
+        supabase
+          .from('messages')
+          .select('status', { count: 'exact' })
+          .gte(
+            'created_at',
+            new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+          ),
+      ])
 
       // For open covers, we need a better check than just count of occurrences
       // Let's get count of assignments with status 'pending' or 'invited'
@@ -39,7 +44,9 @@ export const useDashboardStats = () => {
       // Message Success Rate calculation
       const totalMessages = messagesStats.count || 0
       const successMessages =
-        messagesStats.data?.filter((m) => m.status === 'delivered').length || 0
+        messagesStats.data?.filter(
+          (m: { status: string }) => m.status === 'delivered',
+        ).length || 0
       const successRate =
         totalMessages > 0 ? (successMessages / totalMessages) * 100 : 100
 
@@ -56,6 +63,7 @@ export const useDashboardStats = () => {
 export const useUpcomingAgenda = () => {
   return useQuery<CoverOccurrence[]>({
     queryKey: ['upcoming-agenda'],
+    staleTime: 2 * 60 * 1000, // 2 minutes
     queryFn: async () => {
       const today = new Date().toISOString()
       const sevenDaysFromNow = new Date(
