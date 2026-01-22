@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { supabase } from '@/services/supabase'
 import type { CoverOccurrence } from '@/types/club.types'
+import { supabase } from '@/services/supabase'
 
 export const useDashboardStats = () => {
   return useQuery({
@@ -61,7 +61,7 @@ export const useDashboardStats = () => {
 }
 
 export const useUpcomingAgenda = () => {
-  return useQuery<CoverOccurrence[]>({
+  return useQuery<Array<CoverOccurrence>>({
     queryKey: ['upcoming-agenda'],
     staleTime: 2 * 60 * 1000, // 2 minutes
     queryFn: async () => {

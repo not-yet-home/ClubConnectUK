@@ -1,7 +1,7 @@
 import { AlertCircle, Mail, MessageCircle, X } from "lucide-react"
+import { format } from "date-fns"
 import type { BroadcastFormState } from "../../hooks/use-broadcast-form"
 import { Button } from "@/components/ui/button"
-// import { Switch } from "@/components/ui/switch" // Not available
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -16,7 +16,6 @@ import {
 import { Card } from "@/components/ui/card"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { useAvailableCovers } from "@/features/covers/api/queries"
-import { format } from "date-fns"
 
 interface StepComposeProps {
     formData: BroadcastFormState
@@ -231,7 +230,7 @@ export function StepCompose({ formData, updateField, setChannel, onNext, onBack 
 }
 
 interface CoverSelectorProps {
-    selectedIds: string[]
+    selectedIds: Array<string>
     onToggle: (id: string, selected: boolean) => void
 }
 

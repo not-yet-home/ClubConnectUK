@@ -1,5 +1,12 @@
-import { Check } from "lucide-react"
-import { cn } from "@/lib/utils"
+import React from 'react'
+import {
+  Mail01Icon,
+  Search01Icon,
+  Tick02Icon,
+  UserGroupIcon,
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { cn } from '@/lib/utils'
 
 interface BroadcastStepperNavProps {
     currentStep: number
@@ -25,34 +32,69 @@ export function BroadcastStepperNav({ currentStep }: BroadcastStepperNavProps) {
                                 ? "completed"
                                 : "pending"
 
-                    return (
-                        <div key={step.id} className="flex flex-col items-center gap-2 bg-zinc-50 px-2">
-                            <div
-                                className={cn(
-                                    "w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ring-4 ring-zinc-50 transition-colors",
-                                    status === "active" && "bg-zinc-900 text-white",
-                                    status === "completed" && "bg-zinc-900 text-white",
-                                    status === "pending" && "bg-white border border-zinc-200 text-zinc-400"
-                                )}
-                            >
-                                {status === "completed" ? (
-                                    <Check className="w-4 h-4" />
-                                ) : (
-                                    step.id
-                                )}
-                            </div>
-                            <span
-                                className={cn(
-                                    "text-xs font-medium",
-                                    status === "active" ? "text-zinc-900" : "text-zinc-400"
-                                )}
-                            >
-                                {step.label}
-                            </span>
-                        </div>
-                    )
-                })}
-            </div>
-        </div>
-    )
+          return (
+            <React.Fragment key={step.id}>
+              {/* Step Item */}
+              <div className="flex flex-col items-center relative z-10">
+                {/* Step Circle Indicator with Icon */}
+                <div
+                  className={cn(
+                    'w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300',
+                    status === 'completed' && 'bg-emerald-300 text-white',
+                    status === 'active' &&
+                    'bg-primary text-primary-foreground shadow-lg',
+                    status === 'pending' &&
+                    'bg-muted border-2 border-border text-muted-foreground',
+                  )}
+                >
+                  {status === 'completed' ? (
+                    <HugeiconsIcon icon={Tick02Icon} className="w-4 h-4" />
+                  ) : (
+                    <HugeiconsIcon icon={StepIcon} className="w-4 h-4" />
+                  )}
+                </div>
+
+                {/* Step Title */}
+                <span
+                  className={cn(
+                    'text-sm font-semibold mt-1 transition-colors duration-300',
+                    status === 'pending'
+                      ? 'text-muted-foreground'
+                      : 'text-foreground',
+                  )}
+                >
+                  {step.label}
+                </span>
+
+                {/* Status Badge */}
+                <span
+                  className={cn(
+                    'text-xs font-medium px-2.5 py-1 rounded-md mt-2 transition-all duration-300',
+                    status === 'completed' &&
+                    'bg-emerald-500/20 text-emerald-400',
+                    status === 'active' && 'bg-primary/20 text-primary',
+                    status === 'pending' && 'bg-muted text-muted-foreground',
+                  )}
+                >
+                  {statusText}
+                </span>
+              </div>
+
+              {/* Connector Line */}
+              {!isLast && (
+                <div className="flex-1 flex items-center pt-6 px-2">
+                  <div
+                    className={cn(
+                      'h-0.5 w-full transition-colors duration-300',
+                      currentStep > step.id ? 'bg-emerald-500' : 'bg-border',
+                    )}
+                  />
+                </div>
+              )}
+            </React.Fragment>
+          )
+        })}
+      </div>
+    </div>
+  )
 }

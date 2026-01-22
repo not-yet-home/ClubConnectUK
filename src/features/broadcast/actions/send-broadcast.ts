@@ -37,7 +37,6 @@ export const sendBroadcast = createServerFn({ method: 'POST' })
             throw new Error('Failed to fetch selected teachers or no valid teachers found.')
         }
 
-        // 2. Fetch Cover Details (if any)
         let coverDetailsString = ''
         if (data.coverIds && data.coverIds.length > 0) {
             const { data: covers, error: coverError } = await supabase
@@ -91,14 +90,14 @@ export const sendBroadcast = createServerFn({ method: 'POST' })
                 if (!person?.email) return { error: 'No email found', teacher_id: teacher.id }
 
                 // Variable Substitution
-                let personalizedMessage = data.message
+                const personalizedMessage = data.message
                     .replace(/{{first_name}}/g, person.first_name || '')
                     .replace(/{{last_name}}/g, person.last_name || '')
                     .replace(/{{date_today}}/g, new Date().toLocaleDateString('en-GB'))
                     .replace(/{{cover_details}}/g, coverDetailsString || '(No covers attached)')
                     .replace(/\n/g, '<br>')
 
-                let personalizedSubject = data.subject
+                const personalizedSubject = data.subject
                     .replace(/{{first_name}}/g, person.first_name || '')
 
                 // Send Email
@@ -113,7 +112,6 @@ export const sendBroadcast = createServerFn({ method: 'POST' })
                     throw new Error(emailError.message)
                 }
 
-                // Log Message to DB
                 await supabase.from('messages').insert({
                     teacher_id: teacher.id,
                     broadcast_id: broadcastData.id,
@@ -122,10 +120,10 @@ export const sendBroadcast = createServerFn({ method: 'POST' })
                     subject: personalizedSubject,
                     body: personalizedMessage,
                     status: 'sent',
-                    external_id: emailData?.id
+                    external_id: emailData.id
                 })
 
-                return { success: true, id: emailData?.id }
+                return { success: true, id: emailData.id }
             })
         )
 

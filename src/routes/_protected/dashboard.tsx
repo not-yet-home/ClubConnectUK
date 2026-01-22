@@ -1,16 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  School01Icon,
-  UserGroupIcon,
-  Alert01Icon,
-  Message01Icon,
-  Calendar02Icon,
-  PlusSignIcon,
   ActivityIcon,
+  Alert01Icon,
+  Calendar02Icon,
+  Message01Icon,
+  PlusSignIcon,
+  School01Icon,
   Tick01Icon,
+  UserGroupIcon,
 } from '@hugeicons/core-free-icons'
+import { format } from 'date-fns'
+import type { CoverOccurrence } from '@/types/club.types'
 import { PageLayout } from '@/components/common/page-layout'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -18,15 +21,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { useAuth } from '@/hooks/use-auth'
 import {
   useDashboardStats,
   useUpcomingAgenda,
 } from '@/features/dashboard/api/queries'
+import { useAuth } from '@/hooks/use-auth'
 import { cn } from '@/lib/utils'
-import { format } from 'date-fns'
-import type { CoverOccurrence } from '@/types/club.types'
 
 export const Route = createFileRoute('/_protected/dashboard')({
   component: DashboardPage,
@@ -179,11 +179,7 @@ function DashboardPage() {
                         },
                       }
 
-                      const currentStatus = statusConfig[statusId] || {
-                        label: statusId,
-                        color: 'bg-gray-100 text-gray-700',
-                        icon: Calendar02Icon,
-                      }
+                      const currentStatus = statusConfig[statusId]
 
                       return (
                         <div

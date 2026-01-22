@@ -1,5 +1,5 @@
-import { Broadcast } from '../types/broadcast.types'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import type { Broadcast } from '../types/broadcast.types'
 
 export const useBroadcasts = () => {
     return useQuery({
@@ -16,7 +16,7 @@ export const useBroadcasts = () => {
                 return []
             }
 
-            return data as Broadcast[]
+            return data as Array<Broadcast>
         },
     })
 }
@@ -26,8 +26,8 @@ export const useSendBroadcast = () => {
         mutationFn: async (data: {
             subject: string
             message: string
-            teacherIds: string[]
-            coverIds?: string[]
+            teacherIds: Array<string>
+            coverIds?: Array<string>
         }) => {
             // Dynamic import to avoid SSR issues if any, though createServerFn handles this.
             // But actually we can import directly.
