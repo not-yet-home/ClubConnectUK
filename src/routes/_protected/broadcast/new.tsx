@@ -7,6 +7,7 @@ import { StepAudience } from '@/features/broadcast/components/create-flow/StepAu
 import { StepCompose } from '@/features/broadcast/components/create-flow/StepCompose'
 import { StepReview } from '@/features/broadcast/components/create-flow/StepReview'
 import { useBroadcastForm } from '@/features/broadcast/hooks/use-broadcast-form'
+import { useSendBroadcast } from '@/features/broadcast/hooks/use-broadcasts'
 
 export const Route = createFileRoute('/_protected/broadcast/new')({
   component: BroadcastNewPage,
@@ -31,12 +32,35 @@ function BroadcastNewPage() {
     // In real app, save to DB
   }
 
-  const handleSubmit = () => {
-    // Just mock submission for now
-    toast.success("Broadcast sent!", {
-      description: `Sent to ${state.selectedTeachers.length} recipients.`
+  /* const { data: teachers } = useTeachers() - Removed as unused */
+  const sendBroadcast = useSendBroadcast()
+
+  const handleSubmit = async () => {
+    if (!state.selectedTeachers.length) {
+      toast.error("No recipients selected")
+      return
+    }
+
+    const promise = sendBroadcast.mutateAsync({
+      subject: state.subject,
+      message: state.message,
+      teacherIds: state.selectedTeachers,
+      coverIds: state.selectedCovers,
     })
-    navigate({ to: '/broadcast' })
+
+    toast.promise(promise, {
+      loading: 'Sending broadcast...',
+      success: (data) => {
+        navigate({ to: '/broadcast' })
+        if (data.failed > 0) {
+          return `Sent to ${data.sent} recipients. Failed: ${data.failed}.`
+        }
+        return `Successfully sent to all ${data.sent} recipients.`
+      },
+      error: (err) => {
+        return err.message || 'Failed to send broadcast'
+      }
+    })
   }
 
   return (

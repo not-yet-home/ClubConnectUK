@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ProtectedStepperRouteImport } from './routes/_protected/stepper'
 import { Route as ProtectedSettingsRouteImport } from './routes/_protected/settings'
 import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
 import { Route as ProtectedCoversRouteImport } from './routes/_protected/covers'
@@ -30,11 +29,6 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const ProtectedStepperRoute = ProtectedStepperRouteImport.update({
-  id: '/stepper',
-  path: '/stepper',
-  getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedSettingsRoute = ProtectedSettingsRouteImport.update({
   id: '/settings',
@@ -89,7 +83,6 @@ export interface FileRoutesByFullPath {
   '/covers': typeof ProtectedCoversRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/settings': typeof ProtectedSettingsRoute
-  '/stepper': typeof ProtectedStepperRoute
   '/broadcast/new': typeof ProtectedBroadcastNewRoute
   '/clubs/$clubId': typeof ProtectedClubsClubIdRoute
   '/clubs/club-list': typeof ProtectedClubsClubListRoute
@@ -101,7 +94,6 @@ export interface FileRoutesByTo {
   '/covers': typeof ProtectedCoversRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/settings': typeof ProtectedSettingsRoute
-  '/stepper': typeof ProtectedStepperRoute
   '/broadcast/new': typeof ProtectedBroadcastNewRoute
   '/clubs/$clubId': typeof ProtectedClubsClubIdRoute
   '/clubs/club-list': typeof ProtectedClubsClubListRoute
@@ -116,7 +108,6 @@ export interface FileRoutesById {
   '/_protected/covers': typeof ProtectedCoversRoute
   '/_protected/dashboard': typeof ProtectedDashboardRoute
   '/_protected/settings': typeof ProtectedSettingsRoute
-  '/_protected/stepper': typeof ProtectedStepperRoute
   '/_protected/broadcast/new': typeof ProtectedBroadcastNewRoute
   '/_protected/clubs/$clubId': typeof ProtectedClubsClubIdRoute
   '/_protected/clubs/club-list': typeof ProtectedClubsClubListRoute
@@ -131,7 +122,6 @@ export interface FileRouteTypes {
     | '/covers'
     | '/dashboard'
     | '/settings'
-    | '/stepper'
     | '/broadcast/new'
     | '/clubs/$clubId'
     | '/clubs/club-list'
@@ -143,7 +133,6 @@ export interface FileRouteTypes {
     | '/covers'
     | '/dashboard'
     | '/settings'
-    | '/stepper'
     | '/broadcast/new'
     | '/clubs/$clubId'
     | '/clubs/club-list'
@@ -157,7 +146,6 @@ export interface FileRouteTypes {
     | '/_protected/covers'
     | '/_protected/dashboard'
     | '/_protected/settings'
-    | '/_protected/stepper'
     | '/_protected/broadcast/new'
     | '/_protected/clubs/$clubId'
     | '/_protected/clubs/club-list'
@@ -185,13 +173,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_protected/stepper': {
-      id: '/_protected/stepper'
-      path: '/stepper'
-      fullPath: '/stepper'
-      preLoaderRoute: typeof ProtectedStepperRouteImport
-      parentRoute: typeof ProtectedRoute
     }
     '/_protected/settings': {
       id: '/_protected/settings'
@@ -277,7 +258,6 @@ interface ProtectedRouteChildren {
   ProtectedCoversRoute: typeof ProtectedCoversRoute
   ProtectedDashboardRoute: typeof ProtectedDashboardRoute
   ProtectedSettingsRoute: typeof ProtectedSettingsRoute
-  ProtectedStepperRoute: typeof ProtectedStepperRoute
   ProtectedClubsClubIdRoute: typeof ProtectedClubsClubIdRoute
   ProtectedClubsClubListRoute: typeof ProtectedClubsClubListRoute
   ProtectedTeachersTeacherListRoute: typeof ProtectedTeachersTeacherListRoute
@@ -288,7 +268,6 @@ const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedCoversRoute: ProtectedCoversRoute,
   ProtectedDashboardRoute: ProtectedDashboardRoute,
   ProtectedSettingsRoute: ProtectedSettingsRoute,
-  ProtectedStepperRoute: ProtectedStepperRoute,
   ProtectedClubsClubIdRoute: ProtectedClubsClubIdRoute,
   ProtectedClubsClubListRoute: ProtectedClubsClubListRoute,
   ProtectedTeachersTeacherListRoute: ProtectedTeachersTeacherListRoute,
