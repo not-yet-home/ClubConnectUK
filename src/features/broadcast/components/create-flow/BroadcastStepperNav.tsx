@@ -9,28 +9,40 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { cn } from '@/lib/utils'
 
 interface BroadcastStepperNavProps {
-    currentStep: number
+  currentStep: number
 }
 
 export function BroadcastStepperNav({ currentStep }: BroadcastStepperNavProps) {
-    const steps = [
-        { id: 1, label: "Audience" },
-        { id: 2, label: "Compose" },
-        { id: 3, label: "Review" },
-    ]
+  const steps = [
+    { id: 1, label: 'Audience', icon: UserGroupIcon },
+    { id: 2, label: 'Compose', icon: Mail01Icon },
+    { id: 3, label: 'Review', icon: Search01Icon },
+  ]
 
-    return (
-        <div className="w-full mb-10">
-            <div className="relative flex items-center justify-between w-full max-w-2xl mx-auto">
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[1px] bg-zinc-200 -z-10"></div>
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return 'Completed'
+      case 'active':
+        return 'In Progress'
+      default:
+        return 'Pending'
+    }
+  }
 
-                {steps.map((step) => {
-                    const status =
-                        currentStep === step.id
-                            ? "active"
-                            : currentStep > step.id
-                                ? "completed"
-                                : "pending"
+  return (
+    <div className="w-full sticky top-0 z-10 bg-background pt-2 pb-6">
+      <div className="relative flex items-start justify-between w-full max-w-3xl mx-auto px-4">
+        {steps.map((step, index) => {
+          const status =
+            currentStep === step.id
+              ? 'active'
+              : currentStep > step.id
+                ? 'completed'
+                : 'pending'
+          const statusText = getStatusText(status)
+          const StepIcon = step.icon
+          const isLast = index === steps.length - 1
 
           return (
             <React.Fragment key={step.id}>
