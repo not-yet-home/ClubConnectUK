@@ -29,10 +29,8 @@ function BroadcastNewPage() {
 
   const handleSaveDraft = () => {
     toast.success("Draft saved", { description: "You can resume this broadcast later." })
-    // In real app, save to DB
   }
 
-  /* const { data: teachers } = useTeachers() - Removed as unused */
   const sendBroadcast = useSendBroadcast()
 
   const handleSubmit = async () => {
