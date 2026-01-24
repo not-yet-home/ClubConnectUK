@@ -46,6 +46,7 @@ export async function initializeAuth() {
 export async function login(
     credentials: LoginCredentials
 ): Promise<{ error?: AuthError }> {
+    console.log('🔑 Attempting login for:', credentials.email)
     try {
         const { data, error } = await supabase.auth.signInWithPassword({
             email: credentials.email,
@@ -53,8 +54,11 @@ export async function login(
         })
 
         if (error) {
+            console.error('❌ Login failed:', error.message, error.code)
             return { error: { message: error.message, code: error.code } }
         }
+
+        console.log('✅ Login successful for user:', data.user?.id)
 
         authStore.setState(() => ({
             user: data.user,
@@ -64,6 +68,7 @@ export async function login(
 
         return {}
     } catch (error) {
+        console.error('❌ Unexpected error during login:', error)
         return {
             error: {
                 message:

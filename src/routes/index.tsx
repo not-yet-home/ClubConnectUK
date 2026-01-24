@@ -1,6 +1,6 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { ArrowRight, Lock, Mail, Star } from 'lucide-react'
+import { ArrowRight, Lock, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -52,7 +52,7 @@ function LoginPage() {
                 {/* Background Image with Overlay */}
                 <div className="absolute inset-0 z-0">
                     <img
-                        src="public/login_image.png"
+                        src="/login_image.png"
                         alt="Dancer"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent"></div>

@@ -32,8 +32,9 @@ let supabase: any
 
 try {
     if (!hasValidCredentials) {
-        supabase = createMockClient('Supabase credentials not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env.local')
+        supabase = createMockClient('Supabase credentials not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env')
     } else {
+        console.log('📡 Initializing Supabase client with URL:', supabaseUrl)
         // Try to import Supabase - will fail if package not installed
         const { createClient } = await import('@supabase/supabase-js')
         supabase = createClient(supabaseUrl, supabaseAnonKey, {
@@ -45,7 +46,8 @@ try {
         })
     }
 } catch (error) {
-    supabase = createMockClient('Supabase package not installed. Run: pnpm add @supabase/supabase-js')
+    console.error('❌ Error initializing Supabase:', error)
+    supabase = createMockClient('Supabase package not installed or initialization failed.')
 }
 
 export { supabase }
