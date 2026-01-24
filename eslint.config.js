@@ -3,8 +3,16 @@
 import { tanstackConfig } from '@tanstack/eslint-config'
 
 export default [
-    {
-        ignores: ['eslint.config.js', 'prettier.config.js', 'vite.config.ts', 'dist/**'],
-    },
-    ...tanstackConfig,
+  {
+    ignores: [
+      'eslint.config.js',
+      'prettier.config.js',
+      'vite.config.ts',
+      'dist/**',
+      '.nitro/**',
+      '.output/**',
+      'lint_results*',
+    ],
+  },
+  ...tanstackConfig,
 ]
