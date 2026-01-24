@@ -26,7 +26,10 @@ function LoginPage() {
     }, [isAuthenticated, router])
 
     const handleSubmit = async (e: React.FormEvent) => {
+        console.log('🚀 HandleSubmit triggered')
         e.preventDefault()
+        console.log('🛑 Form submission prevented')
+        window.alert('Form submitted! Email: ' + email) // Debug alert
         setError('')
         setIsLoading(true)
 

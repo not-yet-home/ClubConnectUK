@@ -13,6 +13,7 @@ export const authStore = new Store<AuthState>(initialState)
 
 // Initialize auth state from Supabase session
 export async function initializeAuth() {
+    console.log('🔄 Initializing Auth Store...')
     try {
         const {
             data: { session },
