@@ -1,6 +1,6 @@
 
-import { type Column } from "@tanstack/react-table"
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
+import type {Column} from "@tanstack/react-table";
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
@@ -130,8 +130,8 @@ function DataTablePagination({
   const endRow = Math.min((pageIndex + 1) * pageSize, totalRows)
 
   // Generate page numbers with ellipsis
-  const getPageNumbers = (): (number | "ellipsis")[] => {
-    const pages: (number | "ellipsis")[] = []
+  const getPageNumbers = (): Array<number | "ellipsis"> => {
+    const pages: Array<number | "ellipsis"> = []
 
     if (pageCount <= 7) {
       for (let i = 0; i < pageCount; i++) {

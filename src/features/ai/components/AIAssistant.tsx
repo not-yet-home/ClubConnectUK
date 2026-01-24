@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useStore } from '@tanstack/react-store'
 import { Store } from '@tanstack/store'
 
-import { Send, X, ChevronRight } from 'lucide-react'
+import { ChevronRight, Send, X } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 import rehypeSanitize from 'rehype-sanitize'
@@ -42,8 +42,8 @@ function Messages({ messages }: { messages: Array<UIMessage> }) {
         <div
           key={id}
           className={`py-3 ${role === 'assistant'
-              ? 'bg-gradient-to-r from-orange-500/5 to-red-600/5'
-              : 'bg-transparent'
+            ? 'bg-gradient-to-r from-orange-500/5 to-red-600/5'
+            : 'bg-transparent'
             }`}
         >
           {parts.map((part) => {
@@ -77,12 +77,12 @@ function Messages({ messages }: { messages: Array<UIMessage> }) {
             if (
               part.type === 'tool-recommendGuitar' &&
               part.state === 'output-available' &&
-              (part.output as { id: string })?.id
+              (part.output as { id: string }).id
             ) {
               return (
                 <div key={id} className="max-w-[80%] mx-auto">
                   <GuitarRecommendation
-                    id={(part.output as { id: string })?.id}
+                    id={(part.output as { id: string }).id}
                   />
                 </div>
               )

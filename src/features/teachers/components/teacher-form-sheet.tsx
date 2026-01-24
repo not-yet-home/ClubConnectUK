@@ -1,22 +1,22 @@
 "use client"
 
 import * as React from "react"
-import { Teacher, PersonDetails } from "@/types/teacher.types"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { ArrowLeft02Icon } from "@hugeicons/core-free-icons"
+import type { PersonDetails, Teacher } from "@/types/teacher.types"
 import {
   Sheet,
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetFooter,
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { ArrowLeft02Icon } from "@hugeicons/core-free-icons"
 import { ICON_SIZES } from "@/constants/sizes"
 
 interface TeacherFormData {
@@ -61,14 +61,14 @@ export function TeacherFormSheet({
   React.useEffect(() => {
     if (teacher) {
       setFormData({
-        first_name: teacher.person_details?.first_name ?? "",
-        last_name: teacher.person_details?.last_name ?? "",
-        email: teacher.person_details?.email ?? "",
-        contact: teacher.person_details?.contact ?? "",
-        address: teacher.person_details?.address ?? "",
-        primary_styles: teacher.primary_styles ?? "",
-        secondary_styles: teacher.secondary_styles ?? "",
-        general_notes: teacher.general_notes ?? "",
+        first_name: teacher.person_details.first_name,
+        last_name: teacher.person_details.last_name,
+        email: (teacher.person_details.email as string) || "",
+        contact: (teacher.person_details.contact as string) || "",
+        address: (teacher.person_details.address as string) || "",
+        primary_styles: teacher.primary_styles || "",
+        secondary_styles: teacher.secondary_styles || "",
+        general_notes: teacher.general_notes || "",
       })
     } else {
       setFormData({

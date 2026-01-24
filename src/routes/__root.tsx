@@ -1,27 +1,21 @@
 import {
-  Outlet,
   HeadContent,
+  Outlet,
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
 import { useEffect } from 'react'
-
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
-
-import StoreDevtools from '../lib/demo-store-devtools'
-import { initializeAuth } from '@/features/auth/store'
-
 import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
+import { initializeAuth } from '@/features/auth/store'
+
+import { NotFound } from '@/components/common/not-found'
+import { ProgressBar } from '@/components/common/progress-bar'
 
 interface MyRouterContext {
   queryClient: QueryClient
 }
-
-import { NotFound } from '@/components/common/not-found'
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
@@ -50,7 +44,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 })
 
 function RootDocument() {
-  // Initialize authentication on app startup
   useEffect(() => {
     initializeAuth()
   }, [])
@@ -61,23 +54,8 @@ function RootDocument() {
         <HeadContent />
       </head>
       <body>
+        <ProgressBar />
         <Outlet />
-        {/* <Toaster richColors position="top-right" /> */}
-        {/* Devtools disabled
-        <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            TanStackQueryDevtools,
-            StoreDevtools,
-          ]}
-        />
-        */}
         <Scripts />
       </body>
     </html>

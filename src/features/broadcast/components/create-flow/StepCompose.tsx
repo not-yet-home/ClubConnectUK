@@ -1,6 +1,7 @@
-import { BroadcastFormState } from "../../hooks/use-broadcast-form"
+import { AlertCircle, Mail, MessageCircle, X } from "lucide-react"
+import { format } from "date-fns"
+import type { BroadcastFormState } from "../../hooks/use-broadcast-form"
 import { Button } from "@/components/ui/button"
-// import { Switch } from "@/components/ui/switch" // Not available
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -13,7 +14,8 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Card } from "@/components/ui/card"
-import { Mail, MessageCircle, AlertCircle } from "lucide-react"
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { useAvailableCovers } from "@/features/covers/api/queries"
 
 interface StepComposeProps {
     formData: BroadcastFormState
@@ -111,25 +113,50 @@ export function StepCompose({ formData, updateField, setChannel, onNext, onBack 
                             <p className="text-xs text-blue-600/80 mb-2">
                                 Attach unassigned covers to this request.
                             </p>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="w-full border-blue-200 text-blue-700 hover:bg-blue-50"
-                                onClick={() => {
-                                    // Placeholder for cover selection logic
-                                    const mockCoverId = `cover-${Date.now()}`
-                                    updateField('selectedCovers', [...formData.selectedCovers, mockCoverId])
-                                }}
-                            >
-                                Add Unassigned Cover
-                            </Button>
+
+                            <Sheet>
+                                <SheetTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="w-full border-blue-200 text-blue-700 hover:bg-blue-50"
+                                    >
+                                        Add Unassigned Cover
+                                    </Button>
+                                </SheetTrigger>
+                                <SheetContent>
+                                    <SheetHeader>
+                                        <SheetTitle>Available Covers</SheetTitle>
+                                        <SheetDescription>
+                                            Select upcoming covers to include in this broadcast.
+                                        </SheetDescription>
+                                    </SheetHeader>
+                                    <CoverSelector
+                                        selectedIds={formData.selectedCovers}
+                                        onToggle={(id, selected) => {
+                                            if (selected) {
+                                                updateField('selectedCovers', [...formData.selectedCovers, id])
+                                            } else {
+                                                updateField('selectedCovers', formData.selectedCovers.filter(c => c !== id))
+                                            }
+                                        }}
+                                    />
+                                </SheetContent>
+                            </Sheet>
 
                             {/* Short list of selected covers */}
                             {formData.selectedCovers.length > 0 && (
                                 <div className="space-y-1 mt-2">
-                                    {formData.selectedCovers.slice(0, 3).map((cover, i) => (
-                                        <div key={i} className="text-xs bg-white border px-2 py-1 rounded text-zinc-600 truncate">
-                                            {cover}
+                                    <p className="text-[10px] text-zinc-400 font-medium uppercase tracking-wider">
+                                        Selected IDs
+                                    </p>
+                                    {formData.selectedCovers.slice(0, 3).map((coverId, i) => (
+                                        <div key={i} className="text-xs bg-white border px-2 py-1 rounded text-zinc-600 truncate flex justify-between items-center group">
+                                            <span className="truncate flex-1">{coverId}</span>
+                                            <X
+                                                className="w-3 h-3 opacity-0 group-hover:opacity-100 cursor-pointer text-zinc-400 hover:text-red-500"
+                                                onClick={() => updateField('selectedCovers', formData.selectedCovers.filter(c => c !== coverId))}
+                                            />
                                         </div>
                                     ))}
                                     {formData.selectedCovers.length > 3 && (
@@ -198,6 +225,60 @@ export function StepCompose({ formData, updateField, setChannel, onNext, onBack 
                     Preview & Send
                 </Button>
             </div>
+        </div>
+    )
+}
+
+interface CoverSelectorProps {
+    selectedIds: Array<string>
+    onToggle: (id: string, selected: boolean) => void
+}
+
+function CoverSelector({ selectedIds, onToggle }: CoverSelectorProps) {
+    const { data: covers, isLoading } = useAvailableCovers()
+
+    if (isLoading) {
+        return <div className="p-4 text-center text-sm text-muted-foreground">Loading covers...</div>
+    }
+
+    if (!covers || covers.length === 0) {
+        return <div className="p-4 text-center text-sm text-muted-foreground">No upcoming covers found.</div>
+    }
+
+    return (
+        <div className="max-h-[300px] overflow-y-auto mt-4 space-y-2 pr-2">
+            {covers.map((cover: any) => {
+                const isSelected = selectedIds.includes(cover.id)
+                const date = format(new Date(cover.meeting_date), 'EEE, d MMM yyyy')
+                const time = `${cover.cover_rule.start_time.slice(0, 5)} - ${cover.cover_rule.end_time.slice(0, 5)}`
+                const location = `${cover.cover_rule.school.school_name} - ${cover.cover_rule.club.club_name}`
+
+                return (
+                    <div
+                        key={cover.id}
+                        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${isSelected ? 'bg-blue-50 border-blue-200' : 'bg-white hover:bg-zinc-50 border-zinc-200'
+                            }`}
+                        onClick={() => onToggle(cover.id, !isSelected)}
+                    >
+                        <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={(c) => onToggle(cover.id, !!c)}
+                            id={`cover-${cover.id}`}
+                            className="mt-1"
+                        />
+                        <div className="flex-1">
+                            <div className="flex justify-between">
+                                <Label htmlFor={`cover-${cover.id}`} className="text-sm font-medium text-zinc-900 cursor-pointer">{date}</Label>
+                                <span className="text-xs text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded">{time}</span>
+                            </div>
+                            <p className="text-xs text-zinc-600 mt-1">{location}</p>
+                            {cover.notes && (
+                                <p className="text-[10px] text-zinc-400 mt-1 line-clamp-1 italic">{cover.notes}</p>
+                            )}
+                        </div>
+                    </div>
+                )
+            })}
         </div>
     )
 }

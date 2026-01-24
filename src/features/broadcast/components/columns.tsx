@@ -1,6 +1,6 @@
-import { ColumnDef } from '@tanstack/react-table'
-import { Broadcast } from '../types/broadcast.types'
 import { MoreHorizontal } from 'lucide-react'
+import type { Broadcast } from '../types/broadcast.types'
+import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import {
     DropdownMenu,
@@ -13,7 +13,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
 
-export const columns: ColumnDef<Broadcast>[] = [
+export const columns: Array<ColumnDef<Broadcast>> = [
     {
         id: 'select',
         header: ({ table }) => (
@@ -46,7 +46,7 @@ export const columns: ColumnDef<Broadcast>[] = [
         accessorKey: 'status',
         header: 'Status',
         cell: ({ row }) => {
-            const status = row.getValue('status') as string
+            const status = row.getValue('status')
             return (
                 <Badge variant={status === 'sent' ? 'default' : 'secondary'} className="capitalize">
                     {status}
@@ -61,7 +61,7 @@ export const columns: ColumnDef<Broadcast>[] = [
         accessorKey: 'sent_date',
         header: 'Sent Date',
         cell: ({ row }) => {
-            const date = row.getValue('sent_date') as string
+            const date = row.getValue('sent_date')
             if (!date) return <span className="text-muted-foreground">Not sent</span>
             return <div>{new Date(date).toLocaleDateString()}</div>
         },

@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react"
-import { Club } from "@/types/club.types"
+import { useEffect, useState } from "react"
 import { useCreateClub, useUpdateClub } from "../api/mutations"
+import type { Club } from "@/types/club.types"
 import { useSchools } from "@/hooks/use-schools"
 import {
     Dialog,
@@ -71,7 +71,7 @@ export function ClubFormDialog({ open, onOpenChange, club }: ClubFormDialogProps
         e.preventDefault()
         setError(null)
         try {
-            if (isEditing && club) {
+            if (club) {
                 await updateClub.mutateAsync({
                     id: club.id,
                     ...formData,
@@ -80,9 +80,9 @@ export function ClubFormDialog({ open, onOpenChange, club }: ClubFormDialogProps
                 await createClub.mutateAsync(formData)
             }
             onOpenChange(false)
-        } catch (error) {
-            console.error("Failed to save club:", error)
-            setError(error instanceof Error ? error.message : "An error occurred while saving the club.")
+        } catch (err) {
+            console.error("Failed to save club:", err)
+            setError(err instanceof Error ? err.message : "An error occurred while saving the club.")
         }
     }
 

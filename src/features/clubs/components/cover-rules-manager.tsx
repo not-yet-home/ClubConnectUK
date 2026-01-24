@@ -1,6 +1,8 @@
 import { useState } from "react"
-import { CoverRule } from "@/types/club.types"
-import { useUpsertCoverRule, useDeleteCoverRule } from "../api/mutations"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Add01Icon, Calendar03Icon, Delete02Icon, Edit02Icon } from "@hugeicons/core-free-icons"
+import { useDeleteCoverRule, useUpsertCoverRule } from "../api/mutations"
+import type { CoverRule } from "@/types/club.types"
 import {
     Dialog,
     DialogContent,
@@ -20,15 +22,13 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { Delete02Icon, Add01Icon, Calendar03Icon, Edit02Icon } from "@hugeicons/core-free-icons"
 import { ICON_SIZES } from "@/constants/sizes"
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface CoverRulesManagerProps {
     clubId: string
     schoolId: string
-    rules: CoverRule[]
+    rules: Array<CoverRule>
     isLoading?: boolean
 }
 
@@ -64,8 +64,8 @@ export function CoverRulesManager({ clubId, schoolId, rules, isLoading }: CoverR
         if (confirm("Are you sure you want to delete this rule?")) {
             try {
                 await deleteRule.mutateAsync({ ruleId, clubId })
-            } catch (error) {
-                console.error("Failed to delete rule:", error)
+            } catch (err) {
+                console.error("Failed to delete rule:", err)
                 // Since this is inline, maybe just alert for deletion failure or rely on console for now as item stays
                 alert("Failed to delete rule. Please try again.")
             }
@@ -85,9 +85,9 @@ export function CoverRulesManager({ clubId, schoolId, rules, isLoading }: CoverR
             } as any) // Type assertion needed for upsert params
             setIsDialogOpen(false)
             setEditingRule(null)
-        } catch (error) {
-            console.error("Failed to save rule:", error)
-            setError(error instanceof Error ? error.message : "Failed to save rule")
+        } catch (err) {
+            console.error("Failed to save rule:", err)
+            setError(err instanceof Error ? err.message : "Failed to save rule")
         }
     }
 

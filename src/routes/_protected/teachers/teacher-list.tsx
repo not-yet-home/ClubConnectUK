@@ -1,21 +1,27 @@
-import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { createFileRoute } from '@tanstack/react-router'
-import { PageLayout } from '@/components/common/page-layout'
-import useTeachers from '@/hooks/use-teachers'
-import { DataTable } from '@/features/teachers/components/data-table'
-import { columns } from '@/features/teachers/components/column'
-import { DataTableToolbar, DataTableFilter, DataTableShowEntries, DataTableSearch, DataTableExport } from "@/components/ui/data-table-components"
-import { Button } from '@/components/ui/button'
-import { ICON_SIZES } from '@/constants/sizes'
-import { HugeiconsIcon } from '@hugeicons/react'
 import { Add01Icon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import type { Teacher } from '@/types/teacher.types'
+import { PageLayout } from '@/components/common/page-layout'
+import { Button } from '@/components/ui/button'
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  DataTableExport,
+  DataTableFilter,
+  DataTableSearch,
+  DataTableShowEntries,
+  DataTableToolbar,
+} from '@/components/ui/data-table-components'
+import { ICON_SIZES } from '@/constants/sizes'
+import { useCreateTeacher, useDeleteTeacher, useUpdateTeacher } from '@/features/teachers/api/mutations'
+import { columns } from '@/features/teachers/components/column'
+import { DataTable } from '@/features/teachers/components/data-table'
+import { DeleteTeacherDialog } from '@/features/teachers/components/delete-teacher-dialog'
 import { TeacherFormSheet } from '@/features/teachers/components/teacher-form-sheet'
 import { TeacherViewSheet } from '@/features/teachers/components/teacher-view-sheet'
-import { DeleteTeacherDialog } from '@/features/teachers/components/delete-teacher-dialog'
-import { useState } from 'react'
-import { Teacher } from '@/types/teacher.types'
-import { useCreateTeacher, useUpdateTeacher, useDeleteTeacher } from '@/features/teachers/api/mutations'
-import { toast } from 'sonner'
+import useTeachers from '@/hooks/use-teachers'
 
 export const Route = createFileRoute('/_protected/teachers/teacher-list')({
   component: RouteComponent,
@@ -29,7 +35,6 @@ function RouteComponent() {
   const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null)
   const [isFromViewSheet, setIsFromViewSheet] = useState(false)
 
-  // Mutation hooks
   const createTeacher = useCreateTeacher()
   const updateTeacher = useUpdateTeacher()
   const deleteTeacher = useDeleteTeacher()
@@ -42,13 +47,12 @@ function RouteComponent() {
 
   const handleEditTeacher = (teacher: Teacher) => {
     setSelectedTeacher(teacher)
-    setIsFromViewSheet(viewSheetOpen) // Track if we came from view sheet
+    setIsFromViewSheet(viewSheetOpen)
     setViewSheetOpen(false)
     setFormSheetOpen(true)
   }
 
   const handleCancelEdit = () => {
-    // If we came from view sheet, return to it
     if (isFromViewSheet && selectedTeacher) {
       setFormSheetOpen(false)
       setViewSheetOpen(true)
@@ -161,7 +165,7 @@ function RouteComponent() {
                     <section className="flex flex-1 flex-col justify-between items-center gap-2">
                       <div className="flex w-full items-end justify-end ">
                         <DataTableSearch
-                          value={(table.getState().globalFilter as string) ?? ""}
+                          value={table.getState().globalFilter ?? ""}
                           onChange={(value) => table.setGlobalFilter(value)}
                           placeholder="Search teachers..."
                         />
@@ -179,9 +183,9 @@ function RouteComponent() {
                           <DataTableFilter
                             column={table.getColumn("primary_styles")}
                             title="Primary Styles"
-                            options={Array.from(table.getColumn("primary_styles")?.getFacetedUniqueValues()?.keys() ?? []).map((value) => ({
-                              label: value ?? "N/A",
-                              value: value ?? "",
+                            options={Array.from(table.getColumn("primary_styles")?.getFacetedUniqueValues().keys() ?? []).map((value) => ({
+                              label: (value as string) || "N/A",
+                              value: (value as string) || "",
                             }))}
                           />
                         </div>

@@ -1,21 +1,21 @@
 import { useState } from "react"
 import { useNavigate } from "@tanstack/react-router"
-import { Club, CoverRule, CoverOccurrence } from "@/types/club.types"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { ArrowLeft02Icon, Clock01Icon, Edit02Icon, Settings01Icon, UserMultiple02Icon } from "@hugeicons/core-free-icons"
+import { CoverRulesManager } from "./cover-rules-manager"
+import { ClubFormDialog } from "./club-form-dialog"
+import type { Club, CoverOccurrence, CoverRule } from "@/types/club.types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { Edit02Icon, ArrowLeft02Icon, Clock01Icon, UserMultiple02Icon, Settings01Icon } from "@hugeicons/core-free-icons"
 import { ICON_SIZES } from "@/constants/sizes"
-import { CoverRulesManager } from "./cover-rules-manager"
-import { ClubFormDialog } from "./club-form-dialog"
 import { PageLayout } from "@/components/common/page-layout"
 
 interface ClubDetailsViewProps {
     club: Club
-    coverRules: CoverRule[]
-    upcomingMeetings: CoverOccurrence[]
+    coverRules: Array<CoverRule>
+    upcomingMeetings: Array<CoverOccurrence>
     isLoadingRules: boolean
     isLoadingMeetings: boolean
 }
@@ -137,7 +137,7 @@ export function ClubDetailsView({
                                                 </div>
                                             ))}
                                         </div>
-                                    ) : upcomingMeetings && upcomingMeetings.length > 0 ? (
+                                    ) : upcomingMeetings.length > 0 ? (
                                         <div className="space-y-4">
                                             {upcomingMeetings.map((meeting) => (
                                                 <div key={meeting.id} className="relative pl-4 border-l-2 border-muted pb-4 last:pb-0">
