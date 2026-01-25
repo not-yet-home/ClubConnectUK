@@ -43,11 +43,9 @@ export async function initializeAuth() {
     }
 }
 
-// Login function
 export async function login(
     credentials: LoginCredentials
 ): Promise<{ error?: AuthError }> {
-    console.log('🔑 Attempting login for:', credentials.email)
     try {
         const { data, error } = await supabase.auth.signInWithPassword({
             email: credentials.email,

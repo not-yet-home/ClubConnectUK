@@ -31,7 +31,7 @@ export function BroadcastStepperNav({ currentStep }: BroadcastStepperNavProps) {
   }
 
   return (
-    <div className="w-full sticky top-0 z-10 bg-background pt-2 pb-6">
+    <div className="w-full sticky top-0 z-10 bg-background p-6">
       <div className="relative flex items-start justify-between w-full max-w-3xl mx-auto px-4">
         {steps.map((step, index) => {
           const status =

@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/use-auth'
 import { Checkbox } from '@/components/ui/checkbox'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { ArrowRight02Icon } from '@hugeicons/core-free-icons';
 
 export const Route = createFileRoute('/')({
     component: LoginPage,
@@ -26,10 +28,7 @@ function LoginPage() {
     }, [isAuthenticated, router])
 
     const handleSubmit = async (e: React.FormEvent) => {
-        console.log('🚀 HandleSubmit triggered')
         e.preventDefault()
-        console.log('🛑 Form submission prevented')
-        window.alert('Form submitted! Email: ' + email) // Debug alert
         setError('')
         setIsLoading(true)
 
@@ -102,7 +101,7 @@ function LoginPage() {
                         <div className="space-y-1.5 group">
                             <Label
                                 htmlFor="email"
-                                className="block text-xs font-medium text-neutral-500 uppercase tracking-wide group-focus-within:text-primary transition-colors"
+                                className="text-neutral-600 transition-colors"
                             >
                                 Email Address
                             </Label>
@@ -112,7 +111,7 @@ function LoginPage() {
                                     id="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="peer block w-full rounded-md border border-neutral-800 bg-neutral-900/50 px-4 py-2.5 pl-10 text-sm text-primary placeholder-neutral-600 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all"
+                                    className="pl-10"
                                     placeholder="name@dancearts-uk.com"
                                     required
                                     disabled={isLoading}
@@ -128,7 +127,7 @@ function LoginPage() {
                             <div className="flex items-center justify-between">
                                 <Label
                                     htmlFor="password"
-                                    className="block text-xs font-medium text-neutral-500 uppercase tracking-wide group-focus-within:text-primary transition-colors"
+                                    className="text-neutral-600 transition-colors"
                                 >
                                     Password
                                 </Label>
@@ -142,7 +141,7 @@ function LoginPage() {
                                     id="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="peer block w-full rounded-md border border-neutral-800 bg-neutral-900/50 px-4 py-2.5 pl-10 text-sm text-primary placeholder-neutral-600 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all"
+                                    className="pl-10 text-xs"
                                     placeholder="••••••••"
                                     required
                                     disabled={isLoading}
@@ -186,7 +185,7 @@ function LoginPage() {
                             ) : (
                                 <>
                                     <span>Sign In</span>
-                                    <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+                                    <HugeiconsIcon size={32} className="group-hover:translate-x-0.5 transition-transform" icon={ArrowRight02Icon} />
                                 </>
                             )}
                         </Button>
