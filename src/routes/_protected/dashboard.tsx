@@ -70,7 +70,7 @@ function DashboardPage() {
 
   return (
     <PageLayout breadcrumbs={[{ label: 'Dashboard' }]}>
-      <div className="mx-auto max-w-7xl space-y-8">
+      <div className="mx-auto space-y-8">
         {/* Header Section */}
         {/* <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">
