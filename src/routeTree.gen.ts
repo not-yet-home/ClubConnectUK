@@ -17,6 +17,7 @@ import { Route as ProtectedCoversRouteImport } from './routes/_protected/covers'
 import { Route as ProtectedBroadcastRouteImport } from './routes/_protected/broadcast'
 import { Route as ProtectedBroadcastIndexRouteImport } from './routes/_protected/broadcast/index'
 import { Route as ProtectedTeachersTeacherListRouteImport } from './routes/_protected/teachers/teacher-list'
+import { Route as ProtectedCoversOccurrenceIdRouteImport } from './routes/_protected/covers/$occurrenceId'
 import { Route as ProtectedClubsClubListRouteImport } from './routes/_protected/clubs/club-list'
 import { Route as ProtectedClubsClubIdRouteImport } from './routes/_protected/clubs/$clubId'
 import { Route as ProtectedBroadcastNewRouteImport } from './routes/_protected/broadcast/new'
@@ -61,6 +62,12 @@ const ProtectedTeachersTeacherListRoute =
     path: '/teachers/teacher-list',
     getParentRoute: () => ProtectedRoute,
   } as any)
+const ProtectedCoversOccurrenceIdRoute =
+  ProtectedCoversOccurrenceIdRouteImport.update({
+    id: '/$occurrenceId',
+    path: '/$occurrenceId',
+    getParentRoute: () => ProtectedCoversRoute,
+  } as any)
 const ProtectedClubsClubListRoute = ProtectedClubsClubListRouteImport.update({
   id: '/clubs/club-list',
   path: '/clubs/club-list',
@@ -80,23 +87,25 @@ const ProtectedBroadcastNewRoute = ProtectedBroadcastNewRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/broadcast': typeof ProtectedBroadcastRouteWithChildren
-  '/covers': typeof ProtectedCoversRoute
+  '/covers': typeof ProtectedCoversRouteWithChildren
   '/dashboard': typeof ProtectedDashboardRoute
   '/settings': typeof ProtectedSettingsRoute
   '/broadcast/new': typeof ProtectedBroadcastNewRoute
   '/clubs/$clubId': typeof ProtectedClubsClubIdRoute
   '/clubs/club-list': typeof ProtectedClubsClubListRoute
+  '/covers/$occurrenceId': typeof ProtectedCoversOccurrenceIdRoute
   '/teachers/teacher-list': typeof ProtectedTeachersTeacherListRoute
   '/broadcast/': typeof ProtectedBroadcastIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/covers': typeof ProtectedCoversRoute
+  '/covers': typeof ProtectedCoversRouteWithChildren
   '/dashboard': typeof ProtectedDashboardRoute
   '/settings': typeof ProtectedSettingsRoute
   '/broadcast/new': typeof ProtectedBroadcastNewRoute
   '/clubs/$clubId': typeof ProtectedClubsClubIdRoute
   '/clubs/club-list': typeof ProtectedClubsClubListRoute
+  '/covers/$occurrenceId': typeof ProtectedCoversOccurrenceIdRoute
   '/teachers/teacher-list': typeof ProtectedTeachersTeacherListRoute
   '/broadcast': typeof ProtectedBroadcastIndexRoute
 }
@@ -105,12 +114,13 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_protected': typeof ProtectedRouteWithChildren
   '/_protected/broadcast': typeof ProtectedBroadcastRouteWithChildren
-  '/_protected/covers': typeof ProtectedCoversRoute
+  '/_protected/covers': typeof ProtectedCoversRouteWithChildren
   '/_protected/dashboard': typeof ProtectedDashboardRoute
   '/_protected/settings': typeof ProtectedSettingsRoute
   '/_protected/broadcast/new': typeof ProtectedBroadcastNewRoute
   '/_protected/clubs/$clubId': typeof ProtectedClubsClubIdRoute
   '/_protected/clubs/club-list': typeof ProtectedClubsClubListRoute
+  '/_protected/covers/$occurrenceId': typeof ProtectedCoversOccurrenceIdRoute
   '/_protected/teachers/teacher-list': typeof ProtectedTeachersTeacherListRoute
   '/_protected/broadcast/': typeof ProtectedBroadcastIndexRoute
 }
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
     | '/broadcast/new'
     | '/clubs/$clubId'
     | '/clubs/club-list'
+    | '/covers/$occurrenceId'
     | '/teachers/teacher-list'
     | '/broadcast/'
   fileRoutesByTo: FileRoutesByTo
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
     | '/broadcast/new'
     | '/clubs/$clubId'
     | '/clubs/club-list'
+    | '/covers/$occurrenceId'
     | '/teachers/teacher-list'
     | '/broadcast'
   id:
@@ -149,6 +161,7 @@ export interface FileRouteTypes {
     | '/_protected/broadcast/new'
     | '/_protected/clubs/$clubId'
     | '/_protected/clubs/club-list'
+    | '/_protected/covers/$occurrenceId'
     | '/_protected/teachers/teacher-list'
     | '/_protected/broadcast/'
   fileRoutesById: FileRoutesById
@@ -216,6 +229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedTeachersTeacherListRouteImport
       parentRoute: typeof ProtectedRoute
     }
+    '/_protected/covers/$occurrenceId': {
+      id: '/_protected/covers/$occurrenceId'
+      path: '/$occurrenceId'
+      fullPath: '/covers/$occurrenceId'
+      preLoaderRoute: typeof ProtectedCoversOccurrenceIdRouteImport
+      parentRoute: typeof ProtectedCoversRoute
+    }
     '/_protected/clubs/club-list': {
       id: '/_protected/clubs/club-list'
       path: '/clubs/club-list'
@@ -253,9 +273,21 @@ const ProtectedBroadcastRouteChildren: ProtectedBroadcastRouteChildren = {
 const ProtectedBroadcastRouteWithChildren =
   ProtectedBroadcastRoute._addFileChildren(ProtectedBroadcastRouteChildren)
 
+interface ProtectedCoversRouteChildren {
+  ProtectedCoversOccurrenceIdRoute: typeof ProtectedCoversOccurrenceIdRoute
+}
+
+const ProtectedCoversRouteChildren: ProtectedCoversRouteChildren = {
+  ProtectedCoversOccurrenceIdRoute: ProtectedCoversOccurrenceIdRoute,
+}
+
+const ProtectedCoversRouteWithChildren = ProtectedCoversRoute._addFileChildren(
+  ProtectedCoversRouteChildren,
+)
+
 interface ProtectedRouteChildren {
   ProtectedBroadcastRoute: typeof ProtectedBroadcastRouteWithChildren
-  ProtectedCoversRoute: typeof ProtectedCoversRoute
+  ProtectedCoversRoute: typeof ProtectedCoversRouteWithChildren
   ProtectedDashboardRoute: typeof ProtectedDashboardRoute
   ProtectedSettingsRoute: typeof ProtectedSettingsRoute
   ProtectedClubsClubIdRoute: typeof ProtectedClubsClubIdRoute
@@ -265,7 +297,7 @@ interface ProtectedRouteChildren {
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedBroadcastRoute: ProtectedBroadcastRouteWithChildren,
-  ProtectedCoversRoute: ProtectedCoversRoute,
+  ProtectedCoversRoute: ProtectedCoversRouteWithChildren,
   ProtectedDashboardRoute: ProtectedDashboardRoute,
   ProtectedSettingsRoute: ProtectedSettingsRoute,
   ProtectedClubsClubIdRoute: ProtectedClubsClubIdRoute,

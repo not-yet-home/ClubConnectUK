@@ -1,7 +1,9 @@
 
-import { useMemo, useState } from 'react';
+
+
+import { useMemo, useState, useEffect } from 'react';
 import { Calendar, Views, dateFnsLocalizer } from 'react-big-calendar';
-import { format, getDay, parse, startOfWeek } from 'date-fns';
+import { format, getDay, parse, startOfWeek, endOfWeek } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -26,11 +28,39 @@ const localizer = dateFnsLocalizer({
 interface CalendarViewProps {
     events: Array<CoverOccurrence>;
     onSelectEvent: (event: CoverOccurrence) => void;
+    viewMode?: 'day' | 'week' | 'month' | '4days';
+    date?: Date;
+    onNavigate?: (date: Date) => void;
 }
 
-export function CalendarView({ events, onSelectEvent }: CalendarViewProps) {
-    const [view, setView] = useState<View>(Views.MONTH);
-    const [date, setDate] = useState(new Date());
+export function CalendarView({ events, onSelectEvent, viewMode = 'week', date: controlledDate, onNavigate: onControlledNavigate }: CalendarViewProps) {
+    const getCalendarView = (): View => {
+        switch (viewMode) {
+            case 'day': return Views.DAY;
+            case 'week': return Views.WEEK;
+            case 'month': return Views.MONTH;
+            case '4days': return Views.WORK_WEEK; // Use WORK_WEEK for 4-day view
+            default: return Views.WEEK;
+        }
+    };
+
+    const [view, setView] = useState<View>(getCalendarView());
+    const [internalDate, setInternalDate] = useState(new Date());
+
+    const date = controlledDate ?? internalDate;
+
+    const handleNavigate = (newDate: Date) => {
+        if (onControlledNavigate) {
+            onControlledNavigate(newDate);
+        } else {
+            setInternalDate(newDate);
+        }
+    };
+
+    // Update view when viewMode prop changes
+    useEffect(() => {
+        setView(getCalendarView());
+    }, [viewMode]);
 
     // Custom Toolbar
     const CustomToolbar = (toolbar: any) => {
@@ -44,48 +74,58 @@ export function CalendarView({ events, onSelectEvent }: CalendarViewProps) {
             toolbar.onNavigate('TODAY');
         };
 
-        const label = () => {
-            return (
-                <span className="text-xl font-bold text-gray-900">
-                    {format(toolbar.date, 'MMMM yyyy')}
-                </span>
-            );
+        const getLabel = () => {
+            if (toolbar.view === Views.DAY) {
+                return format(toolbar.date, 'EEEE, MMMM d, yyyy');
+            }
+            if (toolbar.view === Views.WEEK || toolbar.view === Views.WORK_WEEK) {
+                const start = startOfWeek(toolbar.date);
+                const end = endOfWeek(toolbar.date);
+                return `${format(start, 'MMM d')} - ${format(end, 'MMM d, yyyy')}`;
+            }
+            return format(toolbar.date, 'MMMM yyyy');
         };
 
         return (
-            <div className="flex items-center justify-between mb-4 p-2">
+            <div className="flex items-center justify-between mb-4 px-4 py-2 border-b border-gray-200">
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" onClick={goToBack}><ChevronLeft className="h-4 w-4" /></Button>
-                        <Button variant="ghost" size="icon" onClick={goToNext}><ChevronRight className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" onClick={goToBack}>
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={goToNext}>
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
                     </div>
-                    {label()}
+                    <span className="text-xl font-bold text-gray-900">
+                        {getLabel()}
+                    </span>
                     <Button variant="outline" size="sm" onClick={goToToday}>Today</Button>
                 </div>
             </div>
         );
     };
 
-    // Transform CoverOccurrence to Calendar Event
+    // Transform CoverOccurrence to Calendar Event with proper time
     const calendarEvents = useMemo(() => {
         return events.map(occ => {
-            const start = new Date(occ.meeting_date);
-            // Default to provided start time in rule, or assume 1 hour if parsed failing
-            // We really should parse the rule time properly, but for mock display we'll trust rule
-            // In real app, `meeting_date` is TIMESTAMPTZ so it has time. 
-            // But `cover_rule` has `start_time` and `end_time` separately as TIME.
-            // For the mock data, `meeting_date` has the time set.
+            // Parse the meeting_date
+            const meetingDate = new Date(occ.meeting_date);
 
-            let end = new Date(start);
+            // Create start and end times based on cover_rule times
+            let start = new Date(meetingDate);
+            let end = new Date(meetingDate);
+
             if (occ.cover_rule) {
-                // Basic parsing 'HH:mm:ss'
+                // Parse 'HH:mm:ss' format
                 const [startH, startM] = occ.cover_rule.start_time.split(':').map(Number);
                 const [endH, endM] = occ.cover_rule.end_time.split(':').map(Number);
-                // Reset start based on rule time? No, meeting_date is truth.
-                // Calculate duration
-                const durationMinutes = (endH * 60 + endM) - (startH * 60 + startM);
-                end = addMinutes(start, durationMinutes);
+
+                // Set the time on the date
+                start.setHours(startH, startM, 0, 0);
+                end.setHours(endH, endM, 0, 0);
             } else {
+                // Default to 1 hour duration
                 end.setHours(start.getHours() + 1);
             }
 
@@ -99,8 +139,27 @@ export function CalendarView({ events, onSelectEvent }: CalendarViewProps) {
         });
     }, [events]);
 
-    // Custom Event Component
-    const EventComponent = ({ event }: any) => {
+    // Custom Event Component for Week/Day view
+    const WeekEventComponent = ({ event }: any) => {
+        const occ = event.resource as CoverOccurrence;
+        const teacher = occ.assignments?.[0]?.teacher;
+        const teacherName = teacher
+            ? `${teacher.person_details.first_name} ${teacher.person_details.last_name}`
+            : 'Unassigned';
+
+        return (
+            <div className="h-full w-full px-1.5 py-1">
+                <div className="font-semibold text-xs mb-0.5">{event.title}</div>
+                <div className="text-[10px] opacity-90">
+                    {format(event.start, 'h:mm a')} - {format(event.end, 'h:mm a')}
+                </div>
+                <div className="text-[10px] opacity-75 mt-0.5">{teacherName}</div>
+            </div>
+        );
+    };
+
+    // Custom Event Component for Month view
+    const MonthEventComponent = ({ event }: any) => {
         const occ = event.resource as CoverOccurrence;
         const teacher = occ.assignments?.[0]?.teacher;
         const teacherName = teacher ? `${teacher.person_details.first_name[0]}${teacher.person_details.last_name[0]}` : null;
@@ -114,31 +173,45 @@ export function CalendarView({ events, onSelectEvent }: CalendarViewProps) {
                     </span>
                 )}
             </div>
-        )
-    }
+        );
+    };
 
     return (
-        <div className="h-full bg-white rounded-lg border border-gray-100 overflow-hidden">
+        <div className="h-full bg-white overflow-hidden">
             <Calendar
                 localizer={localizer}
                 events={calendarEvents}
                 startAccessor="start"
                 endAccessor="end"
-                style={{ height: '100%' }} // Fill parent container
+                style={{ height: '100%' }}
                 view={view}
                 onView={setView}
                 date={date}
-                onNavigate={setDate}
+                onNavigate={handleNavigate}
+                defaultView={Views.WEEK}
+                views={[Views.MONTH, Views.WEEK, Views.WORK_WEEK, Views.DAY]}
+                step={30}
+                showMultiDayTimes
+                min={new Date(2024, 0, 1, 7, 0, 0)}  // 7 AM
+                max={new Date(2024, 0, 1, 20, 0, 0)} // 8 PM
                 components={{
                     toolbar: CustomToolbar,
-                    event: EventComponent
+                    event: view === Views.MONTH ? MonthEventComponent : WeekEventComponent
                 }}
                 eventPropGetter={(event: any) => {
                     return {
-                        className: cn("rounded-md border-l-4 border-l-transparent px-2 py-1 text-xs shadow-sm cursor-pointer hover:opacity-90 transition-opacity", event.className)
+                        className: cn(
+                            "rounded border-l-4 shadow-sm cursor-pointer hover:opacity-90 transition-opacity",
+                            view === Views.MONTH ? "px-2 py-1 text-xs" : "px-1.5 py-1 text-xs",
+                            event.className
+                        )
                     }
                 }}
                 onSelectEvent={(event: any) => onSelectEvent(event.resource)}
+                formats={{
+                    dayHeaderFormat: (date) => format(date, 'EEE d'),
+                    timeGutterFormat: (date) => format(date, 'h a'),
+                }}
             />
         </div>
     );
@@ -165,6 +238,3 @@ function getEventColor(occurrence: CoverOccurrence): string {
     return 'bg-gray-100 text-gray-700';
 }
 
-function addMinutes(date: Date, minutes: number) {
-    return new Date(date.getTime() + minutes * 60000);
-}

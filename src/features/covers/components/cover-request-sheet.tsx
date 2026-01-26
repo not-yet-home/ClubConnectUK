@@ -26,11 +26,13 @@ import { Separator } from "@/components/ui/separator"
 import { useSchools } from "@/hooks/use-schools"
 import { useClubsBySchool } from "@/hooks/use-clubs"
 import useTeachers from "@/hooks/use-teachers"
-import { useCreateFullCoverRequest } from "@/features/covers/api/mutations"
+import { useCreateFullCoverRequest, useUpdateCoverRequest } from "@/features/covers/api/mutations"
+import type { CoverOccurrence } from "@/types/club.types"
 
 interface CoverRequestSheetProps {
     open: boolean
     onOpenChange: (open: boolean) => void
+    existingData?: CoverOccurrence | null
 }
 
 type RequestType = 'one-off' | 'recurring'
@@ -38,7 +40,11 @@ type RequestType = 'one-off' | 'recurring'
 export function CoverRequestSheet({
     open,
     onOpenChange,
+    existingData
 }: CoverRequestSheetProps) {
+    const isEditing = !!existingData
+
+    // Initial state derived from existingData if available, otherwise defaults
     const [requestType, setRequestType] = React.useState<RequestType>("recurring")
     const [schoolId, setSchoolId] = React.useState<string>("")
     const [clubId, setClubId] = React.useState<string>("")
@@ -49,11 +55,49 @@ export function CoverRequestSheet({
     const [startTime, setStartTime] = React.useState<string>("15:00")
     const [endTime, setEndTime] = React.useState<string>("16:00")
 
+    // Effect to populate form when existingData changes or modal opens
+    React.useEffect(() => {
+        if (open && existingData) {
+            const rule = existingData.cover_rule
+            if (rule) {
+                setSchoolId(rule.school?.id || "")
+                setClubId(rule.club?.id || "")
+                setFrequency(rule.frequency || "weekly")
+                setDayOfWeek(rule.day_of_week || "monday")
+                setStartTime(rule.start_time || "15:00")
+                setEndTime(rule.end_time || "16:00")
+
+                // If frequency is null or something implying one-off, handle that logic if your schema supports it
+                // For now assuming existing logic where one-off is just a UI concept mapping to frequency
+                setRequestType("recurring")
+            }
+
+            // Occurrence overrides
+            if (existingData.meeting_date) {
+                setMeetingDate(format(new Date(existingData.meeting_date), 'yyyy-MM-dd'))
+            }
+
+            // Teacher assignment
+            const assignedTeacher = existingData.assignments?.[0]?.teacher
+            if (assignedTeacher) {
+                setTeacherId(assignedTeacher.id)
+            } else {
+                setTeacherId("unassigned")
+            }
+        } else if (open && !existingData) {
+            // Reset if opening in create mode
+            resetForm()
+        }
+    }, [open, existingData])
+
     const { data: schools, isLoading: schoolsLoading } = useSchools()
     const { data: clubs, isLoading: clubsLoading } = useClubsBySchool(schoolId)
     const { data: teachers, isLoading: teachersLoading } = useTeachers()
 
     const createRequest = useCreateFullCoverRequest()
+    const updateRequest = useUpdateCoverRequest()
+
+    const isPending = createRequest.isPending || updateRequest.isPending
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -64,23 +108,39 @@ export function CoverRequestSheet({
         }
 
         try {
-            await createRequest.mutateAsync({
-                school_id: schoolId,
-                club_id: clubId,
-                frequency: requestType === 'one-off' ? 'weekly' : frequency, // Placeholder for one-off
-                day_of_week: requestType === 'one-off' ? format(new Date(meetingDate), 'eeee').toLowerCase() as DayOfWeek : dayOfWeek,
-                start_time: `${startTime}:00`,
-                end_time: `${endTime}:00`,
-                meeting_date: meetingDate,
-                teacher_id: teacherId === 'unassigned' ? undefined : teacherId
-            })
+            if (isEditing && existingData && existingData.cover_rule) {
+                await updateRequest.mutateAsync({
+                    occurrence_id: existingData.id,
+                    rule_id: existingData.cover_rule.id,
+                    school_id: schoolId,
+                    club_id: clubId,
+                    frequency: requestType === 'one-off' ? 'weekly' : frequency,
+                    day_of_week: requestType === 'one-off' ? format(new Date(meetingDate), 'eeee').toLowerCase() as DayOfWeek : dayOfWeek,
+                    start_time: startTime.length === 5 ? `${startTime}:00` : startTime,
+                    end_time: endTime.length === 5 ? `${endTime}:00` : endTime,
+                    meeting_date: meetingDate,
+                    teacher_id: teacherId === 'unassigned' ? undefined : teacherId
+                })
+                toast.success("Cover request updated successfully.")
+            } else {
+                await createRequest.mutateAsync({
+                    school_id: schoolId,
+                    club_id: clubId,
+                    frequency: requestType === 'one-off' ? 'weekly' : frequency,
+                    day_of_week: requestType === 'one-off' ? format(new Date(meetingDate), 'eeee').toLowerCase() as DayOfWeek : dayOfWeek,
+                    start_time: `${startTime}:00`,
+                    end_time: `${endTime}:00`,
+                    meeting_date: meetingDate,
+                    teacher_id: teacherId === 'unassigned' ? undefined : teacherId
+                })
+                toast.success("Cover request created successfully.")
+            }
 
-            toast.success("Cover request created successfully.")
             onOpenChange(false)
-            resetForm()
+            if (!isEditing) resetForm()
         } catch (error) {
-            console.error("Error creating cover request:", error)
-            toast.error("Failed to create cover request.")
+            console.error("Error saving cover request:", error)
+            toast.error(isEditing ? "Failed to update cover request." : "Failed to create cover request.")
         }
     }
 
@@ -96,18 +156,27 @@ export function CoverRequestSheet({
         setEndTime("16:00")
     }
 
-    // Clear club selection if school changes
+    // Clear club selection if school changes (only in create mode or key change)
+    // We need to be careful not to clear it immediately when populating from existingData
+    // Simple check: if schoolId matches existingData's school, don't clear club
     React.useEffect(() => {
-        setClubId("")
-    }, [schoolId])
+        if (!isEditing) {
+            setClubId("")
+        } else if (existingData?.cover_rule?.school?.id !== schoolId) {
+            // If school changed away from original, clear club
+            setClubId("")
+        }
+    }, [schoolId, isEditing, existingData])
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto p-0">
                 <SheetHeader className="p-6 pb-4">
-                    <SheetTitle>New Cover Request</SheetTitle>
+                    <SheetTitle>{isEditing ? "Edit Cover Request" : "New Cover Request"}</SheetTitle>
                     <SheetDescription>
-                        Create a new cover requirement and optionally assign a teacher.
+                        {isEditing
+                            ? "Update the details of this cover requirement."
+                            : "Create a new cover requirement and optionally assign a teacher."}
                     </SheetDescription>
                 </SheetHeader>
 
@@ -264,8 +333,8 @@ export function CoverRequestSheet({
                             >
                                 Cancel
                             </Button>
-                            <Button type="submit" className="flex-1" disabled={createRequest.isPending}>
-                                {createRequest.isPending ? "Creating..." : "Create Request"}
+                            <Button type="submit" className="flex-1" disabled={isPending}>
+                                {isPending ? (isEditing ? "Updating..." : "Creating...") : (isEditing ? "Update Request" : "Create Request")}
                             </Button>
                         </div>
                     </SheetFooter>
