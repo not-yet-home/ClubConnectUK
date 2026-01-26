@@ -34,19 +34,43 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- ============================================
+-- ENUMS
+-- ============================================
+DO $$ BEGIN
+    CREATE TYPE public.school_status AS ENUM ('active', 'inactive', 'pending');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+DO $$ BEGIN
+    CREATE TYPE public.day_of_week AS ENUM ('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+DO $$ BEGIN
+    CREATE TYPE public.frequency_type AS ENUM ('weekly', 'bi-weekly', 'monthly');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+DO $$ BEGIN
+    CREATE TYPE public.cover_status AS ENUM ('active', 'inactive', 'cancelled');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+DO $$ BEGIN
+    CREATE TYPE public.assignment_status AS ENUM ('invited', 'accepted', 'declined', 'pending', 'confirmed');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+DO $$ BEGIN
+    CREATE TYPE public.broadcast_status AS ENUM ('draft', 'sending', 'completed', 'failed');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+DO $$ BEGIN
+    CREATE TYPE public.broadcast_channel AS ENUM ('sms', 'email', 'all');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
 -- SCHOOLS TABLE
 CREATE TABLE IF NOT EXISTS public.schools (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name TEXT NOT NULL,
-    slug TEXT UNIQUE NOT NULL,
+    school_name VARCHAR(255) NOT NULL,
     address TEXT,
-    postcode TEXT,
-    city TEXT,
-    phone TEXT,
-    email TEXT,
-    website_url TEXT,
-    logo_url TEXT,
-    is_active BOOLEAN DEFAULT true NOT NULL,
+    status public.school_status DEFAULT 'active' NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
@@ -56,18 +80,34 @@ CREATE TRIGGER on_schools_updated
     FOR EACH ROW
     EXECUTE FUNCTION public.handle_updated_at();
 
+-- PERSON_DETAILS TABLE
+CREATE TABLE IF NOT EXISTS public.person_details (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    first_name VARCHAR(255) NOT NULL,
+    middle_name VARCHAR(255),
+    last_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    address TEXT,
+    contact VARCHAR(100),
+    image TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+CREATE TRIGGER on_person_details_updated
+    BEFORE UPDATE ON public.person_details
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_updated_at();
+
 -- TEACHERS TABLE
 CREATE TABLE IF NOT EXISTS public.teachers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    school_id UUID NOT NULL REFERENCES public.schools(id) ON DELETE CASCADE,
-    first_name TEXT NOT NULL,
-    last_name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    phone TEXT,
-    department TEXT,
-    subject_specialization TEXT,
-    avatar_url TEXT,
-    is_active BOOLEAN DEFAULT true NOT NULL,
+    persons_details_id UUID NOT NULL REFERENCES public.person_details(id) ON DELETE CASCADE,
+    documents_id UUID,
+    primary_styles VARCHAR(255),
+    secondary_styles VARCHAR(255),
+    general_notes TEXT,
+    is_blocked BOOLEAN DEFAULT FALSE NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
@@ -77,41 +117,31 @@ CREATE TRIGGER on_teachers_updated
     FOR EACH ROW
     EXECUTE FUNCTION public.handle_updated_at();
 
--- SCHOOL_CLUBS TABLE
-CREATE TABLE IF NOT EXISTS public.school_clubs (
+-- CLUBS TABLE
+CREATE TABLE IF NOT EXISTS public.clubs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     school_id UUID NOT NULL REFERENCES public.schools(id) ON DELETE CASCADE,
-    name TEXT NOT NULL,
-    slug TEXT NOT NULL,
+    club_name VARCHAR(255) NOT NULL,
+    club_code VARCHAR(50) NOT NULL,
     description TEXT,
-    category TEXT NOT NULL CHECK (category IN ('sports', 'academic', 'arts', 'cultural', 'technology', 'social', 'volunteering', 'other')),
-    logo_url TEXT,
-    banner_url TEXT,
-    meeting_day TEXT,
-    meeting_time TIME,
-    meeting_location TEXT,
-    teacher_in_charge_id UUID REFERENCES public.teachers(id) ON DELETE SET NULL,
-    is_active BOOLEAN DEFAULT true NOT NULL,
-    member_count INTEGER DEFAULT 0 NOT NULL,
+    members_count INTEGER DEFAULT 0,
+    status public.cover_status DEFAULT 'active',
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-    updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-    UNIQUE(school_id, slug)
+    updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
-CREATE TRIGGER on_school_clubs_updated
-    BEFORE UPDATE ON public.school_clubs
+CREATE TRIGGER on_clubs_updated
+    BEFORE UPDATE ON public.clubs
     FOR EACH ROW
     EXECUTE FUNCTION public.handle_updated_at();
 
 -- BULK_MESSAGES TABLE
-CREATE TYPE message_status AS ENUM ('draft', 'sent', 'scheduled', 'failed');
-
 CREATE TABLE IF NOT EXISTS public.bulk_messages (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     school_id UUID NOT NULL REFERENCES public.schools(id) ON DELETE CASCADE,
     subject TEXT NOT NULL,
     body TEXT NOT NULL,
-    status message_status DEFAULT 'draft' NOT NULL,
+    status public.broadcast_status DEFAULT 'draft' NOT NULL,
     scheduled_for TIMESTAMPTZ,
     sent_at TIMESTAMPTZ,
     sent_by TEXT,
@@ -128,13 +158,11 @@ CREATE TRIGGER on_bulk_messages_updated
     EXECUTE FUNCTION public.handle_updated_at();
 
 -- BULK_MESSAGE_RECIPIENTS TABLE
-CREATE TYPE recipient_status AS ENUM ('pending', 'sent', 'failed', 'bounced');
-
 CREATE TABLE IF NOT EXISTS public.bulk_message_recipients (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     bulk_message_id UUID NOT NULL REFERENCES public.bulk_messages(id) ON DELETE CASCADE,
     teacher_id UUID NOT NULL REFERENCES public.teachers(id) ON DELETE CASCADE,
-    status recipient_status DEFAULT 'pending' NOT NULL,
+    status public.assignment_status DEFAULT 'pending' NOT NULL,
     sent_at TIMESTAMPTZ,
     error_message TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
@@ -148,29 +176,15 @@ CREATE TRIGGER on_bulk_message_recipients_updated
     EXECUTE FUNCTION public.handle_updated_at();
 
 -- INDEXES
-CREATE INDEX IF NOT EXISTS idx_schools_slug ON public.schools(slug);
-CREATE INDEX IF NOT EXISTS idx_schools_active ON public.schools(is_active);
-CREATE INDEX IF NOT EXISTS idx_schools_city ON public.schools(city);
-
-CREATE INDEX IF NOT EXISTS idx_teachers_school_id ON public.teachers(school_id);
-CREATE INDEX IF NOT EXISTS idx_teachers_email ON public.teachers(email);
-CREATE INDEX IF NOT EXISTS idx_teachers_department ON public.teachers(department);
-CREATE INDEX IF NOT EXISTS idx_teachers_active ON public.teachers(is_active);
-
-CREATE INDEX IF NOT EXISTS idx_school_clubs_school_id ON public.school_clubs(school_id);
-CREATE INDEX IF NOT EXISTS idx_school_clubs_slug ON public.school_clubs(slug);
-CREATE INDEX IF NOT EXISTS idx_school_clubs_category ON public.school_clubs(category);
-CREATE INDEX IF NOT EXISTS idx_school_clubs_active ON public.school_clubs(is_active);
-CREATE INDEX IF NOT EXISTS idx_school_clubs_teacher_in_charge ON public.school_clubs(teacher_in_charge_id);
-
+CREATE INDEX IF NOT EXISTS idx_schools_status ON public.schools(status);
+CREATE INDEX IF NOT EXISTS idx_person_details_last_name ON public.person_details(last_name);
+CREATE INDEX IF NOT EXISTS idx_teachers_person_id ON public.teachers(persons_details_id);
+CREATE INDEX IF NOT EXISTS idx_clubs_school_id ON public.clubs(school_id);
+CREATE INDEX IF NOT EXISTS idx_clubs_status ON public.clubs(status);
 CREATE INDEX IF NOT EXISTS idx_bulk_messages_school_id ON public.bulk_messages(school_id);
 CREATE INDEX IF NOT EXISTS idx_bulk_messages_status ON public.bulk_messages(status);
-CREATE INDEX IF NOT EXISTS idx_bulk_messages_scheduled_for ON public.bulk_messages(scheduled_for);
-CREATE INDEX IF NOT EXISTS idx_bulk_messages_sent_at ON public.bulk_messages(sent_at);
-
 CREATE INDEX IF NOT EXISTS idx_bulk_message_recipients_message_id ON public.bulk_message_recipients(bulk_message_id);
 CREATE INDEX IF NOT EXISTS idx_bulk_message_recipients_teacher_id ON public.bulk_message_recipients(teacher_id);
-CREATE INDEX IF NOT EXISTS idx_bulk_message_recipients_status ON public.bulk_message_recipients(status);
 
 -- ============================================
 -- MIGRATION 2: RLS POLICIES
@@ -184,28 +198,23 @@ CREATE POLICY "Active schools are viewable by everyone"
     ON public.schools
     FOR SELECT
     TO authenticated
-    USING (is_active = true);
+    USING (status = 'active');
 
-DROP POLICY IF EXISTS "Service role can insert schools" ON public.schools;
-CREATE POLICY "Service role can insert schools"
+DROP POLICY IF EXISTS "Authenticated users can manage schools" ON public.schools;
+CREATE POLICY "Authenticated users can manage schools"
     ON public.schools
-    FOR INSERT
-    TO service_role
+    FOR ALL
+    TO authenticated
+    USING (true)
     WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Service role can update schools" ON public.schools;
-CREATE POLICY "Service role can update schools"
+DROP POLICY IF EXISTS "Service role can manage schools" ON public.schools;
+CREATE POLICY "Service role can manage schools"
     ON public.schools
-    FOR UPDATE
+    FOR ALL
     TO service_role
-    USING (true);
-
-DROP POLICY IF EXISTS "Service role can delete schools" ON public.schools;
-CREATE POLICY "Service role can delete schools"
-    ON public.schools
-    FOR DELETE
-    TO service_role
-    USING (true);
+    USING (true)
+    WITH CHECK (true);
 
 -- TEACHERS TABLE RLS
 ALTER TABLE public.teachers ENABLE ROW LEVEL SECURITY;
@@ -215,59 +224,49 @@ CREATE POLICY "Active teachers are viewable by everyone"
     ON public.teachers
     FOR SELECT
     TO authenticated
-    USING (is_active = true);
+    USING (is_blocked = false);
 
-DROP POLICY IF EXISTS "Service role can insert teachers" ON public.teachers;
-CREATE POLICY "Service role can insert teachers"
+DROP POLICY IF EXISTS "Authenticated users can manage teachers" ON public.teachers;
+CREATE POLICY "Authenticated users can manage teachers"
     ON public.teachers
-    FOR INSERT
-    TO service_role
+    FOR ALL
+    TO authenticated
+    USING (true)
     WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Service role can update teachers" ON public.teachers;
-CREATE POLICY "Service role can update teachers"
+DROP POLICY IF EXISTS "Service role can manage teachers" ON public.teachers;
+CREATE POLICY "Service role can manage teachers"
     ON public.teachers
-    FOR UPDATE
+    FOR ALL
     TO service_role
-    USING (true);
+    USING (true)
+    WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Service role can delete teachers" ON public.teachers;
-CREATE POLICY "Service role can delete teachers"
-    ON public.teachers
-    FOR DELETE
-    TO service_role
-    USING (true);
+-- CLUBS TABLE RLS
+ALTER TABLE public.clubs ENABLE ROW LEVEL SECURITY;
 
--- SCHOOL_CLUBS TABLE RLS
-ALTER TABLE public.school_clubs ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Active school clubs are viewable by everyone" ON public.school_clubs;
-CREATE POLICY "Active school clubs are viewable by everyone"
-    ON public.school_clubs
+DROP POLICY IF EXISTS "Active clubs are viewable by everyone" ON public.clubs;
+CREATE POLICY "Active clubs are viewable by everyone"
+    ON public.clubs
     FOR SELECT
     TO authenticated
-    USING (is_active = true);
+    USING (true);
 
-DROP POLICY IF EXISTS "Service role can insert school clubs" ON public.school_clubs;
-CREATE POLICY "Service role can insert school clubs"
-    ON public.school_clubs
-    FOR INSERT
-    TO service_role
+DROP POLICY IF EXISTS "Authenticated users can manage clubs" ON public.clubs;
+CREATE POLICY "Authenticated users can manage clubs"
+    ON public.clubs
+    FOR ALL
+    TO authenticated
+    USING (true)
     WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Service role can update school clubs" ON public.school_clubs;
-CREATE POLICY "Service role can update school clubs"
-    ON public.school_clubs
-    FOR UPDATE
+DROP POLICY IF EXISTS "Service role can manage clubs" ON public.clubs;
+CREATE POLICY "Service role can manage clubs"
+    ON public.clubs
+    FOR ALL
     TO service_role
-    USING (true);
-
-DROP POLICY IF EXISTS "Service role can delete school clubs" ON public.school_clubs;
-CREATE POLICY "Service role can delete school clubs"
-    ON public.school_clubs
-    FOR DELETE
-    TO service_role
-    USING (true);
+    USING (true)
+    WITH CHECK (true);
 
 -- BULK_MESSAGES TABLE RLS
 ALTER TABLE public.bulk_messages ENABLE ROW LEVEL SECURITY;
@@ -340,13 +339,13 @@ CREATE POLICY "Service role can delete message recipients"
 DO $$
 BEGIN
     -- Insert Schools (if not exist)
-    INSERT INTO public.schools (id, name, slug, address, postcode, city, phone, email, website_url, is_active)
+    INSERT INTO public.schools (id, school_name, address, status)
     VALUES
-        ('11111111-1111-1111-1111-111111111111'::uuid, 'Greenwood Academy', 'greenwood-academy', '123 High Street', 'SW1A 1AA', 'London', '020 7946 0958', 'info@greenwood.ac.uk', 'https://greenwood.ac.uk', true),
-        ('22222222-2222-2222-2222-222222222222'::uuid, 'St. Mary''s Secondary School', 'st-marys-secondary', '45 Church Road', 'M1 1AD', 'Manchester', '0161 496 0183', 'admin@stmarys.sch.uk', 'https://stmarys.sch.uk', true),
-        ('33333333-3333-3333-3333-333333333333'::uuid, 'Riverside High School', 'riverside-high', '78 River Lane', 'EH1 1YZ', 'Edinburgh', '0131 496 0234', 'contact@riverside.sch.uk', 'https://riverside.sch.uk', true),
-        ('44444444-4444-4444-4444-444444444444'::uuid, 'Oakwood Grammar School', 'oakwood-grammar', '56 Park Avenue', 'B2 4QA', 'Birmingham', '0121 496 0567', 'info@oakwood.sch.uk', 'https://oakwood.sch.uk', true),
-        ('55555555-5555-5555-5555-555555555555'::uuid, 'Hillside Community College', 'hillside-community', '92 Valley Road', 'LS1 3AB', 'Leeds', '0113 496 0789', 'admin@hillside.ac.uk', 'https://hillside.ac.uk', true)
+        ('11111111-1111-1111-1111-111111111111'::uuid, 'Greenwood Academy', '123 High Street', 'active'),
+        ('22222222-2222-2222-2222-222222222222'::uuid, 'St. Mary''s Secondary School', '45 Church Road', 'active'),
+        ('33333333-3333-3333-3333-333333333333'::uuid, 'Riverside High School', '78 River Lane', 'active'),
+        ('44444444-4444-4444-4444-444444444444'::uuid, 'Oakwood Grammar School', '56 Park Avenue', 'active'),
+        ('55555555-5555-5555-5555-555555555555'::uuid, 'Hillside Community College', '92 Valley Road', 'active')
     ON CONFLICT (id) DO NOTHING;
 
     RAISE NOTICE 'Schools inserted successfully';
