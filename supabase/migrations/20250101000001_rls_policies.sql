@@ -57,6 +57,13 @@ CREATE POLICY "Authenticated users can view active schools"
     TO authenticated
     USING (status = 'active');
 
+CREATE POLICY "Authenticated users can manage schools"
+    ON public.schools
+    FOR ALL
+    TO authenticated
+    USING (true)
+    WITH CHECK (true);
+
 -- ============================================
 -- CLUBS TABLE RLS
 -- ============================================
@@ -75,6 +82,13 @@ CREATE POLICY "Authenticated users can view clubs"
     TO authenticated
     USING (true);
 
+CREATE POLICY "Authenticated users can manage clubs"
+    ON public.clubs
+    FOR ALL
+    TO authenticated
+    USING (true)
+    WITH CHECK (true);
+
 -- ============================================
 -- TEACHERS TABLE RLS
 -- ============================================
@@ -92,6 +106,13 @@ CREATE POLICY "Authenticated users can view non-blocked teachers"
     FOR SELECT
     TO authenticated
     USING (is_blocked = false);
+
+CREATE POLICY "Authenticated users can manage teachers"
+    ON public.teachers
+    FOR ALL
+    TO authenticated
+    USING (true)
+    WITH CHECK (true);
 
 -- ============================================
 -- TEACHER_DOCUMENTS TABLE RLS
