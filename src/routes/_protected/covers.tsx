@@ -103,15 +103,15 @@ function CoversCalendarPage() {
 
     return (
         <>
-            <PageLayout breadcrumbs={[{ label: 'Covers Scheduling' }]}>
+            <PageLayout breadcrumbs={[{ label: 'Covers Scheduling' }]} className="p-3 sm:p-6">
                 <div className="h-[calc(100vh-120px)] flex flex-col">
                     {/* Header Toolbar */}
-                    <div className="flex items-center justify-between mb-4 gap-4">
-                        <div className="flex items-center gap-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3 sm:gap-4 px-1 sm:px-0">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                             {/* Mobile Menu Toggle for Mini Calendar */}
                             <Sheet>
                                 <SheetTrigger asChild>
-                                    <Button variant="outline" size="icon" className="lg:hidden">
+                                    <Button variant="outline" size="icon" className="lg:hidden h-9 w-9">
                                         <Menu className="h-4 w-4" />
                                     </Button>
                                 </SheetTrigger>
@@ -127,11 +127,11 @@ function CoversCalendarPage() {
 
                             {/* School Filter */}
                             <div className="flex items-center gap-2">
-                                <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap hidden sm:block">
+                                <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap hidden lg:block">
                                     School:
                                 </Label>
                                 <Select value={schoolId} onValueChange={setSchoolId}>
-                                    <SelectTrigger className="w-[180px] h-9">
+                                    <SelectTrigger className="w-full sm:w-[180px] h-9">
                                         <SelectValue placeholder="All Schools" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -146,14 +146,19 @@ function CoversCalendarPage() {
                             </div>
 
                             {/* View Toggle */}
-                            <ViewToggle value={viewType} onChange={setViewType} />
+                            <div className="flex-shrink-0">
+                                <ViewToggle value={viewType} onChange={setViewType} />
+                            </div>
                         </div>
 
                         {/* New Request Button */}
-                        <Button onClick={() => setRequestSheetOpen(true)} size="sm">
+                        <Button
+                            onClick={() => setRequestSheetOpen(true)}
+                            size="sm"
+                            className="w-full sm:w-auto mt-1 sm:mt-0 h-9"
+                        >
                             <HugeiconsIcon icon={Add01Icon} className="h-4 w-4 mr-1.5" />
-                            <span className="hidden sm:inline">New Request</span>
-                            <span className="sm:hidden">New</span>
+                            <span>New Request</span>
                         </Button>
                     </div>
 

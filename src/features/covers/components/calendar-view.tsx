@@ -11,6 +11,9 @@ import { Button } from '@/components/ui/button';
 import { getClubColors } from '../utils/formatters';
 
 const rbcStyleOverrides = `
+.rbc-calendar {
+    font-family: inherit;
+}
 .rbc-event {
     min-height: auto !important;
     margin: 0 !important;
@@ -32,13 +35,42 @@ const rbcStyleOverrides = `
     display: none !important;
 }
 .rbc-time-slot {
-    min-height: 24px;
+    min-height: 28px;
 }
 .rbc-current-time-indicator {
     height: 2px !important;
     background-color: #eec366 !important;
     position: absolute;
     z-index: 10;
+}
+.rbc-time-header-content {
+    border-left: 1px solid #e5e7eb !important;
+}
+.rbc-timeslot-group {
+    border-bottom: 1px solid #f3f4f6 !important;
+}
+@media (max-width: 640px) {
+    .rbc-time-gutter {
+        width: 38px !important;
+        font-size: 10px !important;
+    }
+    .rbc-time-header-content {
+        font-size: 10px !important;
+    }
+    .rbc-header {
+        padding: 4px 2px !important;
+    }
+    .rbc-time-slot {
+        min-height: 24px !important;
+    }
+    .rbc-event-content {
+        font-size: 0.6rem !important;
+        line-height: 1.1 !important;
+        padding: 1px !important;
+    }
+    .rbc-time-view .rbc-header + .rbc-header {
+        border-left: 1px solid #f3f4f6 !important;
+    }
 }
 `;
 
@@ -65,12 +97,15 @@ interface CalendarViewProps {
 
 export function CalendarView({ events, onSelectEvent, viewMode = 'week', date: controlledDate, onNavigate: onControlledNavigate }: CalendarViewProps) {
     const getCalendarView = (): View => {
+        // Force day view on mobile if initial load and no specific mode forced beyond default
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+
         switch (viewMode) {
             case 'day': return Views.DAY;
-            case 'week': return Views.WEEK;
+            case 'week': return isMobile ? Views.DAY : Views.WEEK;
             case 'month': return Views.MONTH;
             case '4days': return Views.WORK_WEEK; // Use WORK_WEEK for 4-day view
-            default: return Views.WEEK;
+            default: return isMobile ? Views.DAY : Views.WEEK;
         }
     };
 
@@ -78,7 +113,6 @@ export function CalendarView({ events, onSelectEvent, viewMode = 'week', date: c
     const [internalDate, setInternalDate] = useState(new Date());
 
     const date = controlledDate ?? internalDate;
-
     const handleNavigate = (newDate: Date) => {
         if (onControlledNavigate) {
             onControlledNavigate(newDate);
@@ -89,49 +123,54 @@ export function CalendarView({ events, onSelectEvent, viewMode = 'week', date: c
 
     // Update view when viewMode prop changes
     useEffect(() => {
-        setView(getCalendarView());
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+        if (viewMode === 'week' && isMobile) {
+            setView(Views.DAY);
+        } else {
+            setView(getCalendarView());
+        }
     }, [viewMode]);
 
     // Custom Toolbar
     const CustomToolbar = (toolbar: any) => {
-        const goToBack = () => {
-            toolbar.onNavigate('PREV');
-        };
-        const goToNext = () => {
-            toolbar.onNavigate('NEXT');
-        };
-        const goToToday = () => {
-            toolbar.onNavigate('TODAY');
-        };
+        const goToBack = () => toolbar.onNavigate('PREV');
+        const goToNext = () => toolbar.onNavigate('NEXT');
+        const goToToday = () => toolbar.onNavigate('TODAY');
 
         const getLabel = () => {
             if (toolbar.view === Views.DAY) {
-                return format(toolbar.date, 'EEEE, MMMM d, yyyy');
+                return format(toolbar.date, 'eee, MMM d');
             }
             if (toolbar.view === Views.WEEK || toolbar.view === Views.WORK_WEEK) {
                 const start = startOfWeek(toolbar.date);
                 const end = endOfWeek(toolbar.date);
+                // Use shorter format for mobile
+                const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+                if (isMobile) {
+                    return `${format(start, 'MMM d')} - ${format(end, 'd')}`;
+                }
                 return `${format(start, 'MMM d')} - ${format(end, 'MMM d, yyyy')}`;
             }
             return format(toolbar.date, 'MMMM yyyy');
         };
 
         return (
-            <div className="flex items-center justify-between mb-4 px-4 py-2 border-b border-gray-200">
-                <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between mb-4 px-2 sm:px-4 py-2 border-b border-gray-100 gap-3">
+                <div className="flex items-center justify-between w-full sm:w-auto gap-2">
                     <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" onClick={goToBack}>
+                        <Button variant="ghost" size="icon" onClick={goToBack} className="h-8 w-8">
                             <ChevronLeft className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={goToNext}>
+                        <Button variant="ghost" size="icon" onClick={goToNext} className="h-8 w-8">
                             <ChevronRight className="h-4 w-4" />
                         </Button>
                     </div>
-                    <span className="text-xl font-bold text-gray-900">
+                    <span className="text-lg sm:text-xl font-bold text-gray-900 truncate">
                         {getLabel()}
                     </span>
-                    <Button variant="outline" size="sm" onClick={goToToday}>Today</Button>
+                    <Button variant="outline" size="sm" onClick={goToToday} className="sm:hidden h-8 text-xs font-semibold px-2">Today</Button>
                 </div>
+                <Button variant="outline" size="sm" onClick={goToToday} className="hidden sm:inline-flex h-8 text-xs font-semibold px-3">Today</Button>
             </div>
         );
     };

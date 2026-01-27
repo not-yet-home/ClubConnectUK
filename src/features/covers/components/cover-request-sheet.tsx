@@ -8,7 +8,6 @@ import {
     Sheet,
     SheetContent,
     SheetDescription,
-    SheetFooter,
     SheetHeader,
     SheetTitle,
 } from "@/components/ui/sheet"
@@ -215,10 +214,10 @@ export function CoverRequestSheet({
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
-            <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto p-0">
-                <SheetHeader className="p-6 pb-4">
-                    <SheetTitle>{isEditing ? "Edit Cover Request" : "New Cover Request"}</SheetTitle>
-                    <SheetDescription>
+            <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto p-0 flex flex-col">
+                <SheetHeader className="p-4 sm:p-6 pb-2 sm:pb-4 text-left">
+                    <SheetTitle className="text-xl sm:text-2xl">{isEditing ? "Edit Cover Request" : "New Cover Request"}</SheetTitle>
+                    <SheetDescription className="text-sm">
                         {isEditing
                             ? "Update the details of this cover requirement."
                             : "Create a new cover requirement and optionally assign a teacher."}
@@ -227,145 +226,161 @@ export function CoverRequestSheet({
 
                 <Separator />
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="requestType">Request Type</Label>
-                            <Select value={requestType} onValueChange={(v) => setRequestType(v as RequestType)}>
-                                <SelectTrigger id="requestType">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="one-off">One-off (Single Date)</SelectItem>
-                                    <SelectItem value="recurring">Recurring Schedule</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
+                <div className="flex-1 overflow-y-auto">
+                    <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-5 sm:space-y-6">
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="requestType" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Request Type</Label>
+                                <Select value={requestType} onValueChange={(v) => setRequestType(v as RequestType)}>
+                                    <SelectTrigger id="requestType" className="h-10">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="one-off">One-off (Single Date)</SelectItem>
+                                        <SelectItem value="recurring">Recurring Schedule</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
 
-                        <Separator />
+                            <Separator className="opacity-50" />
 
-                        <div className="space-y-2">
-                            <Label htmlFor="school">School</Label>
-                            <Select value={schoolId} onValueChange={setSchoolId} disabled={schoolsLoading}>
-                                <SelectTrigger id="school">
-                                    <SelectValue placeholder="Select a school" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {schools?.map((school) => (
-                                        <SelectItem key={school.id} value={school.id}>
-                                            {school.school_name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="school" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">School</Label>
+                                <Select value={schoolId} onValueChange={setSchoolId} disabled={schoolsLoading}>
+                                    <SelectTrigger id="school" className="h-10">
+                                        <SelectValue placeholder="Select a school" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {schools?.map((school) => (
+                                            <SelectItem key={school.id} value={school.id}>
+                                                {school.school_name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="club">Club</Label>
-                            <Select
-                                value={clubId}
-                                onValueChange={setClubId}
-                                disabled={!schoolId || clubsLoading}
-                            >
-                                <SelectTrigger id="club">
-                                    <SelectValue placeholder={schoolId ? "Select a club" : "Select a school first"} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {clubs?.map((club) => (
-                                        <SelectItem key={club.id} value={club.id}>
-                                            {club.club_name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="club" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Club</Label>
+                                <Select
+                                    value={clubId}
+                                    onValueChange={setClubId}
+                                    disabled={!schoolId || clubsLoading}
+                                >
+                                    <SelectTrigger id="club" className="h-10">
+                                        <SelectValue placeholder={schoolId ? "Select a club" : "Select a school first"} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {clubs?.map((club) => (
+                                            <SelectItem key={club.id} value={club.id}>
+                                                {club.club_name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="teacher">Assigned Teacher (Optional)</Label>
-                            <Select value={teacherId} onValueChange={setTeacherId} disabled={teachersLoading}>
-                                <SelectTrigger id="teacher">
-                                    <SelectValue placeholder="Select a teacher" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="unassigned">Unassigned</SelectItem>
-                                    {teachers?.map((teacher: any) => (
-                                        <SelectItem key={teacher.id} value={teacher.id}>
-                                            {teacher.person_details.first_name} {teacher.person_details.last_name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="teacher" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Assigned Teacher (Optional)</Label>
+                                <Select value={teacherId} onValueChange={setTeacherId} disabled={teachersLoading}>
+                                    <SelectTrigger id="teacher" className="h-10">
+                                        <SelectValue placeholder="Select a teacher" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="unassigned">Unassigned</SelectItem>
+                                        {teachers?.map((teacher: any) => (
+                                            <SelectItem key={teacher.id} value={teacher.id}>
+                                                {teacher.person_details.first_name} {teacher.person_details.last_name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="date">{requestType === 'one-off' ? 'Meeting Date' : 'Start Date'}</Label>
-                            <Input
-                                id="date"
-                                type="date"
-                                value={meetingDate}
-                                onChange={(e) => setMeetingDate(e.target.value)}
-                                required
-                            />
-                        </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="date" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    {requestType === 'one-off' ? 'Meeting Date' : 'Start Date'}
+                                </Label>
+                                <Input
+                                    id="date"
+                                    type="date"
+                                    value={meetingDate}
+                                    onChange={(e) => setMeetingDate(e.target.value)}
+                                    required
+                                    className="h-10"
+                                />
+                            </div>
 
-                        {requestType === 'recurring' && (
-                            <div className="space-y-4 animate-in fade-in duration-300">
+                            {requestType === 'recurring' && (
+                                <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="frequency" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Frequency</Label>
+                                        <Select value={frequency} onValueChange={(v) => setFrequency(v as CoverFrequency)}>
+                                            <SelectTrigger id="frequency" className="h-10">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="weekly">Weekly</SelectItem>
+                                                <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
+                                                <SelectItem value="monthly">Monthly</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="frequency">Frequency</Label>
-                                    <Select value={frequency} onValueChange={(v) => setFrequency(v as CoverFrequency)}>
-                                        <SelectTrigger id="frequency">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="weekly">Weekly</SelectItem>
-                                            <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
-                                            <SelectItem value="monthly">Monthly</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <Label htmlFor="start_time" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Start Time</Label>
+                                    <Input
+                                        id="start_time"
+                                        type="time"
+                                        value={startTime}
+                                        onChange={(e) => setStartTime(e.target.value)}
+                                        required
+                                        className="h-10"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="end_time" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">End Time</Label>
+                                    <Input
+                                        id="end_time"
+                                        type="time"
+                                        value={endTime}
+                                        onChange={(e) => setEndTime(e.target.value)}
+                                        required
+                                        className="h-10"
+                                    />
                                 </div>
                             </div>
-                        )}
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="start_time">Start Time</Label>
-                                <Input
-                                    id="start_time"
-                                    type="time"
-                                    value={startTime}
-                                    onChange={(e) => setStartTime(e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="end_time">End Time</Label>
-                                <Input
-                                    id="end_time"
-                                    type="time"
-                                    value={endTime}
-                                    onChange={(e) => setEndTime(e.target.value)}
-                                    required
-                                />
-                            </div>
                         </div>
+                    </form>
+                </div>
+
+                <div className="p-4 sm:p-6 pt-2 sm:pt-4 border-t bg-gray-50/50">
+                    <div className="flex gap-3 w-full">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => onOpenChange(false)}
+                            className="flex-1 h-10"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={(e) => {
+                                e.preventDefault();
+                                // Manually trigger form submit since it's now outside the div
+                                const form = document.querySelector('form');
+                                if (form) form.requestSubmit();
+                            }}
+                            className="flex-1 h-10"
+                            disabled={isPending}
+                        >
+                            {isPending ? (isEditing ? "Saving..." : "Creating...") : (isEditing ? "Update" : "Create")}
+                        </Button>
                     </div>
-
-                    <SheetFooter className="pt-4">
-                        <div className="flex gap-3 w-full">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => onOpenChange(false)}
-                                className="flex-1"
-                            >
-                                Cancel
-                            </Button>
-                            <Button type="submit" className="flex-1" disabled={isPending}>
-                                {isPending ? (isEditing ? "Updating..." : "Creating...") : (isEditing ? "Update Request" : "Create Request")}
-                            </Button>
-                        </div>
-                    </SheetFooter>
-                </form>
+                </div>
             </SheetContent>
         </Sheet>
     )
