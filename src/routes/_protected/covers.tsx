@@ -1,12 +1,12 @@
 
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Add01Icon } from '@hugeicons/core-free-icons';
 import { Menu } from 'lucide-react';
 import type { CoverOccurrence } from '@/types/club.types';
 import { CalendarView } from '@/features/covers/components/calendar-view';
-import { MiniCalendar } from '@/features/covers/components/mini-calendar';
+import { UpcomingCoversList } from '@/features/covers/components/upcoming-covers-list';
 import { ViewToggle, type ViewType } from '@/features/covers/components/view-toggle';
 import { CoversListView } from '@/features/covers/components/covers-list-view';
 import { YearView } from '@/features/covers/components/year-view';
@@ -22,6 +22,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
 
 import { CoverRequestSheet } from '@/features/covers/components/cover-request-sheet';
 import { CoverQuickView } from '@/features/covers/components/cover-quick-view';
@@ -47,7 +55,10 @@ function CoversCalendarPage() {
     const [selectedOccurrence, setSelectedOccurrence] = useState<CoverOccurrence | null>(null);
     const [editingBoxOpen, setEditingBoxOpen] = useState(false);
 
-    const navigate = useNavigate();
+    // Delete Confirmation State
+    const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+    const [occurrenceToDelete, setOccurrenceToDelete] = useState<CoverOccurrence | null>(null);
+
 
     const { data: schools } = useSchools();
     const { data: occurrences, isLoading } = useCoverOccurrences({ schoolId });
@@ -69,12 +80,19 @@ function CoversCalendarPage() {
         }, 100);
     };
 
-    const handleDeleteFromQuickView = async (occurrence: CoverOccurrence) => {
-        if (!window.confirm("Are you sure you want to delete this cover session?")) return;
+    const handleDeleteFromQuickView = (occurrence: CoverOccurrence) => {
+        setOccurrenceToDelete(occurrence);
+        setDeleteConfirmationOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!occurrenceToDelete) return;
 
         try {
-            await deleteOccurrence.mutateAsync(occurrence.id);
+            await deleteOccurrence.mutateAsync(occurrenceToDelete.id);
             toast.success("Cover session deleted");
+            setDeleteConfirmationOpen(false);
+            setOccurrenceToDelete(null);
             setQuickViewOpen(false);
         } catch (error) {
             console.error("Failed to delete", error);
@@ -82,10 +100,6 @@ function CoversCalendarPage() {
         }
     };
 
-    const handleViewDetails = (occurrence: CoverOccurrence) => {
-        setQuickViewOpen(false);
-        navigate({ to: `/covers/${occurrence.id}` });
-    };
 
     return (
         <>
@@ -102,11 +116,10 @@ function CoversCalendarPage() {
                                     </Button>
                                 </SheetTrigger>
                                 <SheetContent side="left" className="w-[280px] sm:w-[320px]">
-                                    <div className="mt-6">
-                                        <MiniCalendar
-                                            selectedDate={selectedDate}
-                                            onSelectDate={setSelectedDate}
+                                    <div className="mt-6 h-[500px]">
+                                        <UpcomingCoversList
                                             occurrences={events}
+                                            onSelectOccurrence={handleSelectOccurrence}
                                         />
                                     </div>
                                 </SheetContent>
@@ -148,30 +161,12 @@ function CoversCalendarPage() {
                     <Card className="flex-1 border-gray-200 overflow-hidden">
                         <CardContent className="p-0 h-full">
                             <div className="flex h-full">
-                                {/* Left Sidebar - Mini Calendar (Desktop Only) */}
-                                <div className="hidden lg:block w-64 border-r border-gray-200 p-4 bg-gray-50/50">
-                                    <MiniCalendar
-                                        selectedDate={selectedDate}
-                                        onSelectDate={setSelectedDate}
+                                {/* Left Sidebar - Upcoming Covers List (Desktop Only) */}
+                                <div className="hidden lg:block w-72 border-r border-gray-200 p-4 bg-gray-50/50">
+                                    <UpcomingCoversList
                                         occurrences={events}
+                                        onSelectOccurrence={handleSelectOccurrence}
                                     />
-
-                                    {/* Additional Sidebar Content */}
-                                    <div className="mt-6">
-                                        <h3 className="text-sm font-semibold text-gray-900 mb-3">My Calendars</h3>
-                                        <div className="space-y-2">
-                                            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                                                <input type="checkbox" defaultChecked className="rounded" />
-                                                <span>All Schools</span>
-                                            </label>
-                                            {schools?.slice(0, 3).map((school) => (
-                                                <label key={school.id} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                                                    <input type="checkbox" className="rounded" />
-                                                    <span className="truncate">{school.school_name}</span>
-                                                </label>
-                                            ))}
-                                        </div>
-                                    </div>
                                 </div>
 
                                 {/* Main Calendar/List Area */}
@@ -248,8 +243,24 @@ function CoversCalendarPage() {
                 occurrence={selectedOccurrence}
                 onEdit={handleEditFromQuickView}
                 onDelete={handleDeleteFromQuickView}
-                onViewDetails={handleViewDetails}
             />
+
+            <Dialog open={deleteConfirmationOpen} onOpenChange={setDeleteConfirmationOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Delete Cover Session?</DialogTitle>
+                        <DialogDescription>
+                            This action cannot be undone. This will permanently delete the cover session for <span className="font-medium text-foreground">{occurrenceToDelete?.cover_rule?.club?.club_name}</span>.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="ghost" onClick={() => setDeleteConfirmationOpen(false)}>Cancel</Button>
+                        <Button variant="destructive" onClick={confirmDelete} disabled={deleteOccurrence.isPending}>
+                            {deleteOccurrence.isPending ? "Deleting..." : "Delete"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }

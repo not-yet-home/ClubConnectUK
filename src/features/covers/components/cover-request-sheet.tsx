@@ -27,6 +27,7 @@ import { useSchools } from "@/hooks/use-schools"
 import { useClubsBySchool } from "@/hooks/use-clubs"
 import useTeachers from "@/hooks/use-teachers"
 import { useCreateFullCoverRequest, useUpdateCoverRequest } from "@/features/covers/api/mutations"
+import { useCoverOccurrences } from "@/hooks/use-covers"
 import type { CoverOccurrence } from "@/types/club.types"
 
 interface CoverRequestSheetProps {
@@ -50,7 +51,6 @@ export function CoverRequestSheet({
     const [clubId, setClubId] = React.useState<string>("")
     const [teacherId, setTeacherId] = React.useState<string>("unassigned")
     const [frequency, setFrequency] = React.useState<CoverFrequency>("weekly")
-    const [dayOfWeek, setDayOfWeek] = React.useState<DayOfWeek>("monday")
     const [meetingDate, setMeetingDate] = React.useState<string>(format(new Date(), 'yyyy-MM-dd'))
     const [startTime, setStartTime] = React.useState<string>("15:00")
     const [endTime, setEndTime] = React.useState<string>("16:00")
@@ -63,7 +63,6 @@ export function CoverRequestSheet({
                 setSchoolId(rule.school?.id || "")
                 setClubId(rule.club?.id || "")
                 setFrequency(rule.frequency || "weekly")
-                setDayOfWeek(rule.day_of_week || "monday")
                 setStartTime(rule.start_time || "15:00")
                 setEndTime(rule.end_time || "16:00")
 
@@ -90,9 +89,17 @@ export function CoverRequestSheet({
         }
     }, [open, existingData])
 
+    // ... inside component ...
+
     const { data: schools, isLoading: schoolsLoading } = useSchools()
     const { data: clubs, isLoading: clubsLoading } = useClubsBySchool(schoolId)
     const { data: teachers, isLoading: teachersLoading } = useTeachers()
+
+    // Fetch existing occurrences for conflict checking
+    const { data: existingOccurrences } = useCoverOccurrences({
+        startDate: meetingDate,
+        endDate: meetingDate
+    })
 
     const createRequest = useCreateFullCoverRequest()
     const updateRequest = useUpdateCoverRequest()
@@ -107,7 +114,46 @@ export function CoverRequestSheet({
             return
         }
 
+        // Check for teacher conflicts
+        if (teacherId && teacherId !== 'unassigned' && existingOccurrences) {
+            const newStart = parseInt(startTime.replace(':', ''));
+            const newEnd = parseInt(endTime.replace(':', ''));
+
+            const conflict = existingOccurrences.find(occ => {
+                // Skip if it's the same occurrence we are editing
+                if (isEditing && existingData && occ.id === existingData.id) return false;
+
+                // Check if this teacher is assigned to this occurrence
+                const hasTeacher = occ.assignments?.some(a => a.teacher_id === teacherId);
+                if (!hasTeacher) return false;
+
+                // Check for time overlap
+                if (occ.cover_rule) {
+                    const existingStartStr = occ.cover_rule.start_time.slice(0, 5).replace(':', '');
+                    const existingEndStr = occ.cover_rule.end_time.slice(0, 5).replace(':', '');
+
+                    const existingStart = parseInt(existingStartStr);
+                    const existingEnd = parseInt(existingEndStr);
+
+                    // Overlap logic: (StartA < EndB) && (EndA > StartB)
+                    return (newStart < existingEnd) && (newEnd > existingStart);
+                }
+                return false;
+            });
+
+            if (conflict) {
+                const conflictClub = conflict.cover_rule?.club?.club_name || "another class";
+                const conflictStart = conflict.cover_rule?.start_time.slice(0, 5);
+                const conflictEnd = conflict.cover_rule?.end_time.slice(0, 5);
+
+                toast.error(`Teacher is already working for ${conflictClub} (${conflictStart} - ${conflictEnd})`);
+                return;
+            }
+        }
+
         try {
+            const calculatedDayOfWeek = format(new Date(meetingDate), 'eeee').toLowerCase() as DayOfWeek
+
             if (isEditing && existingData && existingData.cover_rule) {
                 await updateRequest.mutateAsync({
                     occurrence_id: existingData.id,
@@ -115,7 +161,7 @@ export function CoverRequestSheet({
                     school_id: schoolId,
                     club_id: clubId,
                     frequency: requestType === 'one-off' ? 'weekly' : frequency,
-                    day_of_week: requestType === 'one-off' ? format(new Date(meetingDate), 'eeee').toLowerCase() as DayOfWeek : dayOfWeek,
+                    day_of_week: calculatedDayOfWeek,
                     start_time: startTime.length === 5 ? `${startTime}:00` : startTime,
                     end_time: endTime.length === 5 ? `${endTime}:00` : endTime,
                     meeting_date: meetingDate,
@@ -127,7 +173,7 @@ export function CoverRequestSheet({
                     school_id: schoolId,
                     club_id: clubId,
                     frequency: requestType === 'one-off' ? 'weekly' : frequency,
-                    day_of_week: requestType === 'one-off' ? format(new Date(meetingDate), 'eeee').toLowerCase() as DayOfWeek : dayOfWeek,
+                    day_of_week: calculatedDayOfWeek,
                     start_time: `${startTime}:00`,
                     end_time: `${endTime}:00`,
                     meeting_date: meetingDate,
@@ -150,7 +196,6 @@ export function CoverRequestSheet({
         setTeacherId("unassigned")
         setRequestType("recurring")
         setFrequency("weekly")
-        setDayOfWeek("monday")
         setMeetingDate(format(new Date(), 'yyyy-MM-dd'))
         setStartTime("15:00")
         setEndTime("16:00")
@@ -264,7 +309,7 @@ export function CoverRequestSheet({
                         </div>
 
                         {requestType === 'recurring' && (
-                            <div className="grid grid-cols-2 gap-4 animate-in fade-in duration-300">
+                            <div className="space-y-4 animate-in fade-in duration-300">
                                 <div className="space-y-2">
                                     <Label htmlFor="frequency">Frequency</Label>
                                     <Select value={frequency} onValueChange={(v) => setFrequency(v as CoverFrequency)}>
@@ -275,24 +320,6 @@ export function CoverRequestSheet({
                                             <SelectItem value="weekly">Weekly</SelectItem>
                                             <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
                                             <SelectItem value="monthly">Monthly</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="day_of_week">Day of Week</Label>
-                                    <Select value={dayOfWeek} onValueChange={(v) => setDayOfWeek(v as DayOfWeek)}>
-                                        <SelectTrigger id="day_of_week">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="monday">Monday</SelectItem>
-                                            <SelectItem value="tuesday">Tuesday</SelectItem>
-                                            <SelectItem value="wednesday">Wednesday</SelectItem>
-                                            <SelectItem value="thursday">Thursday</SelectItem>
-                                            <SelectItem value="friday">Friday</SelectItem>
-                                            <SelectItem value="saturday">Saturday</SelectItem>
-                                            <SelectItem value="sunday">Sunday</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>

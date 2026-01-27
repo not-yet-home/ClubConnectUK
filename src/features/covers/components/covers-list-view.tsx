@@ -2,9 +2,9 @@ import { format, isSameDay, isToday, isTomorrow, startOfWeek, endOfWeek, isWithi
 import { Calendar as CalendarIcon, Clock, User, ChevronRight } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 import type { CoverOccurrence } from '@/types/club.types'
+import { getClubColors, formatEventTime } from '../utils/formatters';
 
 interface CoversListViewProps {
     occurrences: CoverOccurrence[]
@@ -114,7 +114,10 @@ function OccurrenceCard({ occurrence, onClick }: { occurrence: CoverOccurrence, 
 
     return (
         <Card
-            className="p-4 cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-blue-500"
+            className={cn(
+                "p-4 cursor-pointer hover:shadow-md transition-shadow border-l-4",
+                getClubColors(occurrence.cover_rule?.club?.club_name).border
+            )}
             onClick={onClick}
         >
             <div className="flex items-start justify-between">
@@ -136,7 +139,7 @@ function OccurrenceCard({ occurrence, onClick }: { occurrence: CoverOccurrence, 
                         <div className="flex items-center gap-1.5">
                             <Clock className="h-4 w-4 text-gray-400" />
                             <span>
-                                {cover_rule?.start_time.slice(0, 5)} - {cover_rule?.end_time.slice(0, 5)}
+                                {formatEventTime(cover_rule?.start_time)} - {formatEventTime(cover_rule?.end_time)}
                             </span>
                         </div>
                         <div className="flex items-center gap-1.5">
@@ -151,5 +154,7 @@ function OccurrenceCard({ occurrence, onClick }: { occurrence: CoverOccurrence, 
                 <ChevronRight className="h-5 w-5 text-gray-400 flex-shrink-0 ml-4" />
             </div>
         </Card>
-    )
+    );
 }
+
+

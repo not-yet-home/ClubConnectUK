@@ -1,9 +1,6 @@
-
-
-
 import { useMemo, useState, useEffect } from 'react';
 import { Calendar, Views, dateFnsLocalizer } from 'react-big-calendar';
-import { format, getDay, parse, startOfWeek, endOfWeek } from 'date-fns';
+import { format, getDay, parse, startOfWeek, endOfWeek, set, addHours } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -11,6 +8,39 @@ import type { View } from 'react-big-calendar';
 import type { CoverOccurrence } from '@/types/club.types';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { getClubColors } from '../utils/formatters';
+
+const rbcStyleOverrides = `
+.rbc-event {
+    min-height: auto !important;
+    margin: 0 !important;
+    padding: 1px !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+    transition: all 0.2s ease-in-out;
+}
+.rbc-event:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    z-index: 50 !important;
+}
+.rbc-event-content {
+    font-size: 0.75rem;
+    padding: 2px 4px;
+    height: 100%;
+}
+.rbc-event-label {
+    display: none !important;
+}
+.rbc-time-slot {
+    min-height: 24px;
+}
+.rbc-current-time-indicator {
+    height: 2px !important;
+    background-color: #eec366 !important;
+    position: absolute;
+    z-index: 10;
+}
+`;
 
 // Setup the localizer
 const locales = {
@@ -109,32 +139,39 @@ export function CalendarView({ events, onSelectEvent, viewMode = 'week', date: c
     // Transform CoverOccurrence to Calendar Event with proper time
     const calendarEvents = useMemo(() => {
         return events.map(occ => {
-            // Parse the meeting_date
-            const meetingDate = new Date(occ.meeting_date);
+            // Manually construct local date to prevent any UTC/Timezone shifts
+            // meeting_date is "YYYY-MM-DD" or ISO string
+            const dateStr = typeof occ.meeting_date === 'string' ? occ.meeting_date.substring(0, 10) : '';
+            const [year, month, day] = dateStr.split('-').map(Number);
+            const meetingDate = new Date(year, month - 1, day);
 
             // Create start and end times based on cover_rule times
             let start = new Date(meetingDate);
             let end = new Date(meetingDate);
+            let displayEnd = new Date(meetingDate);
 
             if (occ.cover_rule) {
                 // Parse 'HH:mm:ss' format
-                const [startH, startM] = occ.cover_rule.start_time.split(':').map(Number);
-                const [endH, endM] = occ.cover_rule.end_time.split(':').map(Number);
+                const [startH, startM = 0] = occ.cover_rule.start_time.split(':').map(Number);
+                const [endH, endM = 0] = occ.cover_rule.end_time.split(':').map(Number);
 
-                // Set the time on the date
-                start.setHours(startH, startM, 0, 0);
-                end.setHours(endH, endM, 0, 0);
+                start = set(meetingDate, { hours: startH, minutes: startM, seconds: 0, milliseconds: 0 });
+                // Add 1 hour to end time to make it inclusive of the end hour slot
+                displayEnd = set(meetingDate, { hours: endH, minutes: endM, seconds: 0, milliseconds: 0 });
+                end = addHours(displayEnd, 1);
             } else {
-                // Default to 1 hour duration
-                end.setHours(start.getHours() + 1);
+                start = set(meetingDate, { hours: 9, minutes: 0, seconds: 0, milliseconds: 0 });
+                displayEnd = set(meetingDate, { hours: 10, minutes: 0, seconds: 0, milliseconds: 0 });
+                end = addHours(displayEnd, 1);
             }
 
             return {
                 title: occ.cover_rule?.club?.club_name || 'Cover',
                 start,
                 end,
-                resource: occ,
-                className: getEventColor(occ)
+                displayStart: start,
+                displayEnd,
+                resource: occ
             };
         });
     }, [events]);
@@ -151,7 +188,7 @@ export function CalendarView({ events, onSelectEvent, viewMode = 'week', date: c
             <div className="h-full w-full px-1.5 py-1">
                 <div className="font-semibold text-xs mb-0.5">{event.title}</div>
                 <div className="text-[10px] opacity-90">
-                    {format(event.start, 'h:mm a')} - {format(event.end, 'h:mm a')}
+                    {format(event.displayStart, 'h:mm a')} - {format(event.displayEnd, 'h:mm a')}
                 </div>
                 <div className="text-[10px] opacity-75 mt-0.5">{teacherName}</div>
             </div>
@@ -177,7 +214,8 @@ export function CalendarView({ events, onSelectEvent, viewMode = 'week', date: c
     };
 
     return (
-        <div className="h-full bg-white overflow-hidden">
+        <div className="h-full bg-white overflow-hidden relative">
+            <style>{rbcStyleOverrides}</style>
             <Calendar
                 localizer={localizer}
                 events={calendarEvents}
@@ -192,49 +230,42 @@ export function CalendarView({ events, onSelectEvent, viewMode = 'week', date: c
                 views={[Views.MONTH, Views.WEEK, Views.WORK_WEEK, Views.DAY]}
                 step={30}
                 showMultiDayTimes
-                min={new Date(2024, 0, 1, 7, 0, 0)}  // 7 AM
-                max={new Date(2024, 0, 1, 20, 0, 0)} // 8 PM
+                min={set(new Date(), { hours: 7, minutes: 0 })}  // 7 AM
+                max={set(new Date(), { hours: 20, minutes: 0 })} // 8 PM
+                scrollToTime={set(new Date(), { hours: 9, minutes: 0 })}
                 components={{
                     toolbar: CustomToolbar,
                     event: view === Views.MONTH ? MonthEventComponent : WeekEventComponent
                 }}
                 eventPropGetter={(event: any) => {
+                    const colors = getClubColors(event.resource.cover_rule?.club?.club_name);
                     return {
                         className: cn(
-                            "rounded border-l-4 shadow-sm cursor-pointer hover:opacity-90 transition-opacity",
-                            view === Views.MONTH ? "px-2 py-1 text-xs" : "px-1.5 py-1 text-xs",
-                            event.className
-                        )
-                    }
+                            "cursor-pointer hover:opacity-90 transition-opacity",
+                            view === Views.MONTH ? "px-2 py-1 text-xs" : "px-0 py-0"
+                        ),
+                        style: {
+                            backgroundColor: colors.bgHex,
+                            color: colors.textHex,
+                            borderColor: colors.borderHex,
+                            borderRadius: '4px',
+                            borderStyle: 'solid',
+                            borderWidth: '1px',
+                            borderLeftWidth: '4px',
+                            margin: 0,
+                            marginBottom: 0
+                        }
+                    };
                 }}
                 onSelectEvent={(event: any) => onSelectEvent(event.resource)}
                 formats={{
                     dayHeaderFormat: (date) => format(date, 'EEE d'),
                     timeGutterFormat: (date) => format(date, 'h a'),
+                    eventTimeRangeFormat: () => '', // Hide default time range as we render it in the component
                 }}
             />
         </div>
     );
 }
 
-function getEventColor(occurrence: CoverOccurrence): string {
-    // This logic simulates the status coloring from the image
-    // In a real app, this would be based on real status fields.
-    // For mock, we used the passed 'status' in creating mock data, but we didn't save it on the type!
-    // We should infer it or just randomize for "mock" visual if not present.
-    // Actually, let's use the Club color logic or random for now, matching the image classes directly.
-
-    // The image has:
-    // Purple (Art Club)
-    // Blue (Coding Club)
-    // Green (Football)
-    // Pink (Dance Class)
-
-    const name = occurrence.cover_rule?.club?.club_name || '';
-    if (name.includes('Art')) return 'bg-purple-100 text-purple-700 border-l-purple-500';
-    if (name.includes('Coding')) return 'bg-blue-100 text-blue-700 border-l-blue-500';
-    if (name.includes('Football')) return 'bg-green-100 text-green-700 border-l-green-500';
-    if (name.includes('Dance')) return 'bg-pink-100 text-pink-700 border-l-pink-500';
-    return 'bg-gray-100 text-gray-700';
-}
 

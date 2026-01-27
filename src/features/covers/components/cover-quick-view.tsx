@@ -5,9 +5,7 @@ import {
     MapPin,
     User,
     Pencil,
-    Trash2,
-    Maximize2,
-    MoreHorizontal
+    Trash2
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -15,14 +13,9 @@ import {
     DialogContent,
     DialogTitle
 } from "@/components/ui/dialog"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import type { CoverOccurrence } from "@/types/club.types"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { formatEventTime, getClubColors } from "../utils/formatters"
 
 interface CoverQuickViewProps {
     occurrence: CoverOccurrence | null
@@ -30,7 +23,6 @@ interface CoverQuickViewProps {
     onOpenChange: (open: boolean) => void
     onEdit: (occurrence: CoverOccurrence) => void
     onDelete: (occurrence: CoverOccurrence) => void
-    onViewDetails: (occurrence: CoverOccurrence) => void
 }
 
 export function CoverQuickView({
@@ -38,8 +30,7 @@ export function CoverQuickView({
     open,
     onOpenChange,
     onEdit,
-    onDelete,
-    onViewDetails
+    onDelete
 }: CoverQuickViewProps) {
     if (!occurrence) return null
 
@@ -52,20 +43,13 @@ export function CoverQuickView({
         ? `${teacher.person_details.first_name} ${teacher.person_details.last_name}`
         : "Unassigned"
 
-    // Simulate status color logic
-    const getHeaderColor = () => {
-        if (clubName.includes('Art')) return 'bg-purple-600'
-        if (clubName.includes('Coding')) return 'bg-blue-600'
-        if (clubName.includes('Football')) return 'bg-green-600'
-        if (clubName.includes('Dance')) return 'bg-pink-600'
-        return 'bg-blue-600' // Default
-    }
+    const colors = getClubColors(clubName);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="p-0 gap-0 overflow-hidden sm:max-w-[400px] border-0 shadow-2xl">
                 {/* Header Strip with Actions usually found in GCal */}
-                <div className={`h-2 ${getHeaderColor()} w-full`} />
+                <div className={`h-2 ${colors.dot} w-full`} />
 
                 <div className="flex justify-between items-start p-4 pb-0">
                     <div>
@@ -84,19 +68,6 @@ export function CoverQuickView({
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500" onClick={() => onDelete(occurrence)}>
                             <Trash2 className="h-4 w-4" />
                         </Button>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => onViewDetails(occurrence)}>
-                                    <Maximize2 className="mr-2 h-4 w-4" />
-                                    View Full Details
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
                     </div>
                 </div>
 
@@ -111,7 +82,7 @@ export function CoverQuickView({
                                 {format(new Date(occurrence.meeting_date), 'EEEE, MMMM d')}
                             </p>
                             <p>
-                                {cover_rule?.start_time.slice(0, 5)} - {cover_rule?.end_time.slice(0, 5)}
+                                {formatEventTime(cover_rule?.start_time)} - {formatEventTime(cover_rule?.end_time)}
                             </p>
                         </div>
                     </div>
