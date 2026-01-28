@@ -113,6 +113,11 @@ export function CoverRequestSheet({
             return
         }
 
+        if (startTime >= endTime) {
+            toast.error("End time must be after start time.")
+            return
+        }
+
         // Check for teacher conflicts
         if (teacherId && teacherId !== 'unassigned' && existingOccurrences) {
             const newStart = parseInt(startTime.replace(':', ''));

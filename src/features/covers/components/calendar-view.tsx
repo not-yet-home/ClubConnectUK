@@ -9,6 +9,8 @@ import type { CoverOccurrence } from '@/types/club.types';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { getClubColors } from '../utils/formatters';
+import type { ViewType } from './view-toggle';
+
 
 const rbcStyleOverrides = `
 .rbc-calendar {
@@ -90,26 +92,49 @@ const localizer = dateFnsLocalizer({
 interface CalendarViewProps {
     events: Array<CoverOccurrence>;
     onSelectEvent: (event: CoverOccurrence) => void;
-    viewMode?: 'day' | 'week' | 'month' | '4days';
+    viewMode?: ViewType;
     date?: Date;
     onNavigate?: (date: Date) => void;
+    onViewChange?: (view: ViewType) => void;
 }
 
-export function CalendarView({ events, onSelectEvent, viewMode = 'week', date: controlledDate, onNavigate: onControlledNavigate }: CalendarViewProps) {
-    const getCalendarView = (): View => {
-        // Force day view on mobile if initial load and no specific mode forced beyond default
-        const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-
-        switch (viewMode) {
+export function CalendarView({
+    events,
+    onSelectEvent,
+    viewMode = 'week',
+    date: controlledDate,
+    onNavigate: onControlledNavigate,
+    onViewChange
+}: CalendarViewProps) {
+    const getCalendarView = (mode: ViewType): View => {
+        switch (mode) {
             case 'day': return Views.DAY;
-            case 'week': return isMobile ? Views.DAY : Views.WEEK;
+            case 'week': return Views.WEEK;
             case 'month': return Views.MONTH;
-            case '4days': return Views.WORK_WEEK; // Use WORK_WEEK for 4-day view
-            default: return isMobile ? Views.DAY : Views.WEEK;
+            case 'year': return Views.MONTH; // Placeholder as RBC has no year view
+            case 'schedule': return Views.AGENDA;
+            case '4days': return Views.WORK_WEEK;
+            default: return Views.WEEK;
         }
     };
 
-    const [view, setView] = useState<View>(getCalendarView());
+    const getViewTypeFromRBC = (rbcView: View): ViewType => {
+        switch (rbcView) {
+            case Views.DAY: return 'day';
+            case Views.WEEK: return 'week';
+            case Views.MONTH: return 'month';
+            case Views.AGENDA: return 'schedule';
+            case Views.WORK_WEEK: return '4days';
+            default: return 'week';
+        }
+    };
+
+    const [view, setView] = useState<View>(() => {
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+        if (viewMode === 'week' && isMobile) return Views.DAY;
+        return getCalendarView(viewMode);
+    });
+
     const [internalDate, setInternalDate] = useState(new Date());
 
     const date = controlledDate ?? internalDate;
@@ -124,12 +149,32 @@ export function CalendarView({ events, onSelectEvent, viewMode = 'week', date: c
     // Update view when viewMode prop changes
     useEffect(() => {
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+        let newView: View;
+
         if (viewMode === 'week' && isMobile) {
-            setView(Views.DAY);
+            newView = Views.DAY;
         } else {
-            setView(getCalendarView());
+            newView = getCalendarView(viewMode);
         }
+
+        setView(newView);
     }, [viewMode]);
+
+    // Handle internal view changes from RBC
+    const handleViewChange = (newView: View) => {
+        setView(newView);
+        if (onViewChange) {
+            onViewChange(getViewTypeFromRBC(newView));
+        }
+    };
+
+    // Notify parent if mobile override happens on mount
+    useEffect(() => {
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+        if (viewMode === 'week' && isMobile && onViewChange) {
+            onViewChange('day');
+        }
+    }, []);
 
     // Custom Toolbar
     const CustomToolbar = (toolbar: any) => {
@@ -262,7 +307,7 @@ export function CalendarView({ events, onSelectEvent, viewMode = 'week', date: c
                 endAccessor="end"
                 style={{ height: '100%' }}
                 view={view}
-                onView={setView}
+                onView={handleViewChange}
                 date={date}
                 onNavigate={handleNavigate}
                 defaultView={Views.WEEK}

@@ -185,6 +185,7 @@ function CoversCalendarPage() {
                                             events={events}
                                             onSelectEvent={(occ) => handleSelectOccurrence(occ)}
                                             viewMode={viewType}
+                                            onViewChange={setViewType}
                                             date={selectedDate}
                                             onNavigate={setSelectedDate}
                                         />
