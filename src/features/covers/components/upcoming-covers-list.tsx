@@ -1,11 +1,13 @@
 import { format, isAfter, startOfDay } from 'date-fns';
-import { Calendar, Clock, User } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, User } from 'lucide-react';
+
+import { formatEventTime, getClubColors } from '../utils/formatters';
 import type { CoverOccurrence } from '@/types/club.types';
+
 import { cn } from '@/lib/utils';
-import { getClubColors, formatEventTime } from '../utils/formatters';
 
 interface UpcomingCoversListProps {
-    occurrences: CoverOccurrence[];
+    occurrences: Array<CoverOccurrence>;
     onSelectOccurrence: (occurrence: CoverOccurrence) => void;
 }
 
@@ -22,7 +24,7 @@ export function UpcomingCoversList({ occurrences, onSelectOccurrence }: Upcoming
     return (
         <div className="flex flex-col h-full">
             <h3 className="text-sm font-semibold text-gray-900 mb-4 px-1 flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-primary" />
+                <CalendarIcon className="h-4 w-4 text-primary" />
                 <span>Upcoming Covers</span>
             </h3>
             <div className="flex-1 -mx-4 px-4 overflow-y-auto">
@@ -55,7 +57,7 @@ export function UpcomingCoversList({ occurrences, onSelectOccurrence }: Upcoming
 
                                 <div className="space-y-1.5">
                                     <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-700">
-                                        <Calendar className="h-3 w-3 opacity-70" />
+                                        <CalendarIcon className="h-3 w-3 opacity-70" />
                                         {format(new Date(occ.meeting_date), 'EEEE, MMM d')}
                                     </div>
                                     <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-700">

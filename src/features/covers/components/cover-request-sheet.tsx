@@ -3,7 +3,7 @@
 import * as React from "react"
 import { toast } from "sonner"
 import { format } from "date-fns"
-import type { CoverFrequency, DayOfWeek } from "@/types/club.types"
+import type { CoverFrequency, CoverOccurrence, DayOfWeek } from "@/types/club.types"
 import {
     Sheet,
     SheetContent,
@@ -27,7 +27,6 @@ import { useClubsBySchool } from "@/hooks/use-clubs"
 import useTeachers from "@/hooks/use-teachers"
 import { useCreateFullCoverRequest, useUpdateCoverRequest } from "@/features/covers/api/mutations"
 import { useCoverOccurrences } from "@/hooks/use-covers"
-import type { CoverOccurrence } from "@/types/club.types"
 
 interface CoverRequestSheetProps {
     open: boolean
@@ -61,7 +60,7 @@ export function CoverRequestSheet({
             if (rule) {
                 setSchoolId(rule.school?.id || "")
                 setClubId(rule.club?.id || "")
-                setFrequency(rule.frequency || "weekly")
+                setFrequency(rule.frequency)
                 setStartTime(rule.start_time || "15:00")
                 setEndTime(rule.end_time || "16:00")
 
@@ -125,7 +124,7 @@ export function CoverRequestSheet({
 
             const conflict = existingOccurrences.find(occ => {
                 // Skip if it's the same occurrence we are editing
-                if (isEditing && existingData && occ.id === existingData.id) return false;
+                if (existingData && occ.id === existingData.id) return false;
 
                 // Check if this teacher is assigned to this occurrence
                 const hasTeacher = occ.assignments?.some(a => a.teacher_id === teacherId);
@@ -158,7 +157,7 @@ export function CoverRequestSheet({
         try {
             const calculatedDayOfWeek = format(new Date(meetingDate), 'eeee').toLowerCase() as DayOfWeek
 
-            if (isEditing && existingData && existingData.cover_rule) {
+            if (existingData?.cover_rule) {
                 await updateRequest.mutateAsync({
                     occurrence_id: existingData.id,
                     rule_id: existingData.cover_rule.id,
@@ -211,7 +210,7 @@ export function CoverRequestSheet({
     React.useEffect(() => {
         if (!isEditing) {
             setClubId("")
-        } else if (existingData?.cover_rule?.school?.id !== schoolId) {
+        } else if (existingData.cover_rule?.school?.id !== schoolId) {
             // If school changed away from original, clear club
             setClubId("")
         }

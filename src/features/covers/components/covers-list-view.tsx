@@ -1,13 +1,15 @@
-import { format, isSameDay, isToday, isTomorrow, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns'
-import { Calendar as CalendarIcon, Clock, User, ChevronRight } from 'lucide-react'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { cn } from '@/lib/utils'
+import { endOfWeek, format, isSameDay, isToday, isTomorrow, isWithinInterval, startOfWeek } from 'date-fns'
+import { Calendar as CalendarIcon, ChevronRight, Clock, User } from 'lucide-react'
+
+import { formatEventTime, getClubColors } from '../utils/formatters';
 import type { CoverOccurrence } from '@/types/club.types'
-import { getClubColors, formatEventTime } from '../utils/formatters';
+
+import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 
 interface CoversListViewProps {
-    occurrences: CoverOccurrence[]
+    occurrences: Array<CoverOccurrence>
     onSelectOccurrence: (occurrence: CoverOccurrence) => void
 }
 
@@ -75,7 +77,7 @@ function Section({
     onSelect
 }: {
     title: string
-    occurrences: CoverOccurrence[]
+    occurrences: Array<CoverOccurrence>
     onSelect: (occ: CoverOccurrence) => void
 }) {
     return (

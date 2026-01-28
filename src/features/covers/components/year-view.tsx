@@ -1,10 +1,11 @@
-import { format } from 'date-fns'
 import { Calendar as CalendarIcon } from 'lucide-react'
-import { Card } from '@/components/ui/card'
+
 import type { CoverOccurrence } from '@/types/club.types'
 
+import { Card } from '@/components/ui/card'
+
 interface YearViewProps {
-    occurrences: CoverOccurrence[]
+    occurrences: Array<CoverOccurrence>
     selectedYear: number
     onSelectMonth: (month: number) => void
 }

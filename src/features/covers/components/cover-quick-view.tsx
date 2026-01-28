@@ -3,19 +3,21 @@ import { format } from "date-fns"
 import {
     Clock,
     MapPin,
-    User,
     Pencil,
-    Trash2
+    Trash2,
+    User,
 } from "lucide-react"
+
+import { formatEventTime, getClubColors } from "../utils/formatters"
+import type { CoverOccurrence } from "@/types/club.types"
+
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
     DialogContent,
     DialogTitle
 } from "@/components/ui/dialog"
-import type { CoverOccurrence } from "@/types/club.types"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { formatEventTime, getClubColors } from "../utils/formatters"
 
 interface CoverQuickViewProps {
     occurrence: CoverOccurrence | null
@@ -61,11 +63,11 @@ export function CoverQuickView({
                         </p>
                     </div>
 
-                    <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500" onClick={() => onEdit(occurrence)}>
+                    <div className="flex items-center gap-2 pr-8">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-gray-900 transition-colors" onClick={() => onEdit(occurrence)}>
                             <Pencil className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500" onClick={() => onDelete(occurrence)}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-600 transition-colors" onClick={() => onDelete(occurrence)}>
                             <Trash2 className="h-4 w-4" />
                         </Button>
                     </div>

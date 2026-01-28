@@ -1,27 +1,25 @@
-
 import { createFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
-import { HugeiconsIcon } from '@hugeicons/react';
+import { toast } from 'sonner';
 import { Add01Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import { Menu } from 'lucide-react';
+
 import type { CoverOccurrence } from '@/types/club.types';
+
+import type { ViewType } from '@/features/covers/components/view-toggle';
+import { useDeleteCoverOccurrence } from '@/features/covers/api/mutations';
 import { CalendarView } from '@/features/covers/components/calendar-view';
-import { UpcomingCoversList } from '@/features/covers/components/upcoming-covers-list';
-import { ViewToggle, type ViewType } from '@/features/covers/components/view-toggle';
+import { CoverQuickView } from '@/features/covers/components/cover-quick-view';
+import { CoverRequestSheet } from '@/features/covers/components/cover-request-sheet';
 import { CoversListView } from '@/features/covers/components/covers-list-view';
+import { UpcomingCoversList } from '@/features/covers/components/upcoming-covers-list';
+import { ViewToggle } from '@/features/covers/components/view-toggle';
 import { YearView } from '@/features/covers/components/year-view';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+
 import { PageLayout } from '@/components/common/page-layout';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 import {
     Dialog,
     DialogContent,
@@ -30,11 +28,15 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
-
-import { CoverRequestSheet } from '@/features/covers/components/cover-request-sheet';
-import { CoverQuickView } from '@/features/covers/components/cover-quick-view';
-import { useDeleteCoverOccurrence } from '@/features/covers/api/mutations';
-import { toast } from 'sonner';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 import { useCoverOccurrences } from '@/hooks/use-covers';
 import { useSchools } from '@/hooks/use-schools';
@@ -46,7 +48,7 @@ export const Route = createFileRoute('/_protected/covers')({
 
 function CoversCalendarPage() {
     const [selectedDate, setSelectedDate] = useState(new Date());
-    const [viewType, setViewType] = useState<ViewType>('week');
+    const [viewType, setViewType] = useState<ViewType>('month');
     const [schoolId, setSchoolId] = useState('all');
     const [requestSheetOpen, setRequestSheetOpen] = useState(false);
 

@@ -1,26 +1,31 @@
-
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { format } from 'date-fns';
-import { useState } from 'react';
 import {
-    Calendar as CalendarIcon,
-    Clock,
-    User,
-    MapPin,
-    CheckCircle2,
     AlertCircle,
+    Calendar as CalendarIcon,
+    CheckCircle2,
+    Clock,
+    Mail,
+    MapPin,
     MoreHorizontal,
     Pencil,
     Trash2,
-    Mail
+    User,
 } from 'lucide-react';
-import { supabase } from '@/services/supabase';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useState } from 'react';
+import { toast } from 'sonner';
+
+import type { CoverOccurrence } from '@/types/club.types';
+
+import { useDeleteCoverOccurrence } from '@/features/covers/api/mutations';
+import { CoverRequestSheet } from '@/features/covers/components/cover-request-sheet';
+
+import { PageLayout } from '@/components/common/page-layout';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -28,12 +33,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { PageLayout } from '@/components/common/page-layout';
-import type { CoverOccurrence } from '@/types/club.types';
-
-import { useDeleteCoverOccurrence } from '@/features/covers/api/mutations';
-import { CoverRequestSheet } from '@/features/covers/components/cover-request-sheet';
-import { toast } from 'sonner';
+import { Separator } from '@/components/ui/separator';
+import { supabase } from '@/services/supabase';
 
 export const Route = createFileRoute('/_protected/covers/$occurrenceId')({
     component: CoverDetailsPage,
@@ -44,7 +45,7 @@ function CoverDetailsPage() {
     const navigate = useNavigate();
     const [editSheetOpen, setEditSheetOpen] = useState(false);
 
-    const { data: occurrence, isLoading, error } = useQuery({
+    const { data: occurrence, isLoading, error: queryError } = useQuery({
         queryKey: ['cover-occurrence', occurrenceId],
         queryFn: async () => {
             const { data, error } = await supabase
@@ -99,8 +100,8 @@ function CoverDetailsPage() {
             await deleteOccurrence.mutateAsync(occurrenceId);
             toast.success("Cover session deleted");
             navigate({ to: '/covers' });
-        } catch (error) {
-            console.error("Failed to delete", error);
+        } catch (err) {
+            console.error("Failed to delete", err);
             toast.error("Failed to delete cover session");
         }
     };
@@ -115,7 +116,7 @@ function CoverDetailsPage() {
         );
     }
 
-    if (error || !occurrence) {
+    if (queryError || !occurrence) {
         return (
             <PageLayout breadcrumbs={[{ label: 'Covers Scheduling', href: '/covers' }, { label: 'Error' }]}>
                 <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
@@ -134,10 +135,10 @@ function CoverDetailsPage() {
 
     // Determine status color
     const assignment = occurrence.assignments?.[0];
-    const status = assignment?.status || 'unassigned';
+    const currentStatus = assignment?.status || 'unassigned';
 
-    const getStatusBadge = (status: string) => {
-        switch (status) {
+    const getStatusBadge = (s: string) => {
+        switch (s) {
             case 'confirmed':
                 return <Badge className="bg-green-100 text-green-700 hover:bg-green-200 border-green-200 gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" /> Confirmed</Badge>;
             case 'pending':
@@ -167,7 +168,7 @@ function CoverDetailsPage() {
                     <div>
                         <div className="flex items-center gap-2 mb-2">
                             <h1 className="text-3xl font-bold tracking-tight text-gray-900">{clubName}</h1>
-                            {getStatusBadge(status)}
+                            {getStatusBadge(currentStatus)}
                         </div>
                         <div className="flex items-center gap-2 text-gray-500">
                             <MapPin className="w-4 h-4" />

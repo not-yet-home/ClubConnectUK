@@ -1,15 +1,19 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Calendar, Views, dateFnsLocalizer } from 'react-big-calendar';
-import { format, getDay, parse, startOfWeek, endOfWeek, set, addHours } from 'date-fns';
+import { addHours, endOfWeek, format, getDay, parse, set, startOfWeek } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+import { getClubColors } from '../utils/formatters';
+import type { ViewType } from '@/features/covers/components/view-toggle';
 import type { View } from 'react-big-calendar';
 import type { CoverOccurrence } from '@/types/club.types';
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { getClubColors } from '../utils/formatters';
-import type { ViewType } from './view-toggle';
+import { cn } from '@/lib/utils';
+
+
+
 
 
 const rbcStyleOverrides = `
@@ -101,7 +105,7 @@ interface CalendarViewProps {
 export function CalendarView({
     events,
     onSelectEvent,
-    viewMode = 'week',
+    viewMode = 'month',
     date: controlledDate,
     onNavigate: onControlledNavigate,
     onViewChange
@@ -131,7 +135,8 @@ export function CalendarView({
 
     const [view, setView] = useState<View>(() => {
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-        if (viewMode === 'week' && isMobile) return Views.DAY;
+        // Override week or month with day view on mobile platforms for better legibility
+        if ((viewMode === 'week' || viewMode === 'month') && isMobile) return Views.DAY;
         return getCalendarView(viewMode);
     });
 
@@ -151,7 +156,7 @@ export function CalendarView({
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
         let newView: View;
 
-        if (viewMode === 'week' && isMobile) {
+        if ((viewMode === 'week' || viewMode === 'month') && isMobile) {
             newView = Views.DAY;
         } else {
             newView = getCalendarView(viewMode);
@@ -171,7 +176,7 @@ export function CalendarView({
     // Notify parent if mobile override happens on mount
     useEffect(() => {
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-        if (viewMode === 'week' && isMobile && onViewChange) {
+        if ((viewMode === 'week' || viewMode === 'month') && isMobile && onViewChange) {
             onViewChange('day');
         }
     }, []);
@@ -343,8 +348,8 @@ export function CalendarView({
                 }}
                 onSelectEvent={(event: any) => onSelectEvent(event.resource)}
                 formats={{
-                    dayHeaderFormat: (date) => format(date, 'EEE d'),
-                    timeGutterFormat: (date) => format(date, 'h a'),
+                    dayHeaderFormat: (d) => format(d, 'EEE d'),
+                    timeGutterFormat: (d) => format(d, 'h a'),
                     eventTimeRangeFormat: () => '', // Hide default time range as we render it in the component
                 }}
             />

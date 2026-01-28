@@ -1,26 +1,28 @@
 import * as React from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import {
-    format,
-    startOfMonth,
-    endOfMonth,
-    eachDayOfInterval,
-    isSameMonth,
-    isSameDay,
-    isToday,
     addMonths,
-    subMonths,
+    eachDayOfInterval,
+    endOfMonth,
+    endOfWeek,
+    format,
+    isSameDay,
+    isSameMonth,
+    isToday,
+    startOfMonth,
     startOfWeek,
-    endOfWeek
+    subMonths,
 } from 'date-fns'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+
+import type { CoverOccurrence } from '@/types/club.types'
+
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import type { CoverOccurrence } from '@/types/club.types'
 
 interface MiniCalendarProps {
     selectedDate: Date
     onSelectDate: (date: Date) => void
-    occurrences: CoverOccurrence[]
+    occurrences: Array<CoverOccurrence>
 }
 
 export function MiniCalendar({ selectedDate, onSelectDate, occurrences }: MiniCalendarProps) {

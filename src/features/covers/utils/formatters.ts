@@ -1,4 +1,4 @@
-import { parse, format } from 'date-fns';
+import { format, parse } from 'date-fns';
 
 export function formatEventTime(timeStr: string | undefined | null): string {
     if (!timeStr) return '';
