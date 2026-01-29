@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Calendar, Views, dateFnsLocalizer } from 'react-big-calendar';
-import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
+import withDragAndDropAcccent from 'react-big-calendar/lib/addons/dragAndDrop';
 import { addHours, endOfWeek, format, getDay, parse, set, startOfWeek } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -8,13 +8,14 @@ import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { getClubColors, parseLocalDate } from '../utils/formatters';
-import type { View } from 'react-big-calendar';
+import type { SlotInfo, View } from 'react-big-calendar';
 import type { ViewType } from '@/features/covers/components/view-toggle';
 import type { CoverOccurrence } from '@/types/club.types';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
+const withDragAndDrop: any = (withDragAndDropAcccent as any).default || withDragAndDropAcccent;
 const DragAndDropCalendar = withDragAndDrop(Calendar as any);
 
 // ... (rbcStyleOverrides remains unchanged) ...
@@ -333,14 +334,14 @@ export function CalendarView({
                 scrollToTime={set(new Date(), { hours: 9, minutes: 0 })}
                 draggableAccessor={() => true}
                 selectable={true}
-                onSelectSlot={(slotInfo) => {
+                onSelectSlot={(slotInfo: SlotInfo) => {
                     // Prevent clicking on gray areas (off-month days) in Month view
                     if (view === Views.MONTH) {
                         if (slotInfo.start.getMonth() !== date.getMonth()) return;
                     }
                     onSelectSlot?.(slotInfo.start);
                 }}
-                onDrillDown={(drillDate) => {
+                onDrillDown={(drillDate: Date) => {
                     // Prevent drilling down on gray areas (off-month days) in Month view
                     if (view === Views.MONTH) {
                         if (drillDate.getMonth() !== date.getMonth()) return;
@@ -374,8 +375,8 @@ export function CalendarView({
                 }}
                 onSelectEvent={(event: any) => onSelectEvent(event.resource)}
                 formats={{
-                    dayHeaderFormat: (d) => format(d, 'EEE d'),
-                    timeGutterFormat: (d) => format(d, 'h a'),
+                    dayHeaderFormat: (d: Date) => format(d, 'EEE d'),
+                    timeGutterFormat: (d: Date) => format(d, 'h a'),
                     eventTimeRangeFormat: () => '', // Hide default time range as we render it in the component
                 }}
             />

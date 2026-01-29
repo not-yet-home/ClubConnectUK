@@ -54,6 +54,7 @@ export function CoverRequestSheet({
     const [meetingDate, setMeetingDate] = React.useState<string>(format(new Date(), 'yyyy-MM-dd'))
     const [startTime, setStartTime] = React.useState<string>("15:00")
     const [endTime, setEndTime] = React.useState<string>("16:00")
+    const [updateType, setUpdateType] = React.useState<'single' | 'series'>('single')
 
     // Effect to populate form when existingData changes or modal opens
     React.useEffect(() => {
@@ -174,7 +175,8 @@ export function CoverRequestSheet({
                     end_time: endTime.length === 5 ? `${endTime}:00` : endTime,
                     meeting_date: meetingDate,
                     teacher_id: teacherId === 'unassigned' ? undefined : teacherId,
-                    request_type: requestType
+                    request_type: requestType,
+                    updateType: updateType
                 })
                 toast.success("Cover request updated successfully.")
             } else {
@@ -209,6 +211,7 @@ export function CoverRequestSheet({
         setMeetingDate(format(new Date(), 'yyyy-MM-dd'))
         setStartTime("15:00")
         setEndTime("16:00")
+        setUpdateType("single")
     }
 
     // Clear club selection if school changes (only in create mode or key change)
@@ -252,6 +255,29 @@ export function CoverRequestSheet({
                                     </SelectContent>
                                 </Select>
                             </div>
+
+                            {isEditing && requestType === 'recurring' && (
+                                <div className="space-y-2 pt-1 animate-in slide-in-from-left-2 duration-300">
+                                    <Label className="text-xs font-semibold uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
+                                        <span className="h-1.5 w-1.5 rounded-full bg-blue-600 animate-pulse" />
+                                        Update Mode
+                                    </Label>
+                                    <Select value={updateType} onValueChange={(v) => setUpdateType(v as any)}>
+                                        <SelectTrigger className="h-10 border-blue-100 bg-blue-50/30">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="single">Just this session</SelectItem>
+                                            <SelectItem value="series">Entire series</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <p className="text-[10px] text-muted-foreground px-1">
+                                        {updateType === 'single'
+                                            ? "Only this specific date will be modified."
+                                            : "All related sessions in this series will be updated."}
+                                    </p>
+                                </div>
+                            )}
 
                             <Separator className="opacity-50" />
 

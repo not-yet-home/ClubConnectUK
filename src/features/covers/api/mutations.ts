@@ -125,32 +125,66 @@ export function useUpdateCoverRequest() {
     const queryClient = useQueryClient()
 
     return useMutation({
-        mutationFn: async (params: CreateCoverRequestParams & { occurrence_id: string, rule_id: string }) => {
-            // 1. Update the Cover Rule
-            const { error: ruleError } = await supabase
-                .from('cover_rules')
-                .update({
-                    school_id: params.school_id,
-                    club_id: params.club_id,
-                    frequency: params.frequency,
-                    day_of_week: params.day_of_week,
-                    start_time: params.start_time,
-                    end_time: params.end_time,
-                })
-                .eq('id', params.rule_id)
+        mutationFn: async (params: CreateCoverRequestParams & {
+            occurrence_id: string,
+            rule_id: string,
+            updateType?: 'single' | 'series'
+        }) => {
+            const isSeries = params.updateType === 'series'
 
-            if (ruleError) throw ruleError
+            if (isSeries) {
+                // 1. Update the EXISTING Cover Rule
+                const { error: ruleError } = await supabase
+                    .from('cover_rules')
+                    .update({
+                        school_id: params.school_id,
+                        club_id: params.club_id,
+                        frequency: params.frequency,
+                        day_of_week: params.day_of_week,
+                        start_time: params.start_time,
+                        end_time: params.end_time,
+                    })
+                    .eq('id', params.rule_id)
 
-            // 2. Update the Cover Occurrence
-            const { error: occError } = await supabase
-                .from('cover_occurrences')
-                .update({
-                    meeting_date: params.meeting_date,
-                    // notes: params.notes // Assuming we might want to update notes too, adding if available
-                })
-                .eq('id', params.occurrence_id)
+                if (ruleError) throw ruleError
 
-            if (occError) throw occError
+                // 2. Update the specific occurrence's date
+                const { error: occError } = await supabase
+                    .from('cover_occurrences')
+                    .update({ meeting_date: params.meeting_date })
+                    .eq('id', params.occurrence_id)
+
+                if (occError) throw occError
+            } else {
+                // UPDATE ONLY ONE (Isolated):
+                // 1. Create a NEW isolated rule for this session
+                const { data: newRule, error: newRuleError } = await supabase
+                    .from('cover_rules')
+                    .insert({
+                        school_id: params.school_id,
+                        club_id: params.club_id,
+                        frequency: 'weekly', // Dummy, will be one-off in practice
+                        day_of_week: params.day_of_week,
+                        start_time: params.start_time,
+                        end_time: params.end_time,
+                        status: 'active'
+                    })
+                    .select()
+                    .single()
+
+                if (newRuleError) throw newRuleError
+
+                // 2. Translocate this occurrence to the new isolated rule
+                const { error: occUpdateError } = await supabase
+                    .from('cover_occurrences')
+                    .update({
+                        cover_rule_id: newRule.id,
+                        meeting_date: params.meeting_date
+                    })
+                    .eq('id', params.occurrence_id)
+
+                if (occUpdateError) throw occUpdateError
+            }
 
             // 3. Update Assignment
             // First, remove existing assignment for this occurrence
