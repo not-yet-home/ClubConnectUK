@@ -32,6 +32,7 @@ interface CoverRequestSheetProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     existingData?: CoverOccurrence | null
+    initialDate?: Date | null
 }
 
 type RequestType = 'one-off' | 'recurring'
@@ -39,7 +40,8 @@ type RequestType = 'one-off' | 'recurring'
 export function CoverRequestSheet({
     open,
     onOpenChange,
-    existingData
+    existingData,
+    initialDate
 }: CoverRequestSheetProps) {
     const isEditing = !!existingData
 
@@ -84,8 +86,11 @@ export function CoverRequestSheet({
         } else if (open && !existingData) {
             // Reset if opening in create mode
             resetForm()
+            if (initialDate) {
+                setMeetingDate(format(initialDate, 'yyyy-MM-dd'))
+            }
         }
-    }, [open, existingData])
+    }, [open, existingData, initialDate])
 
     // ... inside component ...
 
@@ -168,7 +173,8 @@ export function CoverRequestSheet({
                     start_time: startTime.length === 5 ? `${startTime}:00` : startTime,
                     end_time: endTime.length === 5 ? `${endTime}:00` : endTime,
                     meeting_date: meetingDate,
-                    teacher_id: teacherId === 'unassigned' ? undefined : teacherId
+                    teacher_id: teacherId === 'unassigned' ? undefined : teacherId,
+                    request_type: requestType
                 })
                 toast.success("Cover request updated successfully.")
             } else {
@@ -180,7 +186,8 @@ export function CoverRequestSheet({
                     start_time: `${startTime}:00`,
                     end_time: `${endTime}:00`,
                     meeting_date: meetingDate,
-                    teacher_id: teacherId === 'unassigned' ? undefined : teacherId
+                    teacher_id: teacherId === 'unassigned' ? undefined : teacherId,
+                    request_type: requestType
                 })
                 toast.success("Cover request created successfully.")
             }
@@ -313,6 +320,11 @@ export function CoverRequestSheet({
                                     required
                                     className="h-10"
                                 />
+                                {(new Date(meetingDate).getDay() === 0 || new Date(meetingDate).getDay() === 6) && (
+                                    <p className="text-[10px] text-orange-600 font-medium animate-pulse mt-1">
+                                        Weekend selected. Sessions will be automatically shifted to the nearest weekday.
+                                    </p>
+                                )}
                             </div>
 
                             {requestType === 'recurring' && (

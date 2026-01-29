@@ -1,7 +1,7 @@
 import { format, isAfter, startOfDay } from 'date-fns';
 import { Calendar as CalendarIcon, Clock, User } from 'lucide-react';
 
-import { formatEventTime, getClubColors } from '../utils/formatters';
+import { formatEventTime, getClubColors, parseLocalDate } from '../utils/formatters';
 import type { CoverOccurrence } from '@/types/club.types';
 
 import { cn } from '@/lib/utils';
@@ -16,9 +16,16 @@ export function UpcomingCoversList({ occurrences, onSelectOccurrence }: Upcoming
 
     // Sort and filter upcoming occurrences
     const upcoming = occurrences
-        .filter(occ => isAfter(startOfDay(new Date(occ.meeting_date)), today) ||
-            format(new Date(occ.meeting_date), 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd'))
-        .sort((a, b) => new Date(a.meeting_date).getTime() - new Date(b.meeting_date).getTime())
+        .filter(occ => {
+            const occDate = parseLocalDate(occ.meeting_date);
+            return isAfter(startOfDay(occDate), today) ||
+                format(occDate, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd');
+        })
+        .sort((a, b) => {
+            const dateA = parseLocalDate(a.meeting_date).getTime();
+            const dateB = parseLocalDate(b.meeting_date).getTime();
+            return dateA - dateB;
+        })
         .slice(0, 10);
 
     return (
@@ -37,6 +44,7 @@ export function UpcomingCoversList({ occurrences, onSelectOccurrence }: Upcoming
                             : 'Unassigned';
 
                         const colors = getClubColors(occ.cover_rule?.club?.club_name);
+                        const displayDate = parseLocalDate(occ.meeting_date);
 
                         return (
                             <div
@@ -58,7 +66,7 @@ export function UpcomingCoversList({ occurrences, onSelectOccurrence }: Upcoming
                                 <div className="space-y-1.5">
                                     <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-700">
                                         <CalendarIcon className="h-3 w-3 opacity-70" />
-                                        {format(new Date(occ.meeting_date), 'EEEE, MMM d')}
+                                        {format(displayDate, 'EEEE, MMM d')}
                                     </div>
                                     <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-700">
                                         <Clock className="h-3 w-3 opacity-70" />

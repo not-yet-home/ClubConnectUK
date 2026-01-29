@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
+import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Add01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
@@ -8,7 +9,7 @@ import { Menu } from 'lucide-react';
 import type { CoverOccurrence } from '@/types/club.types';
 
 import type { ViewType } from '@/features/covers/components/view-toggle';
-import { useDeleteCoverOccurrence } from '@/features/covers/api/mutations';
+import { useDeleteCoverOccurrence, useMoveCoverOccurrence } from '@/features/covers/api/mutations';
 import { CalendarView } from '@/features/covers/components/calendar-view';
 import { CoverQuickView } from '@/features/covers/components/cover-quick-view';
 import { CoverRequestSheet } from '@/features/covers/components/cover-request-sheet';
@@ -51,6 +52,7 @@ function CoversCalendarPage() {
     const [viewType, setViewType] = useState<ViewType>('month');
     const [schoolId, setSchoolId] = useState('all');
     const [requestSheetOpen, setRequestSheetOpen] = useState(false);
+    const [preselectedDate, setPreselectedDate] = useState<Date | null>(null);
 
     // Quick View & Edit State
     const [quickViewOpen, setQuickViewOpen] = useState(false);
@@ -61,16 +63,37 @@ function CoversCalendarPage() {
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
     const [occurrenceToDelete, setOccurrenceToDelete] = useState<CoverOccurrence | null>(null);
 
+    const handleSelectSlot = (date: Date) => {
+        setPreselectedDate(date);
+        setRequestSheetOpen(true);
+    };
+
 
     const { data: schools } = useSchools();
     const { data: occurrences, isLoading } = useCoverOccurrences({ schoolId });
     const deleteOccurrence = useDeleteCoverOccurrence();
+    const moveOccurrence = useMoveCoverOccurrence();
 
     const events = useMemo(() => occurrences || [], [occurrences]);
 
     const handleSelectOccurrence = (occurrence: CoverOccurrence) => {
         setSelectedOccurrence(occurrence);
         setQuickViewOpen(true);
+    };
+
+    const handleEventDrop = async (occurrence: CoverOccurrence, newDate: Date) => {
+        const dateStr = format(newDate, 'yyyy-MM-dd');
+
+        try {
+            await moveOccurrence.mutateAsync({
+                id: occurrence.id,
+                newDate: dateStr
+            });
+            toast.success(`Moved cover to ${format(newDate, 'PPP')}`);
+        } catch (error) {
+            console.error("Failed to move cover", error);
+            toast.error("Failed to move cover session");
+        }
     };
 
     const handleEditFromQuickView = (occurrence: CoverOccurrence) => {
@@ -155,7 +178,10 @@ function CoversCalendarPage() {
 
                         {/* New Request Button */}
                         <Button
-                            onClick={() => setRequestSheetOpen(true)}
+                            onClick={() => {
+                                setPreselectedDate(null);
+                                setRequestSheetOpen(true);
+                            }}
                             size="sm"
                             className="w-full sm:w-auto mt-1 sm:mt-0 h-9"
                         >
@@ -186,6 +212,9 @@ function CoversCalendarPage() {
                                         <CalendarView
                                             events={events}
                                             onSelectEvent={(occ) => handleSelectOccurrence(occ)}
+                                            onSelectSlot={handleSelectSlot}
+                                            onDrillDown={handleSelectSlot}
+                                            onEventDrop={handleEventDrop}
                                             viewMode={viewType}
                                             onViewChange={setViewType}
                                             date={selectedDate}
@@ -235,6 +264,7 @@ function CoversCalendarPage() {
             <CoverRequestSheet
                 open={requestSheetOpen}
                 onOpenChange={setRequestSheetOpen}
+                initialDate={preselectedDate}
             />
 
             {/* Edit Sheet (reusing same component) */}

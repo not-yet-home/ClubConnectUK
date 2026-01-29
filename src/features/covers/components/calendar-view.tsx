@@ -1,20 +1,23 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Calendar, Views, dateFnsLocalizer } from 'react-big-calendar';
+import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import { addHours, endOfWeek, format, getDay, parse, set, startOfWeek } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-import { getClubColors } from '../utils/formatters';
-import type { ViewType } from '@/features/covers/components/view-toggle';
+import { getClubColors, parseLocalDate } from '../utils/formatters';
 import type { View } from 'react-big-calendar';
+import type { ViewType } from '@/features/covers/components/view-toggle';
 import type { CoverOccurrence } from '@/types/club.types';
+
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
+const DragAndDropCalendar = withDragAndDrop(Calendar as any);
 
-
-
+// ... (rbcStyleOverrides remains unchanged) ...
 
 const rbcStyleOverrides = `
 .rbc-calendar {
@@ -44,10 +47,7 @@ const rbcStyleOverrides = `
     min-height: 28px;
 }
 .rbc-current-time-indicator {
-    height: 2px !important;
-    background-color: #eec366 !important;
-    position: absolute;
-    z-index: 10;
+    display: none !important;
 }
 .rbc-time-header-content {
     border-left: 1px solid #e5e7eb !important;
@@ -96,6 +96,9 @@ const localizer = dateFnsLocalizer({
 interface CalendarViewProps {
     events: Array<CoverOccurrence>;
     onSelectEvent: (event: CoverOccurrence) => void;
+    onSelectSlot?: (date: Date) => void;
+    onDrillDown?: (date: Date) => void;
+    onEventDrop?: (event: CoverOccurrence, newDate: Date) => void;
     viewMode?: ViewType;
     date?: Date;
     onNavigate?: (date: Date) => void;
@@ -105,6 +108,9 @@ interface CalendarViewProps {
 export function CalendarView({
     events,
     onSelectEvent,
+    onSelectSlot,
+    onDrillDown,
+    onEventDrop,
     viewMode = 'month',
     date: controlledDate,
     onNavigate: onControlledNavigate,
@@ -228,11 +234,7 @@ export function CalendarView({
     // Transform CoverOccurrence to Calendar Event with proper time
     const calendarEvents = useMemo(() => {
         return events.map(occ => {
-            // Manually construct local date to prevent any UTC/Timezone shifts
-            // meeting_date is "YYYY-MM-DD" or ISO string
-            const dateStr = typeof occ.meeting_date === 'string' ? occ.meeting_date.substring(0, 10) : '';
-            const [year, month, day] = dateStr.split('-').map(Number);
-            const meetingDate = new Date(year, month - 1, day);
+            const meetingDate = parseLocalDate(occ.meeting_date);
 
             // Create start and end times based on cover_rule times
             let start = new Date(meetingDate);
@@ -255,6 +257,7 @@ export function CalendarView({
             }
 
             return {
+                id: occ.id,
                 title: occ.cover_rule?.club?.club_name || 'Cover',
                 start,
                 end,
@@ -264,6 +267,12 @@ export function CalendarView({
             };
         });
     }, [events]);
+
+    const handleEventDrop = ({ event, start }: any) => {
+        if (onEventDrop && event.resource) {
+            onEventDrop(event.resource, start);
+        }
+    };
 
     // Custom Event Component for Week/Day view
     const WeekEventComponent = ({ event }: any) => {
@@ -305,7 +314,7 @@ export function CalendarView({
     return (
         <div className="h-full bg-white overflow-hidden relative">
             <style>{rbcStyleOverrides}</style>
-            <Calendar
+            <DragAndDropCalendar
                 localizer={localizer}
                 events={calendarEvents}
                 startAccessor="start"
@@ -322,6 +331,23 @@ export function CalendarView({
                 min={set(new Date(), { hours: 7, minutes: 0 })}  // 7 AM
                 max={set(new Date(), { hours: 20, minutes: 0 })} // 8 PM
                 scrollToTime={set(new Date(), { hours: 9, minutes: 0 })}
+                draggableAccessor={() => true}
+                selectable={true}
+                onSelectSlot={(slotInfo) => {
+                    // Prevent clicking on gray areas (off-month days) in Month view
+                    if (view === Views.MONTH) {
+                        if (slotInfo.start.getMonth() !== date.getMonth()) return;
+                    }
+                    onSelectSlot?.(slotInfo.start);
+                }}
+                onDrillDown={(drillDate) => {
+                    // Prevent drilling down on gray areas (off-month days) in Month view
+                    if (view === Views.MONTH) {
+                        if (drillDate.getMonth() !== date.getMonth()) return;
+                    }
+                    onDrillDown?.(drillDate);
+                }}
+                onEventDrop={handleEventDrop}
                 components={{
                     toolbar: CustomToolbar,
                     event: view === Views.MONTH ? MonthEventComponent : WeekEventComponent
@@ -330,7 +356,7 @@ export function CalendarView({
                     const colors = getClubColors(event.resource.cover_rule?.club?.club_name);
                     return {
                         className: cn(
-                            "cursor-pointer hover:opacity-90 transition-opacity",
+                            "cursor-grab active:cursor-grabbing hover:opacity-90 transition-opacity",
                             view === Views.MONTH ? "px-2 py-1 text-xs" : "px-0 py-0"
                         ),
                         style: {

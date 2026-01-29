@@ -78,3 +78,16 @@ export function getClubColors(clubName: string | undefined): { border: string; b
         borderHex: '#d1d5db'
     };
 }
+
+/**
+ * Safely parses a "YYYY-MM-DD" date string from Supabase into a local Date object,
+ * avoiding any UTC/timezone shifting issues.
+ */
+export function parseLocalDate(dateStr: string | undefined | null): Date {
+    if (!dateStr) return new Date();
+    // Handle both YYYY-MM-DD and ISO strings
+    const str = dateStr.substring(0, 10);
+    const [year, month, day] = str.split('-').map(Number);
+    // month - 1 because JS months are 0-indexed
+    return new Date(year, month - 1, day);
+}
