@@ -75,8 +75,11 @@ export const useUpcomingAgenda = () => {
         .select(
           `
                     id,
+                    cover_rule_id,
                     meeting_date,
                     notes,
+                    created_at,
+                    updated_at,
                     cover_rule:cover_rule_id (
                         start_time,
                         end_time,
@@ -96,7 +99,11 @@ export const useUpcomingAgenda = () => {
         .limit(10)
 
       if (error) throw error
-      return data
+      return (data as Array<any>).map((d) => ({
+        ...d,
+        cover_rule: Array.isArray(d.cover_rule) ? d.cover_rule[0] : d.cover_rule,
+        assignments: d.assignments || [],
+      }))
     },
   })
 }

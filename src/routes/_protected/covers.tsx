@@ -1,18 +1,35 @@
-
 import { createFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
-import { HugeiconsIcon } from '@hugeicons/react';
+import { format } from 'date-fns';
+import { toast } from 'sonner';
 import { Add01Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Menu } from 'lucide-react';
+
 import type { CoverOccurrence } from '@/types/club.types';
+
+import type { ViewType } from '@/features/covers/components/view-toggle';
+import { useDeleteCoverOccurrence, useMoveCoverOccurrence } from '@/features/covers/api/mutations';
 import { CalendarView } from '@/features/covers/components/calendar-view';
-import { EventDetailsPanel } from '@/features/covers/components/event-details-panel';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
+import { CoverQuickView } from '@/features/covers/components/cover-quick-view';
+import { CoverRequestSheet } from '@/features/covers/components/cover-request-sheet';
+import { CoversListView } from '@/features/covers/components/covers-list-view';
+import { UpcomingCoversList } from '@/features/covers/components/upcoming-covers-list';
+import { ViewToggle } from '@/features/covers/components/view-toggle';
+import { YearView } from '@/features/covers/components/year-view';
+
 import { PageLayout } from '@/components/common/page-layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { DataTableToolbar, DataTableToolbarLeft, DataTableToolbarRight } from '@/components/ui/data-table-components';
-import { ICON_SIZES } from '@/constants/sizes';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
+import { Label } from '@/components/ui/label';
 import {
     Select,
     SelectContent,
@@ -20,95 +37,221 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-
-import { CoverRequestSheet } from '@/features/covers/components/cover-request-sheet';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 import { useCoverOccurrences } from '@/hooks/use-covers';
 import { useSchools } from '@/hooks/use-schools';
+import { cn } from '@/lib/utils';
 
 export const Route = createFileRoute('/_protected/covers')({
     component: CoversCalendarPage,
 });
 
 function CoversCalendarPage() {
-    const [selectedEvent, setSelectedEvent] = useState<CoverOccurrence | null>(null);
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [viewType, setViewType] = useState<ViewType>('month');
     const [schoolId, setSchoolId] = useState('all');
     const [requestSheetOpen, setRequestSheetOpen] = useState(false);
+    const [preselectedDate, setPreselectedDate] = useState<Date | null>(null);
+
+    // Quick View & Edit State
+    const [quickViewOpen, setQuickViewOpen] = useState(false);
+    const [selectedOccurrence, setSelectedOccurrence] = useState<CoverOccurrence | null>(null);
+    const [editingBoxOpen, setEditingBoxOpen] = useState(false);
+
+    // Delete Confirmation State
+    const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+    const [occurrenceToDelete, setOccurrenceToDelete] = useState<CoverOccurrence | null>(null);
+
+    const handleSelectSlot = (date: Date) => {
+        setPreselectedDate(date);
+        setRequestSheetOpen(true);
+    };
+
 
     const { data: schools } = useSchools();
     const { data: occurrences, isLoading } = useCoverOccurrences({ schoolId });
+    const deleteOccurrence = useDeleteCoverOccurrence();
+    const moveOccurrence = useMoveCoverOccurrence();
 
-    // Fallback to empty array if still loading or error
     const events = useMemo(() => occurrences || [], [occurrences]);
+
+    const handleSelectOccurrence = (occurrence: CoverOccurrence) => {
+        setSelectedOccurrence(occurrence);
+        setQuickViewOpen(true);
+    };
+
+    const handleEventDrop = async (occurrence: CoverOccurrence, newDate: Date) => {
+        const dateStr = format(newDate, 'yyyy-MM-dd');
+
+        try {
+            await moveOccurrence.mutateAsync({
+                id: occurrence.id,
+                newDate: dateStr
+            });
+            toast.success(`Moved cover to ${format(newDate, 'PPP')}`);
+        } catch (error) {
+            console.error("Failed to move cover", error);
+            toast.error("Failed to move cover session");
+        }
+    };
+
+    const handleEditFromQuickView = (occurrence: CoverOccurrence) => {
+        setQuickViewOpen(false);
+        // Small delay to allow dialog to close smoothly
+        setTimeout(() => {
+            setSelectedOccurrence(occurrence);
+            setEditingBoxOpen(true);
+        }, 100);
+    };
+
+    const handleDeleteFromQuickView = (occurrence: CoverOccurrence) => {
+        setOccurrenceToDelete(occurrence);
+        setDeleteConfirmationOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!occurrenceToDelete) return;
+
+        try {
+            await deleteOccurrence.mutateAsync(occurrenceToDelete.id);
+            toast.success("Cover session deleted");
+            setDeleteConfirmationOpen(false);
+            setOccurrenceToDelete(null);
+            setQuickViewOpen(false);
+        } catch (error) {
+            console.error("Failed to delete", error);
+            toast.error("Failed to delete cover session");
+        }
+    };
+
 
     return (
         <>
-            <PageLayout breadcrumbs={[{ label: 'Covers Scheduling' }]}>
-                <div className="mx-auto space-y-6">
-                    <Card className="border-none shadow-none bg-transparent">
-                        <CardHeader className="flex flex-row justify-between items-center px-0 pt-0">
-                            <section className="flex flex-col gap-2">
-                                <CardTitle>Covers Scheduling</CardTitle>
-                                <CardDescription>
-                                    Manage and monitor club cover assignments and teacher availability
-                                </CardDescription>
-                            </section>
-                            <section>
-                                <Button onClick={() => setRequestSheetOpen(true)}>
-                                    <HugeiconsIcon icon={Add01Icon} className={ICON_SIZES.lg} />
-                                    New Cover Request
-                                </Button>
-                            </section>
-                        </CardHeader>
-                        <CardContent className="px-0">
-                            <div className="flex flex-col gap-4">
-                                <DataTableToolbar className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
-                                    <DataTableToolbarLeft>
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex items-center gap-2">
-                                                <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap">Filter by School:</Label>
-                                                <Select value={schoolId} onValueChange={setSchoolId}>
-                                                    <SelectTrigger className="w-[200px] h-9">
-                                                        <SelectValue placeholder="All Schools" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="all">All Schools</SelectItem>
-                                                        {schools?.map((school) => (
-                                                            <SelectItem key={school.id} value={school.id}>
-                                                                {school.school_name}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-
-                                            <div className="flex items-center space-x-2 bg-gray-50 px-3 py-1.5 rounded-md border border-gray-100">
-                                                <Checkbox id="show-availability" />
-                                                <Label htmlFor="show-availability" className="text-sm font-medium cursor-pointer">Show Teacher Availability</Label>
-                                            </div>
-                                        </div>
-                                    </DataTableToolbarLeft>
-                                    <DataTableToolbarRight>
-                                        {/* Additional actions can go here */}
-                                    </DataTableToolbarRight>
-                                </DataTableToolbar>
-
-                                <div className="flex h-[calc(100vh-320px)] min-h-[600px] gap-6">
-                                    {/* Calendar Area */}
-                                    <div className="flex-1 min-w-0">
-                                        <CalendarView
-                                            events={events}
-                                            onSelectEvent={setSelectedEvent}
+            <PageLayout breadcrumbs={[{ label: 'Covers Scheduling' }]} className="p-3 sm:p-6">
+                <div className="h-[calc(100vh-120px)] flex flex-col">
+                    {/* Header Toolbar */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3 sm:gap-4 px-1 sm:px-0">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                            {/* Mobile Menu Toggle for Mini Calendar */}
+                            <Sheet>
+                                <SheetTrigger asChild>
+                                    <Button variant="outline" size="icon" className="lg:hidden h-9 w-9">
+                                        <Menu className="h-4 w-4" />
+                                    </Button>
+                                </SheetTrigger>
+                                <SheetContent side="left" className="w-[280px] sm:w-[320px]">
+                                    <div className="mt-6 h-[500px]">
+                                        <UpcomingCoversList
+                                            occurrences={events}
+                                            onSelectOccurrence={handleSelectOccurrence}
                                         />
                                     </div>
+                                </SheetContent>
+                            </Sheet>
 
-                                    {/* Side Panel - Details */}
-                                    {selectedEvent && (
-                                        <div className="w-80 shrink-0 h-full border rounded-lg bg-white overflow-hidden animate-in slide-in-from-right-5 duration-300 shadow-sm">
-                                            <EventDetailsPanel
-                                                occurrence={selectedEvent}
-                                                onClose={() => setSelectedEvent(null)}
+                            {/* School Filter */}
+                            <div className="flex items-center gap-2">
+                                <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap hidden lg:block">
+                                    School:
+                                </Label>
+                                <Select value={schoolId} onValueChange={setSchoolId}>
+                                    <SelectTrigger className="w-full sm:w-[180px] h-9">
+                                        <SelectValue placeholder="All Schools" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Schools</SelectItem>
+                                        {schools?.map((school) => (
+                                            <SelectItem key={school.id} value={school.id}>
+                                                {school.school_name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            {/* View Toggle */}
+                            <div className="flex-shrink-0">
+                                <ViewToggle value={viewType} onChange={setViewType} />
+                            </div>
+                        </div>
+
+                        {/* New Request Button */}
+                        <Button
+                            onClick={() => {
+                                setPreselectedDate(null);
+                                setRequestSheetOpen(true);
+                            }}
+                            size="sm"
+                            className="w-full sm:w-auto mt-1 sm:mt-0 h-9"
+                        >
+                            <HugeiconsIcon icon={Add01Icon} className="h-4 w-4 mr-1.5" />
+                            <span>New Request</span>
+                        </Button>
+                    </div>
+
+                    {/* Main Content Area */}
+                    <Card className="flex-1 border-gray-200 overflow-hidden">
+                        <CardContent className="p-0 h-full">
+                            <div className="flex h-full">
+                                {/* Left Sidebar - Upcoming Covers List (Desktop Only) */}
+                                <div className="hidden lg:block w-72 border-r border-gray-200 p-4 bg-gray-50/50">
+                                    <UpcomingCoversList
+                                        occurrences={events}
+                                        onSelectOccurrence={handleSelectOccurrence}
+                                    />
+                                </div>
+
+                                {/* Main Calendar/List Area */}
+                                <div className={cn(
+                                    "flex-1 overflow-auto",
+                                    (viewType === 'schedule' || viewType === 'year') ? "p-0" : "p-0"
+                                )}>
+                                    {/* Calendar Views */}
+                                    {(viewType === 'day' || viewType === 'week' || viewType === 'month' || viewType === '4days') && (
+                                        <CalendarView
+                                            events={events}
+                                            onSelectEvent={(occ) => handleSelectOccurrence(occ)}
+                                            onSelectSlot={handleSelectSlot}
+                                            onDrillDown={handleSelectSlot}
+                                            onEventDrop={handleEventDrop}
+                                            viewMode={viewType}
+                                            onViewChange={setViewType}
+                                            date={selectedDate}
+                                            onNavigate={setSelectedDate}
+                                        />
+                                    )}
+
+                                    {/* Schedule (Agenda) View */}
+                                    {viewType === 'schedule' && (
+                                        <div className="p-6">
+                                            <CoversListView
+                                                occurrences={events}
+                                                onSelectOccurrence={handleSelectOccurrence}
                                             />
+                                        </div>
+                                    )}
+
+                                    {/* Year View */}
+                                    {viewType === 'year' && (
+                                        <YearView
+                                            occurrences={events}
+                                            selectedYear={selectedDate.getFullYear()}
+                                            onSelectMonth={(month) => {
+                                                const newDate = new Date(selectedDate)
+                                                newDate.setMonth(month)
+                                                setSelectedDate(newDate)
+                                                setViewType('month')
+                                            }}
+                                        />
+                                    )}
+
+                                    {isLoading && (
+                                        <div className="flex items-center justify-center h-full">
+                                            <div className="text-center">
+                                                <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-3"></div>
+                                                <p className="text-sm text-gray-500">Loading covers...</p>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -121,7 +264,41 @@ function CoversCalendarPage() {
             <CoverRequestSheet
                 open={requestSheetOpen}
                 onOpenChange={setRequestSheetOpen}
+                initialDate={preselectedDate}
             />
+
+            {/* Edit Sheet (reusing same component) */}
+            <CoverRequestSheet
+                open={editingBoxOpen}
+                onOpenChange={setEditingBoxOpen}
+                existingData={selectedOccurrence}
+            />
+
+            {/* Quick View Dialog */}
+            <CoverQuickView
+                open={quickViewOpen}
+                onOpenChange={setQuickViewOpen}
+                occurrence={selectedOccurrence}
+                onEdit={handleEditFromQuickView}
+                onDelete={handleDeleteFromQuickView}
+            />
+
+            <Dialog open={deleteConfirmationOpen} onOpenChange={setDeleteConfirmationOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Delete Cover Session?</DialogTitle>
+                        <DialogDescription>
+                            This action cannot be undone. This will permanently delete the cover session for <span className="font-medium text-foreground">{occurrenceToDelete?.cover_rule?.club?.club_name}</span>.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="ghost" onClick={() => setDeleteConfirmationOpen(false)}>Cancel</Button>
+                        <Button variant="destructive" onClick={confirmDelete} disabled={deleteOccurrence.isPending}>
+                            {deleteOccurrence.isPending ? "Deleting..." : "Delete"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }
