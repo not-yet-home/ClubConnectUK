@@ -15,6 +15,7 @@ import { Route as ProtectedSettingsRouteImport } from './routes/_protected/setti
 import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
 import { Route as ProtectedCoversRouteImport } from './routes/_protected/covers'
 import { Route as ProtectedBroadcastRouteImport } from './routes/_protected/broadcast'
+import { Route as ProtectedCoversIndexRouteImport } from './routes/_protected/covers/index'
 import { Route as ProtectedBroadcastIndexRouteImport } from './routes/_protected/broadcast/index'
 import { Route as ProtectedTeachersTeacherListRouteImport } from './routes/_protected/teachers/teacher-list'
 import { Route as ProtectedCoversOccurrenceIdRouteImport } from './routes/_protected/covers/$occurrenceId'
@@ -50,6 +51,11 @@ const ProtectedBroadcastRoute = ProtectedBroadcastRouteImport.update({
   id: '/broadcast',
   path: '/broadcast',
   getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedCoversIndexRoute = ProtectedCoversIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProtectedCoversRoute,
 } as any)
 const ProtectedBroadcastIndexRoute = ProtectedBroadcastIndexRouteImport.update({
   id: '/',
@@ -96,10 +102,10 @@ export interface FileRoutesByFullPath {
   '/covers/$occurrenceId': typeof ProtectedCoversOccurrenceIdRoute
   '/teachers/teacher-list': typeof ProtectedTeachersTeacherListRoute
   '/broadcast/': typeof ProtectedBroadcastIndexRoute
+  '/covers/': typeof ProtectedCoversIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/covers': typeof ProtectedCoversRouteWithChildren
   '/dashboard': typeof ProtectedDashboardRoute
   '/settings': typeof ProtectedSettingsRoute
   '/broadcast/new': typeof ProtectedBroadcastNewRoute
@@ -108,6 +114,7 @@ export interface FileRoutesByTo {
   '/covers/$occurrenceId': typeof ProtectedCoversOccurrenceIdRoute
   '/teachers/teacher-list': typeof ProtectedTeachersTeacherListRoute
   '/broadcast': typeof ProtectedBroadcastIndexRoute
+  '/covers': typeof ProtectedCoversIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -123,6 +130,7 @@ export interface FileRoutesById {
   '/_protected/covers/$occurrenceId': typeof ProtectedCoversOccurrenceIdRoute
   '/_protected/teachers/teacher-list': typeof ProtectedTeachersTeacherListRoute
   '/_protected/broadcast/': typeof ProtectedBroadcastIndexRoute
+  '/_protected/covers/': typeof ProtectedCoversIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -138,10 +146,10 @@ export interface FileRouteTypes {
     | '/covers/$occurrenceId'
     | '/teachers/teacher-list'
     | '/broadcast/'
+    | '/covers/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/covers'
     | '/dashboard'
     | '/settings'
     | '/broadcast/new'
@@ -150,6 +158,7 @@ export interface FileRouteTypes {
     | '/covers/$occurrenceId'
     | '/teachers/teacher-list'
     | '/broadcast'
+    | '/covers'
   id:
     | '__root__'
     | '/'
@@ -164,6 +173,7 @@ export interface FileRouteTypes {
     | '/_protected/covers/$occurrenceId'
     | '/_protected/teachers/teacher-list'
     | '/_protected/broadcast/'
+    | '/_protected/covers/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -214,6 +224,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/broadcast'
       preLoaderRoute: typeof ProtectedBroadcastRouteImport
       parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/covers/': {
+      id: '/_protected/covers/'
+      path: '/'
+      fullPath: '/covers/'
+      preLoaderRoute: typeof ProtectedCoversIndexRouteImport
+      parentRoute: typeof ProtectedCoversRoute
     }
     '/_protected/broadcast/': {
       id: '/_protected/broadcast/'
@@ -275,10 +292,12 @@ const ProtectedBroadcastRouteWithChildren =
 
 interface ProtectedCoversRouteChildren {
   ProtectedCoversOccurrenceIdRoute: typeof ProtectedCoversOccurrenceIdRoute
+  ProtectedCoversIndexRoute: typeof ProtectedCoversIndexRoute
 }
 
 const ProtectedCoversRouteChildren: ProtectedCoversRouteChildren = {
   ProtectedCoversOccurrenceIdRoute: ProtectedCoversOccurrenceIdRoute,
+  ProtectedCoversIndexRoute: ProtectedCoversIndexRoute,
 }
 
 const ProtectedCoversRouteWithChildren = ProtectedCoversRoute._addFileChildren(

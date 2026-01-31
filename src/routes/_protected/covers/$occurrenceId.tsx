@@ -54,7 +54,6 @@ function CoverDetailsPage() {
                     id,
                     meeting_date,
                     notes,
-                    status,
                     cover_rule:cover_rules (
                         id,
                         start_time,

@@ -69,7 +69,7 @@ export function CoverRequestSheet({
 
                 // If frequency is null or something implying one-off, handle that logic if your schema supports it
                 // For now assuming existing logic where one-off is just a UI concept mapping to frequency
-                setRequestType("recurring")
+                setRequestType("one-off")
             }
 
             // Occurrence overrides
@@ -206,7 +206,7 @@ export function CoverRequestSheet({
         setSchoolId("")
         setClubId("")
         setTeacherId("unassigned")
-        setRequestType("recurring")
+        setRequestType("one-off")
         setFrequency("weekly")
         setMeetingDate(format(new Date(), 'yyyy-MM-dd'))
         setStartTime("15:00")

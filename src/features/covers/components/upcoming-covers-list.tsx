@@ -66,7 +66,7 @@ export function UpcomingCoversList({ occurrences, onSelectOccurrence }: Upcoming
                                 <div className="space-y-1.5">
                                     <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-700">
                                         <CalendarIcon className="h-3 w-3 opacity-70" />
-                                        {format(displayDate, 'EEEE, MMM d')}
+                                        {format(displayDate, 'EEEE, MMM d, yyyy')}
                                     </div>
                                     <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-700">
                                         <Clock className="h-3 w-3 opacity-70" />
