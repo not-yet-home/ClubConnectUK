@@ -13,6 +13,7 @@ export const authStore = new Store<AuthState>(initialState)
 
 // Initialize auth state from Supabase session
 export async function initializeAuth() {
+    console.log('🔄 Initializing Auth Store...')
     try {
         const {
             data: { session },
@@ -42,7 +43,6 @@ export async function initializeAuth() {
     }
 }
 
-// Login function
 export async function login(
     credentials: LoginCredentials
 ): Promise<{ error?: AuthError }> {
@@ -53,8 +53,11 @@ export async function login(
         })
 
         if (error) {
+            console.error('❌ Login failed:', error.message, error.code)
             return { error: { message: error.message, code: error.code } }
         }
+
+        console.log('✅ Login successful for user:', data.user?.id)
 
         authStore.setState(() => ({
             user: data.user,
@@ -64,6 +67,7 @@ export async function login(
 
         return {}
     } catch (error) {
+        console.error('❌ Unexpected error during login:', error)
         return {
             error: {
                 message:

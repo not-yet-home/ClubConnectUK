@@ -75,6 +75,7 @@ function BroadcastNewPage() {
         { label: 'Broadcasts', href: '/broadcast' },
         { label: 'New Broadcast' },
       ]}
+      className='pt-0'
     >
       <div
         ref={containerRef}
@@ -82,7 +83,7 @@ function BroadcastNewPage() {
       >
         <BroadcastStepperNav currentStep={state.step} />
 
-        <div className="max-w-4xl pb-4 mx-auto w-full">
+        <div className="max-w-6xl pb-4 mx-2 w-full">
           {state.step === 1 && (
             <StepAudience
               formData={state}

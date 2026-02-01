@@ -236,7 +236,7 @@ export function StepAudience({
     <div className="space-y-6 animate-in slide-in-from-right-5 duration-300">
       <div className="bg-white rounded-xl overflow-hidden">
         {/* Filter Bar */}
-        <div className="flex flex-wrap justify-between gap-3 py-4 items-center">
+        <div className="flex flex-wrap justify-between gap-3 p-4 items-center">
           <div className="flex items-center gap-2">
             <div className="relative">
               <Input
