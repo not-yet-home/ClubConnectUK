@@ -57,7 +57,7 @@ export async function login(
             return { error: { message: error.message, code: error.code } }
         }
 
-        console.log('✅ Login successful for user:', data.user?.id)
+        console.log('✅ Login successful for user:', data.user.id)
 
         authStore.setState(() => ({
             user: data.user,

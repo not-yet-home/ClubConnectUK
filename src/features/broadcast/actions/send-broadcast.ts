@@ -33,13 +33,13 @@ export const sendBroadcast = createServerFn({ method: 'POST' })
             `)
             .in('id', data.teacherIds)
 
-        if (teacherError || !teachers || teachers.length === 0) {
+        if (teacherError || teachers.length === 0) {
             throw new Error('Failed to fetch selected teachers or no valid teachers found.')
         }
 
         let coverDetailsString = ''
         if (data.coverIds && data.coverIds.length > 0) {
-            const { data: covers, error: coverError } = await supabase
+            const { data: covers } = await supabase
                 .from('cover_occurrences')
                 .select(`
                     id,
@@ -53,7 +53,7 @@ export const sendBroadcast = createServerFn({ method: 'POST' })
                 `)
                 .in('id', data.coverIds)
 
-            if (!coverError && covers) {
+            if (covers) {
                 coverDetailsString = covers.map((c: any) => {
                     const date = new Date(c.meeting_date).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
                     const time = `${c.cover_rule.start_time.slice(0, 5)} - ${c.cover_rule.end_time.slice(0, 5)}`
@@ -127,7 +127,7 @@ export const sendBroadcast = createServerFn({ method: 'POST' })
             })
         )
 
-        const successCount = results.filter((r) => r.status === 'fulfilled' && !r.value?.error).length
+        const successCount = results.filter((r) => r.status === 'fulfilled' && !r.value.error).length
         const failCount = results.length - successCount
 
         // 5. Update Broadcast Status
