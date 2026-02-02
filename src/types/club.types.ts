@@ -15,6 +15,7 @@ export interface Club {
   id: string
   school_id: string
   club_name: string
+  category?: string
   club_code: string
   description?: string | null
   members_count: number

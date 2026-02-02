@@ -13,13 +13,13 @@ import {
     Trash2,
     User,
 } from 'lucide-react';
-import { useState } from 'react';
+
 import { toast } from 'sonner';
 
 import type { CoverOccurrence } from '@/types/club.types';
 
 import { useDeleteCoverOccurrence } from '@/features/covers/api/mutations';
-import { CoverRequestSheet } from '@/features/covers/components/cover-request-sheet';
+
 
 import { PageLayout } from '@/components/common/page-layout';
 import { Badge } from '@/components/ui/badge';
@@ -43,7 +43,7 @@ export const Route = createFileRoute('/_protected/covers/$occurrenceId')({
 function CoverDetailsPage() {
     const { occurrenceId } = Route.useParams();
     const navigate = useNavigate();
-    const [editSheetOpen, setEditSheetOpen] = useState(false);
+
 
     const { data: occurrence, isLoading, error: queryError } = useQuery({
         queryKey: ['cover-occurrence', occurrenceId],
@@ -184,7 +184,7 @@ function CoverDetailsPage() {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => setEditSheetOpen(true)}>
+                                <DropdownMenuItem onClick={() => toast.info("Editing coming soon")}>
                                     <Pencil className="w-4 h-4 mr-2" />
                                     Edit Details
                                 </DropdownMenuItem>
@@ -330,11 +330,7 @@ function CoverDetailsPage() {
                     </div>
                 </div>
 
-                <CoverRequestSheet
-                    open={editSheetOpen}
-                    onOpenChange={setEditSheetOpen}
-                    existingData={occurrence}
-                />
+
             </div>
         </PageLayout>
     );

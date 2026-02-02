@@ -2,8 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import { Add01Icon } from '@hugeicons/core-free-icons';
-import { HugeiconsIcon } from '@hugeicons/react';
+
 
 import type { CoverOccurrence } from '@/types/club.types';
 
@@ -11,10 +10,11 @@ import type { ViewType } from '@/features/covers/components/view-toggle';
 import { useDeleteCoverOccurrence, useMoveCoverOccurrence } from '@/features/covers/api/mutations';
 import { CalendarView } from '@/features/covers/components/calendar-view';
 import { CoverQuickView } from '@/features/covers/components/cover-quick-view';
-import { CoverRequestSheet } from '@/features/covers/components/cover-request-sheet';
+import { CoverQuickAdd } from '@/features/covers/components/cover-quick-add';
 import { CoversListView } from '@/features/covers/components/covers-list-view';
 import { ViewToggle } from '@/features/covers/components/view-toggle';
 import { YearView } from '@/features/covers/components/year-view';
+import { UpcomingCoversList } from '@/features/covers/components/upcoming-covers-list';
 
 import { PageLayout } from '@/components/common/page-layout';
 import { Button } from '@/components/ui/button';
@@ -48,21 +48,23 @@ function CoversCalendarPage() {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [viewType, setViewType] = useState<ViewType>('month');
     const [schoolId, setSchoolId] = useState('all');
-    const [requestSheetOpen, setRequestSheetOpen] = useState(false);
     const [preselectedDate, setPreselectedDate] = useState<Date | null>(null);
 
     // Quick View & Edit State
     const [quickViewOpen, setQuickViewOpen] = useState(false);
     const [selectedOccurrence, setSelectedOccurrence] = useState<CoverOccurrence | null>(null);
-    const [editingBoxOpen, setEditingBoxOpen] = useState(false);
+
 
     // Delete Confirmation State
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
     const [occurrenceToDelete, setOccurrenceToDelete] = useState<CoverOccurrence | null>(null);
 
+    // Quick Add State
+    const [quickAddOpen, setQuickAddOpen] = useState(false);
+
     const handleSelectSlot = (date: Date) => {
         setPreselectedDate(date);
-        setRequestSheetOpen(true);
+        setQuickAddOpen(true);
     };
 
 
@@ -95,11 +97,8 @@ function CoversCalendarPage() {
 
     const handleEditFromQuickView = (occurrence: CoverOccurrence) => {
         setQuickViewOpen(false);
-        // Small delay to allow dialog to close smoothly
-        setTimeout(() => {
-            setSelectedOccurrence(occurrence);
-            setEditingBoxOpen(true);
-        }, 100);
+        setSelectedOccurrence(occurrence);
+        setQuickAddOpen(true);
     };
 
     const handleDeleteFromQuickView = (occurrence: CoverOccurrence) => {
@@ -155,92 +154,93 @@ function CoversCalendarPage() {
                             </div>
                         </div>
 
-                        {/* New Request Button */}
-                        <Button
-                            onClick={() => {
-                                setPreselectedDate(null);
-                                setRequestSheetOpen(true);
-                            }}
-                            size="sm"
-                            className="h-9"
-                        >
-                            <HugeiconsIcon icon={Add01Icon} className="h-4 w-4 mr-1.5" />
-                            <span>New Request</span>
-                        </Button>
+
                     </div>
 
                     {/* Main Content Area */}
-                    <Card className="flex-1 border-gray-200 overflow-hidden">
-                        <CardContent className="p-0 h-full">
-                            <div className={cn(
-                                "h-full overflow-auto",
-                                (viewType === 'schedule' || viewType === 'year') ? "p-0" : "p-0"
-                            )}>
-                                {/* Calendar Views */}
-                                {(viewType === 'day' || viewType === 'week' || viewType === 'month' || viewType === '4days') && (
-                                    <CalendarView
-                                        events={events}
-                                        onSelectEvent={(occ) => handleSelectOccurrence(occ)}
-                                        onSelectSlot={handleSelectSlot}
-                                        onDrillDown={handleSelectSlot}
-                                        onEventDrop={handleEventDrop}
-                                        viewMode={viewType}
-                                        onViewChange={setViewType}
-                                        date={selectedDate}
-                                        onNavigate={setSelectedDate}
-                                    />
-                                )}
-
-                                {/* Schedule (Agenda) View */}
-                                {viewType === 'schedule' && (
-                                    <div className="p-6">
-                                        <CoversListView
-                                            occurrences={events}
-                                            onSelectOccurrence={handleSelectOccurrence}
+                    <div className="flex-1 flex gap-4 min-h-0">
+                        <Card className="flex-1 border-gray-200 overflow-hidden flex flex-col">
+                            <CardContent className="p-0 h-full">
+                                <div className={cn(
+                                    "h-full overflow-auto",
+                                    (viewType === 'schedule' || viewType === 'year') ? "p-0" : "p-0"
+                                )}>
+                                    {/* Calendar Views */}
+                                    {(viewType === 'day' || viewType === 'week' || viewType === 'month' || viewType === '4days') && (
+                                        <CalendarView
+                                            events={events}
+                                            onSelectEvent={(occ) => handleSelectOccurrence(occ)}
+                                            onSelectSlot={handleSelectSlot}
+                                            onDrillDown={handleSelectSlot}
+                                            onEventDrop={handleEventDrop}
+                                            viewMode={viewType}
+                                            onViewChange={setViewType}
+                                            date={selectedDate}
+                                            onNavigate={setSelectedDate}
                                         />
-                                    </div>
-                                )}
+                                    )}
 
-                                {/* Year View */}
-                                {viewType === 'year' && (
-                                    <YearView
-                                        occurrences={events}
-                                        selectedYear={selectedDate.getFullYear()}
-                                        onSelectMonth={(month) => {
-                                            const newDate = new Date(selectedDate)
-                                            newDate.setMonth(month)
-                                            setSelectedDate(newDate)
-                                            setViewType('month')
-                                        }}
-                                    />
-                                )}
-
-                                {isLoading && (
-                                    <div className="flex items-center justify-center h-full">
-                                        <div className="text-center">
-                                            <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-3"></div>
-                                            <p className="text-sm text-gray-500">Loading covers...</p>
+                                    {/* Schedule (Agenda) View */}
+                                    {viewType === 'schedule' && (
+                                        <div className="p-6">
+                                            <CoversListView
+                                                occurrences={events}
+                                                onSelectOccurrence={handleSelectOccurrence}
+                                            />
                                         </div>
-                                    </div>
-                                )}
+                                    )}
+
+                                    {/* Year View */}
+                                    {viewType === 'year' && (
+                                        <YearView
+                                            occurrences={events}
+                                            selectedYear={selectedDate.getFullYear()}
+                                            onSelectMonth={(month) => {
+                                                const newDate = new Date(selectedDate)
+                                                newDate.setMonth(month)
+                                                setSelectedDate(newDate)
+                                                setViewType('month')
+                                            }}
+                                        />
+                                    )}
+
+                                    {isLoading && (
+                                        <div className="flex items-center justify-center h-full">
+                                            <div className="text-center">
+                                                <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-3"></div>
+                                                <p className="text-sm text-gray-500">Loading covers...</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Right Sidebar - Upcoming Covers */}
+                        <div className="w-80 hidden xl:flex flex-col bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                            <div className="p-4 h-full overflow-hidden">
+                                <UpcomingCoversList
+                                    occurrences={events}
+                                    onSelectOccurrence={handleSelectOccurrence}
+                                />
                             </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </div>
                 </div>
             </PageLayout>
 
-            <CoverRequestSheet
-                open={requestSheetOpen}
-                onOpenChange={setRequestSheetOpen}
-                initialDate={preselectedDate}
+            <CoverQuickAdd
+                open={quickAddOpen}
+                onOpenChange={(open) => {
+                    setQuickAddOpen(open);
+                    if (!open) setSelectedOccurrence(null);
+                }}
+                date={preselectedDate || selectedDate}
+                initialSchoolId={schoolId}
+                editingOccurrence={selectedOccurrence}
             />
 
-            {/* Edit Sheet (reusing same component) */}
-            <CoverRequestSheet
-                open={editingBoxOpen}
-                onOpenChange={setEditingBoxOpen}
-                existingData={selectedOccurrence}
-            />
+
 
             {/* Quick View Dialog */}
             <CoverQuickView
