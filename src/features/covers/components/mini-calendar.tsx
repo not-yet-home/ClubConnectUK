@@ -28,6 +28,13 @@ interface MiniCalendarProps {
 export function MiniCalendar({ selectedDate, onSelectDate, occurrences }: MiniCalendarProps) {
     const [currentMonth, setCurrentMonth] = React.useState(selectedDate)
 
+    // Sync currentMonth when selectedDate changes from external source
+    React.useEffect(() => {
+        if (!isSameMonth(selectedDate, currentMonth)) {
+            setCurrentMonth(selectedDate)
+        }
+    }, [selectedDate])
+
     const monthStart = startOfMonth(currentMonth)
     const monthEnd = endOfMonth(currentMonth)
     const calendarStart = startOfWeek(monthStart)
@@ -51,51 +58,53 @@ export function MiniCalendar({ selectedDate, onSelectDate, occurrences }: MiniCa
         setCurrentMonth(addMonths(currentMonth, 1))
     }
 
-    const handleDateClick = (date: Date) => {
-        onSelectDate(date)
+    const handleDateClick = (day: Date, isCurrentMonth: boolean) => {
+        // Only allow clicking on current month days
+        if (!isCurrentMonth) return
+        onSelectDate(day)
     }
 
     return (
-        <div className="w-full bg-white rounded-lg border border-gray-200 p-4">
-            {/* Month Navigation */}
-            <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-gray-900">
+        <div className="w-full">
+            {/* Month Navigation - Google Calendar style */}
+            <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-medium text-gray-900">
                     {format(currentMonth, 'MMMM yyyy')}
                 </h3>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center">
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7"
+                        className="h-6 w-6 hover:bg-gray-100 rounded-full"
                         onClick={handlePrevMonth}
                     >
-                        <ChevronLeft className="h-4 w-4" />
+                        <ChevronLeft className="h-4 w-4 text-gray-600" />
                     </Button>
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7"
+                        className="h-6 w-6 hover:bg-gray-100 rounded-full"
                         onClick={handleNextMonth}
                     >
-                        <ChevronRight className="h-4 w-4" />
+                        <ChevronRight className="h-4 w-4 text-gray-600" />
                     </Button>
                 </div>
             </div>
 
-            {/* Week Days Header */}
-            <div className="grid grid-cols-7 gap-1 mb-2">
+            {/* Week Days Header - Google Calendar style */}
+            <div className="grid grid-cols-7 mb-1">
                 {weekDays.map((day, i) => (
                     <div
                         key={i}
-                        className="text-xs font-medium text-gray-500 text-center py-1"
+                        className="text-[10px] font-medium text-gray-500 text-center py-1"
                     >
                         {day}
                     </div>
                 ))}
             </div>
 
-            {/* Calendar Grid */}
-            <div className="grid grid-cols-7 gap-1">
+            {/* Calendar Grid - Google Calendar style */}
+            <div className="grid grid-cols-7">
                 {days.map((day, i) => {
                     const isCurrentMonth = isSameMonth(day, currentMonth)
                     const isSelected = isSameDay(day, selectedDate)
@@ -103,27 +112,42 @@ export function MiniCalendar({ selectedDate, onSelectDate, occurrences }: MiniCa
                     const hasEvent = hasOccurrence(day)
 
                     return (
-                        <button
+                        <div
                             key={i}
-                            onClick={() => handleDateClick(day)}
+                            onClick={() => handleDateClick(day, isCurrentMonth)}
                             className={cn(
-                                "relative h-8 w-full text-xs font-medium rounded-md transition-colors",
-                                "hover:bg-gray-100",
-                                !isCurrentMonth && "text-gray-300",
-                                isCurrentMonth && "text-gray-700",
-                                isTodayDate && "bg-blue-50 text-blue-600 font-semibold",
-                                isSelected && "bg-blue-500 text-white hover:bg-blue-600",
-                                isSelected && isTodayDate && "bg-blue-600"
+                                "relative flex items-center justify-center h-8 w-full",
+                                // Gray out non-current month days and make non-clickable
+                                isCurrentMonth
+                                    ? "cursor-pointer hover:bg-gray-100 rounded-full transition-colors"
+                                    : "cursor-default"
                             )}
                         >
-                            {format(day, 'd')}
-                            {hasEvent && (
+                            <span
+                                className={cn(
+                                    "flex items-center justify-center w-7 h-7 text-xs font-medium rounded-full transition-colors",
+                                    // Non-current month days are grayed out
+                                    !isCurrentMonth && "text-gray-300",
+                                    // Current month days
+                                    isCurrentMonth && !isSelected && !isTodayDate && "text-gray-700",
+                                    // Today's date - blue circle with white text (Google style)
+                                    isTodayDate && !isSelected && "bg-blue-600 text-white",
+                                    // Selected date
+                                    isSelected && !isTodayDate && "bg-blue-100 text-blue-700",
+                                    // Selected + Today
+                                    isSelected && isTodayDate && "bg-blue-600 text-white ring-2 ring-blue-200"
+                                )}
+                            >
+                                {format(day, 'd')}
+                            </span>
+                            {/* Event indicator dot */}
+                            {hasEvent && isCurrentMonth && (
                                 <div className={cn(
-                                    "absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full",
-                                    isSelected ? "bg-white" : "bg-blue-500"
+                                    "absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full",
+                                    isSelected || isTodayDate ? "bg-blue-300" : "bg-blue-500"
                                 )} />
                             )}
-                        </button>
+                        </div>
                     )
                 })}
             </div>

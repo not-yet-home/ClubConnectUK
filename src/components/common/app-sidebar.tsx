@@ -7,9 +7,18 @@ import {
     UserGroupIcon
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { ChevronDown } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
 import { ICON_SIZES } from '@/constants/sizes'
+import { MiniCalendar } from '@/features/covers/components/mini-calendar'
+import { UpcomingCoversList } from '@/features/covers/components/upcoming-covers-list'
 import { NavMain } from '@/components/common/nav-main'
 import { NavUser } from '@/components/common/nav-user'
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 import {
     Sidebar,
     SidebarContent,
@@ -20,9 +29,19 @@ import {
     SidebarRail,
 } from '@/components/ui/sidebar'
 import { useAuth } from '@/hooks/use-auth'
+import { useCoverOccurrences } from '@/hooks/use-covers'
+import { cn } from '@/lib/utils'
+
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { user } = useAuth()
+    const navigate = useNavigate()
+    const [selectedDate, setSelectedDate] = React.useState(new Date())
+    const [upcomingCoversOpen, setUpcomingCoversOpen] = React.useState(true)
+
+    // Fetch cover occurrences for mini calendar and upcoming covers
+    const { data: occurrences } = useCoverOccurrences({ schoolId: 'all' })
+    const events = React.useMemo(() => occurrences || [], [occurrences])
 
     const navItems = [
         {
@@ -63,6 +82,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         avatar: '',
     }
 
+    const handleSelectDate = (date: Date) => {
+        setSelectedDate(date)
+        // Navigate to covers page with the selected date
+        navigate({ to: '/covers' })
+    }
+
+    const handleSelectOccurrence = (occurrence: any) => {
+        // Navigate to the specific cover occurrence
+        navigate({ to: '/covers/$occurrenceId', params: { occurrenceId: occurrence.id } })
+    }
+
     return (
         <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
@@ -82,6 +112,36 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarGroup>
                     <SidebarGroupLabel>Application</SidebarGroupLabel>
                     <NavMain items={navItems} />
+                </SidebarGroup>
+
+                {/* Mini Calendar - Hidden when sidebar collapsed */}
+                <SidebarGroup className="group-data-[collapsible=icon]:hidden mt-4">
+                    <MiniCalendar
+                        selectedDate={selectedDate}
+                        onSelectDate={handleSelectDate}
+                        occurrences={events}
+                    />
+                </SidebarGroup>
+
+                {/* Upcoming Covers - Hidden when sidebar collapsed */}
+                <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+                    <Collapsible open={upcomingCoversOpen} onOpenChange={setUpcomingCoversOpen}>
+                        <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-xs font-semibold text-muted-foreground hover:text-foreground uppercase tracking-wider">
+                            <span>Upcoming Covers</span>
+                            <ChevronDown className={cn(
+                                "h-3 w-3 transition-transform",
+                                upcomingCoversOpen && "rotate-180"
+                            )} />
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="pt-2">
+                            <div className="max-h-[250px] overflow-y-auto -mx-2 px-2">
+                                <UpcomingCoversList
+                                    occurrences={events}
+                                    onSelectOccurrence={handleSelectOccurrence}
+                                />
+                            </div>
+                        </CollapsibleContent>
+                    </Collapsible>
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>

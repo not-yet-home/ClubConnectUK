@@ -4,7 +4,6 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Add01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Menu } from 'lucide-react';
 
 import type { CoverOccurrence } from '@/types/club.types';
 
@@ -14,7 +13,6 @@ import { CalendarView } from '@/features/covers/components/calendar-view';
 import { CoverQuickView } from '@/features/covers/components/cover-quick-view';
 import { CoverRequestSheet } from '@/features/covers/components/cover-request-sheet';
 import { CoversListView } from '@/features/covers/components/covers-list-view';
-import { UpcomingCoversList } from '@/features/covers/components/upcoming-covers-list';
 import { ViewToggle } from '@/features/covers/components/view-toggle';
 import { YearView } from '@/features/covers/components/year-view';
 
@@ -37,7 +35,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 import { useCoverOccurrences } from '@/hooks/use-covers';
 import { useSchools } from '@/hooks/use-schools';
@@ -125,7 +122,6 @@ function CoversCalendarPage() {
         }
     };
 
-
     return (
         <>
             <PageLayout breadcrumbs={[{ label: 'Covers Scheduling' }]} className="p-3 sm:p-6">
@@ -133,23 +129,6 @@ function CoversCalendarPage() {
                     {/* Header Toolbar */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3 sm:gap-4 px-1 sm:px-0">
                         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                            {/* Mobile Menu Toggle for Mini Calendar */}
-                            <Sheet>
-                                <SheetTrigger asChild>
-                                    <Button variant="outline" size="icon" className="lg:hidden h-9 w-9">
-                                        <Menu className="h-4 w-4" />
-                                    </Button>
-                                </SheetTrigger>
-                                <SheetContent side="left" className="w-[280px] sm:w-[320px]">
-                                    <div className="mt-6 h-[500px]">
-                                        <UpcomingCoversList
-                                            occurrences={events}
-                                            onSelectOccurrence={handleSelectOccurrence}
-                                        />
-                                    </div>
-                                </SheetContent>
-                            </Sheet>
-
                             {/* School Filter */}
                             <div className="flex items-center gap-2">
                                 <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap hidden lg:block">
@@ -183,7 +162,7 @@ function CoversCalendarPage() {
                                 setRequestSheetOpen(true);
                             }}
                             size="sm"
-                            className="w-full sm:w-auto mt-1 sm:mt-0 h-9"
+                            className="h-9"
                         >
                             <HugeiconsIcon icon={Add01Icon} className="h-4 w-4 mr-1.5" />
                             <span>New Request</span>
@@ -193,68 +172,57 @@ function CoversCalendarPage() {
                     {/* Main Content Area */}
                     <Card className="flex-1 border-gray-200 overflow-hidden">
                         <CardContent className="p-0 h-full">
-                            <div className="flex h-full">
-                                {/* Left Sidebar - Upcoming Covers List (Desktop Only) */}
-                                <div className="hidden lg:block w-72 border-r border-gray-200 p-4 bg-gray-50/50">
-                                    <UpcomingCoversList
-                                        occurrences={events}
-                                        onSelectOccurrence={handleSelectOccurrence}
+                            <div className={cn(
+                                "h-full overflow-auto",
+                                (viewType === 'schedule' || viewType === 'year') ? "p-0" : "p-0"
+                            )}>
+                                {/* Calendar Views */}
+                                {(viewType === 'day' || viewType === 'week' || viewType === 'month' || viewType === '4days') && (
+                                    <CalendarView
+                                        events={events}
+                                        onSelectEvent={(occ) => handleSelectOccurrence(occ)}
+                                        onSelectSlot={handleSelectSlot}
+                                        onDrillDown={handleSelectSlot}
+                                        onEventDrop={handleEventDrop}
+                                        viewMode={viewType}
+                                        onViewChange={setViewType}
+                                        date={selectedDate}
+                                        onNavigate={setSelectedDate}
                                     />
-                                </div>
+                                )}
 
-                                {/* Main Calendar/List Area */}
-                                <div className={cn(
-                                    "flex-1 overflow-auto",
-                                    (viewType === 'schedule' || viewType === 'year') ? "p-0" : "p-0"
-                                )}>
-                                    {/* Calendar Views */}
-                                    {(viewType === 'day' || viewType === 'week' || viewType === 'month' || viewType === '4days') && (
-                                        <CalendarView
-                                            events={events}
-                                            onSelectEvent={(occ) => handleSelectOccurrence(occ)}
-                                            onSelectSlot={handleSelectSlot}
-                                            onDrillDown={handleSelectSlot}
-                                            onEventDrop={handleEventDrop}
-                                            viewMode={viewType}
-                                            onViewChange={setViewType}
-                                            date={selectedDate}
-                                            onNavigate={setSelectedDate}
-                                        />
-                                    )}
-
-                                    {/* Schedule (Agenda) View */}
-                                    {viewType === 'schedule' && (
-                                        <div className="p-6">
-                                            <CoversListView
-                                                occurrences={events}
-                                                onSelectOccurrence={handleSelectOccurrence}
-                                            />
-                                        </div>
-                                    )}
-
-                                    {/* Year View */}
-                                    {viewType === 'year' && (
-                                        <YearView
+                                {/* Schedule (Agenda) View */}
+                                {viewType === 'schedule' && (
+                                    <div className="p-6">
+                                        <CoversListView
                                             occurrences={events}
-                                            selectedYear={selectedDate.getFullYear()}
-                                            onSelectMonth={(month) => {
-                                                const newDate = new Date(selectedDate)
-                                                newDate.setMonth(month)
-                                                setSelectedDate(newDate)
-                                                setViewType('month')
-                                            }}
+                                            onSelectOccurrence={handleSelectOccurrence}
                                         />
-                                    )}
+                                    </div>
+                                )}
 
-                                    {isLoading && (
-                                        <div className="flex items-center justify-center h-full">
-                                            <div className="text-center">
-                                                <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-3"></div>
-                                                <p className="text-sm text-gray-500">Loading covers...</p>
-                                            </div>
+                                {/* Year View */}
+                                {viewType === 'year' && (
+                                    <YearView
+                                        occurrences={events}
+                                        selectedYear={selectedDate.getFullYear()}
+                                        onSelectMonth={(month) => {
+                                            const newDate = new Date(selectedDate)
+                                            newDate.setMonth(month)
+                                            setSelectedDate(newDate)
+                                            setViewType('month')
+                                        }}
+                                    />
+                                )}
+
+                                {isLoading && (
+                                    <div className="flex items-center justify-center h-full">
+                                        <div className="text-center">
+                                            <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-3"></div>
+                                            <p className="text-sm text-gray-500">Loading covers...</p>
                                         </div>
-                                    )}
-                                </div>
+                                    </div>
+                                )}
                             </div>
                         </CardContent>
                     </Card>
