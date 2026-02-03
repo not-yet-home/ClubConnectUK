@@ -2,7 +2,6 @@ import { useNavigate } from '@tanstack/react-router';
 import { format } from "date-fns"
 import {
     Bell,
-    // Mail,
     MoreVertical,
     Pencil,
     Trash2,
@@ -93,22 +92,6 @@ export function CoverQuickView({
                                 <p className="text-xs">Delete event</p>
                             </TooltipContent>
                         </Tooltip>
-
-                        {/* <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 rounded-full hover:bg-gray-100"
-                                >
-                                    <Mail className="h-4 w-4 text-gray-600" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">
-                                <p className="text-xs">Email assignee</p>
-                            </TooltipContent>
-                        </Tooltip> */}
-
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
@@ -160,16 +143,6 @@ export function CoverQuickView({
                             </p>
                         </div>
                     </div>
-
-                    {/* Action Button - like "Invite via link" */}
-                    {/* <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-auto text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300 font-medium"
-                    >
-                        <Mail className="h-4 w-4 mr-2" />
-                        Invite via link
-                    </Button> */}
 
                     {/* Info rows with icons */}
                     <div className="space-y-3 pt-2">

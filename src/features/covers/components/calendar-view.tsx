@@ -7,7 +7,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-import { getClubColors, parseLocalDate } from '../utils/formatters';
+import { getSchoolColors, parseLocalDate } from '../utils/formatters';
 import type { SlotInfo, View } from 'react-big-calendar';
 import type { ViewType } from '@/features/covers/components/view-toggle';
 import type { CoverOccurrence } from '@/types/club.types';
@@ -339,7 +339,7 @@ export function CalendarView({
 
             return {
                 id: occ.id,
-                title: occ.cover_rule?.club?.club_name || 'Cover',
+                title: occ.cover_rule?.school?.school_name || occ.cover_rule?.club?.club_name || 'Cover',
                 start,
                 end,
                 displayStart: start,
@@ -355,6 +355,68 @@ export function CalendarView({
         }
     };
 
+    // Group events by date for dynamic display in month view
+    const eventsByDate = useMemo(() => {
+        const grouped: Record<string, typeof calendarEvents> = {}
+        calendarEvents.forEach(evt => {
+            const dateKey = format(evt.start, 'yyyy-MM-dd')
+            grouped[dateKey] ??= []
+            grouped[dateKey].push(evt)
+        })
+        return grouped
+    }, [calendarEvents])
+
+    // Custom Day cell component for Month view - shows stacked events with overflow
+    const CustomDateCellWrapper = (props: any) => {
+        const { day } = props;
+        
+        // Validate that day is a valid Date object
+        if (!day || !(day instanceof Date) || Number.isNaN(day.getTime())) {
+            return <div className="h-full bg-white" />;
+        }
+        
+        const dateKey = format(day, 'yyyy-MM-dd');
+        const dayEvents = eventsByDate[dateKey] ?? [];
+        const maxVisibleEvents = 3; // Show up to 3 events, then "+N more"
+        const visibleEvents = dayEvents.slice(0, maxVisibleEvents);
+        const moreCount = Math.max(0, dayEvents.length - maxVisibleEvents);
+
+        return (
+            <div className="h-full flex flex-col bg-white relative">
+                <div className="flex-1 overflow-hidden p-1 space-y-0.5">
+                    {visibleEvents.map((evt) => {
+                        const occ = evt.resource
+                        const colors = getSchoolColors(occ.cover_rule?.school?.school_name)
+                        const teacher = occ.assignments?.[0]?.teacher;
+                        const teacherInitials = teacher ? `${teacher.person_details.first_name[0]}${teacher.person_details.last_name[0]}` : null;
+
+                        return (
+                            <div
+                                key={evt.id}
+                                className="text-[8px] px-1 py-0.5 rounded truncate cursor-pointer hover:opacity-80 transition-opacity"
+                                style={{
+                                    backgroundColor: colors.bgHex,
+                                    color: colors.textHex,
+                                    borderLeft: `2px solid ${colors.borderHex}`,
+                                }}
+                                onClick={() => onSelectEvent(occ)}
+                                title={`${evt.title} ${format(evt.displayStart, 'h:mm a')}`}
+                            >
+                                <span className="font-semibold">{evt.title}</span>
+                                {teacherInitials && <span className="ml-1 opacity-75">({teacherInitials})</span>}
+                            </div>
+                        );
+                    })}
+                    {moreCount > 0 && (
+                        <div className="text-[8px] text-gray-600 px-1 py-0.5 font-medium">
+                            +{moreCount} more
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
     // Custom Event Component for Week/Day view
     const WeekEventComponent = ({ event }: any) => {
         const occ = event.resource as CoverOccurrence;
@@ -362,6 +424,8 @@ export function CalendarView({
         const teacherName = teacher
             ? `${teacher.person_details.first_name} ${teacher.person_details.last_name}`
             : 'Unassigned';
+        const schoolName = occ.cover_rule?.school?.school_name || '';
+        const clubName = occ.cover_rule?.club?.club_name || '';
 
         return (
             <div className="h-full w-full px-1.5 py-1">
@@ -370,23 +434,35 @@ export function CalendarView({
                     {format(event.displayStart, 'h:mm a')} - {format(event.displayEnd, 'h:mm a')}
                 </div>
                 <div className="text-[10px] opacity-75 mt-0.5">{teacherName}</div>
+                {schoolName && event.title !== schoolName && (
+                    <div className="text-[10px] opacity-90 mt-0.5 font-medium">{schoolName}</div>
+                )}
+                {clubName && event.title !== clubName && (
+                    <div className="text-[10px] opacity-60">{clubName}</div>
+                )}
             </div>
         );
     };
 
-    // Custom Event Component for Month view
+    // Custom Event Component for Month view - shows compact event blocks
     const MonthEventComponent = ({ event }: any) => {
         const occ = event.resource as CoverOccurrence;
         const teacher = occ.assignments?.[0]?.teacher;
-        const teacherName = teacher ? `${teacher.person_details.first_name[0]}${teacher.person_details.last_name[0]}` : null;
+        const teacherInitials = teacher ? `${teacher.person_details.first_name[0]}${teacher.person_details.last_name[0]}` : null;
+        const startTime = occ.cover_rule?.start_time || '';
 
         return (
-            <div className="flex justify-between items-center text-[10px] h-full w-full px-1">
-                <span className="truncate font-medium">{event.title}</span>
-                {teacherName && (
-                    <span className="bg-white/40 rounded px-1 ml-1 font-bold">
-                        {teacherName}
-                    </span>
+            <div className="flex flex-col text-[10px] h-full w-full px-1 py-0.5">
+                <div className="flex items-center justify-between gap-1">
+                    <span className="truncate font-semibold text-[9px]">{event.title}</span>
+                    {teacherInitials && (
+                        <span className="bg-white/50 rounded px-0.5 font-bold text-[9px] whitespace-nowrap">
+                            {teacherInitials}
+                        </span>
+                    )}
+                </div>
+                {startTime && (
+                    <div className="text-[9px] opacity-70">{format(event.displayStart, 'h:mm a')}</div>
                 )}
             </div>
         );
@@ -431,25 +507,26 @@ export function CalendarView({
                 onEventDrop={handleEventDrop}
                 components={{
                     toolbar: CustomToolbar,
-                    event: view === Views.MONTH ? MonthEventComponent : WeekEventComponent
+                    event: view === Views.MONTH ? MonthEventComponent : WeekEventComponent,
+                    dateCellWrapper: view === Views.MONTH ? CustomDateCellWrapper : undefined
                 }}
                 eventPropGetter={(event: any) => {
-                    const colors = getClubColors(event.resource.cover_rule?.club?.club_name);
+                    const colors = getSchoolColors(event.resource.cover_rule?.school?.school_name);
                     return {
                         className: cn(
                             "cursor-grab active:cursor-grabbing hover:opacity-90 transition-opacity",
-                            view === Views.MONTH ? "px-2 py-1 text-xs" : "px-0 py-0"
+                            view === Views.MONTH ? "px-1.5 py-1 text-[9px]" : "px-0 py-0"
                         ),
                         style: {
                             backgroundColor: colors.bgHex,
                             color: colors.textHex,
                             borderColor: colors.borderHex,
-                            borderRadius: '4px',
+                            borderRadius: '3px',
                             borderStyle: 'solid',
                             borderWidth: '1px',
-                            borderLeftWidth: '4px',
-                            margin: 0,
-                            marginBottom: 0
+                            borderLeftWidth: '3px',
+                            margin: '1px 0',
+                            marginBottom: '1px'
                         }
                     };
                 }}

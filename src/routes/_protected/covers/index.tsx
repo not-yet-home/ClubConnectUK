@@ -14,7 +14,6 @@ import { CoverQuickAdd } from '@/features/covers/components/cover-quick-add';
 import { CoversListView } from '@/features/covers/components/covers-list-view';
 import { ViewToggle } from '@/features/covers/components/view-toggle';
 import { YearView } from '@/features/covers/components/year-view';
-import { UpcomingCoversList } from '@/features/covers/components/upcoming-covers-list';
 
 import { PageLayout } from '@/components/common/page-layout';
 import { Button } from '@/components/ui/button';
@@ -215,16 +214,6 @@ function CoversCalendarPage() {
                                 </div>
                             </CardContent>
                         </Card>
-
-                        {/* Right Sidebar - Upcoming Covers */}
-                        <div className="w-80 hidden xl:flex flex-col bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-                            <div className="p-4 h-full overflow-hidden">
-                                <UpcomingCoversList
-                                    occurrences={events}
-                                    onSelectOccurrence={handleSelectOccurrence}
-                                />
-                            </div>
-                        </div>
                     </div>
                 </div>
             </PageLayout>
