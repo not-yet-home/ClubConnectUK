@@ -14,6 +14,13 @@ import type { CoverOccurrence } from '@/types/club.types';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+    PopoverClose,
+} from "@/components/ui/popover";
+import { X } from 'lucide-react';
 
 const withDragAndDrop: any = (withDragAndDropAcccent as any).default || withDragAndDropAcccent;
 const DragAndDropCalendar = withDragAndDrop(Calendar as any);
@@ -21,142 +28,169 @@ const DragAndDropCalendar = withDragAndDrop(Calendar as any);
 const rbcStyleOverrides = `
 .rbc-calendar {
     font-family: inherit;
+    background: #fff;
 }
+
+/* Day/Month Header styling */
+.rbc-header {
+    border-bottom: 1px solid #f1f3f4 !important;
+    padding: 12px 0 !important;
+    font-weight: 500 !important;
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    color: #70757a !important;
+}
+
 /* Event styling */
 .rbc-event {
-    min-height: auto !important;
-    margin: 0 !important;
-    padding: 1px !important;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
-    transition: all 0.2s ease-in-out;
+    min-height: 32px !important;
+    margin: 2px 4px !important;
+    padding: 0 !important;
+    border: none !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
 }
-.rbc-event:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
-    z-index: 50 !important;
+.rbc-event:focus {
+    outline: none !important;
 }
+
 .rbc-event-content {
     font-size: 0.75rem;
-    padding: 2px 4px;
     height: 100%;
 }
+
 .rbc-event-label {
     display: none !important;
 }
 
-/* Month View - Google Calendar style */
+/* Month View styling */
 .rbc-month-view {
-    border: none !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
 }
-.rbc-month-view .rbc-header {
-    border-bottom: 1px solid #e5e7eb !important;
-    padding: 8px 0 !important;
-    font-weight: 500 !important;
-    font-size: 11px !important;
-    text-transform: uppercase !important;
-    color: #70757a !important;
-}
+
 .rbc-month-row {
-    border: none !important;
-}
-.rbc-month-row + .rbc-month-row {
     border-top: 1px solid #e5e7eb !important;
+    min-height: 125px !important;
 }
+
 .rbc-day-bg {
     border-left: 1px solid #e5e7eb !important;
-    transition: background-color 0.15s ease;
+    transition: background-color 0.1s ease;
 }
+
 .rbc-day-bg:first-child {
     border-left: none !important;
 }
-.rbc-day-bg:hover {
-    background-color: #f8f9fa !important;
-}
-/* Off-month (gray) days - non-clickable appearance */
-.rbc-day-bg.rbc-off-range-bg {
-    background-color: #f8f9fa !important;
-    cursor: default !important;
-}
-.rbc-day-bg.rbc-off-range-bg:hover {
-    background-color: #f8f9fa !important;
-}
-/* Today highlight */
+
 .rbc-day-bg.rbc-today {
-    background-color: #e8f0fe !important;
+    background-color: transparent !important;
 }
-/* Date cell content */
+
+.rbc-off-range-bg {
+    background-color: #f8f9fa !important;
+}
+
+/* Date cell numbering */
 .rbc-date-cell {
-    padding: 4px 8px !important;
-    text-align: right !important;
+    padding: 6px 8px !important;
+    text-align: center !important;
 }
+
 .rbc-date-cell > a {
     font-size: 12px !important;
     font-weight: 500 !important;
     color: #3c4043 !important;
-    pointer-events: none !important;
-}
-.rbc-date-cell.rbc-off-range > a {
-    color: #c4c7c5 !important;
-}
-.rbc-date-cell.rbc-now > a {
-    background-color: #1a73e8 !important;
-    color: white !important;
     width: 24px !important;
     height: 24px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     border-radius: 50% !important;
+    transition: background-color 0.2s;
 }
-.rbc-row-content {
-    z-index: 1 !important;
+
+.rbc-date-cell.rbc-now > a {
+    background-color: #1a73e8 !important;
+    color: white !important;
 }
-.rbc-row-segment {
-    padding: 0 2px 2px 2px !important;
+
+.rbc-date-cell.rbc-off-range > a {
+    color: #c4c7c5 !important;
+}
+
+/* More +N link */
+.rbc-show-more {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #1a73e8 !important;
+    padding: 3px 8px !important;
+    margin: 2px 4px !important;
+    background: rgba(26, 115, 232, 0.05) !important;
+    border-radius: 4px !important;
+    text-decoration: none !important;
+    display: inline-block !important;
+    transition: all 0.2s ease !important;
+}
+.rbc-show-more:hover {
+    background: rgba(26, 115, 232, 0.12) !important;
+    color: #174ea6 !important;
+}
+
+/* Popover styling */
+.rbc-overlay {
+    border-radius: 8px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+    border: 1px solid #e5e7eb !important;
+    padding: 8px !important;
+    z-index: 100 !important;
+}
+
+.rbc-overlay-header {
+    border-bottom: 1px solid #f1f3f4 !important;
+    margin-bottom: 8px !important;
+    padding-bottom: 4px !important;
+    font-weight: 600 !important;
+    color: #3c4043 !important;
+    font-size: 14px !important;
 }
 
 /* Time View styling */
-.rbc-time-slot {
-    min-height: 28px;
-}
-.rbc-current-time-indicator {
-    display: none !important;
-}
-.rbc-time-header-content {
-    border-left: 1px solid #e5e7eb !important;
-}
-.rbc-timeslot-group {
-    border-bottom: 1px solid #f3f4f6 !important;
+.rbc-time-view {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
 }
 
-/* Mobile responsive */
+.rbc-time-gutter .rbc-timeslot-group {
+    border-bottom: none !important;
+    font-size: 11px !important;
+    color: #70757a !important;
+}
+
+.rbc-timeslot-group {
+    min-height: 48px !important;
+    border-bottom: 1px solid #f1f3f4 !important;
+}
+
+.rbc-day-slot .rbc-timeslot-group {
+    border-left: 1px solid #f1f3f4 !important;
+}
+
+/* Mobile responsive tweaks */
 @media (max-width: 640px) {
-    .rbc-time-gutter {
-        width: 38px !important;
-        font-size: 10px !important;
-    }
-    .rbc-time-header-content {
-        font-size: 10px !important;
-    }
     .rbc-header {
-        padding: 4px 2px !important;
-    }
-    .rbc-time-slot {
-        min-height: 24px !important;
-    }
-    .rbc-event-content {
-        font-size: 0.6rem !important;
-        line-height: 1.1 !important;
-        padding: 1px !important;
-    }
-    .rbc-time-view .rbc-header + .rbc-header {
-        border-left: 1px solid #f3f4f6 !important;
+        padding: 8px 0 !important;
+        font-size: 10px !important;
     }
     .rbc-date-cell {
-        padding: 2px 4px !important;
+        padding: 4px !important;
     }
     .rbc-date-cell > a {
-        font-size: 10px !important;
+        font-size: 11px !important;
+        width: 20px !important;
+        height: 20px !important;
     }
 }
 `;
@@ -339,7 +373,7 @@ export function CalendarView({
 
             return {
                 id: occ.id,
-                title: occ.cover_rule?.school?.school_name || occ.cover_rule?.club?.club_name || 'Cover',
+                title: occ.cover_rule?.club?.club_name || occ.cover_rule?.school?.school_name || 'Cover',
                 start,
                 end,
                 displayStart: start,
@@ -355,64 +389,14 @@ export function CalendarView({
         }
     };
 
-    // Group events by date for dynamic display in month view
-    const eventsByDate = useMemo(() => {
-        const grouped: Record<string, typeof calendarEvents> = {}
-        calendarEvents.forEach(evt => {
-            const dateKey = format(evt.start, 'yyyy-MM-dd')
-            grouped[dateKey] ??= []
-            grouped[dateKey].push(evt)
-        })
-        return grouped
-    }, [calendarEvents])
+
 
     // Custom Day cell component for Month view - shows stacked events with overflow
     const CustomDateCellWrapper = (props: any) => {
-        const { day } = props;
-        
-        // Validate that day is a valid Date object
-        if (!day || !(day instanceof Date) || Number.isNaN(day.getTime())) {
-            return <div className="h-full bg-white" />;
-        }
-        
-        const dateKey = format(day, 'yyyy-MM-dd');
-        const dayEvents = eventsByDate[dateKey] ?? [];
-        const maxVisibleEvents = 3; // Show up to 3 events, then "+N more"
-        const visibleEvents = dayEvents.slice(0, maxVisibleEvents);
-        const moreCount = Math.max(0, dayEvents.length - maxVisibleEvents);
-
+        const { children } = props;
         return (
-            <div className="h-full flex flex-col bg-white relative">
-                <div className="flex-1 overflow-hidden p-1 space-y-0.5">
-                    {visibleEvents.map((evt) => {
-                        const occ = evt.resource
-                        const colors = getSchoolColors(occ.cover_rule?.school?.school_name)
-                        const teacher = occ.assignments?.[0]?.teacher;
-                        const teacherInitials = teacher ? `${teacher.person_details.first_name[0]}${teacher.person_details.last_name[0]}` : null;
-
-                        return (
-                            <div
-                                key={evt.id}
-                                className="text-[8px] px-1 py-0.5 rounded truncate cursor-pointer hover:opacity-80 transition-opacity"
-                                style={{
-                                    backgroundColor: colors.bgHex,
-                                    color: colors.textHex,
-                                    borderLeft: `2px solid ${colors.borderHex}`,
-                                }}
-                                onClick={() => onSelectEvent(occ)}
-                                title={`${evt.title} ${format(evt.displayStart, 'h:mm a')}`}
-                            >
-                                <span className="font-semibold">{evt.title}</span>
-                                {teacherInitials && <span className="ml-1 opacity-75">({teacherInitials})</span>}
-                            </div>
-                        );
-                    })}
-                    {moreCount > 0 && (
-                        <div className="text-[8px] text-gray-600 px-1 py-0.5 font-medium">
-                            +{moreCount} more
-                        </div>
-                    )}
-                </div>
+            <div className="h-full flex flex-col bg-white">
+                {children}
             </div>
         );
     };
@@ -426,20 +410,25 @@ export function CalendarView({
             : 'Unassigned';
         const schoolName = occ.cover_rule?.school?.school_name || '';
         const clubName = occ.cover_rule?.club?.club_name || '';
+        const colors = getSchoolColors(schoolName);
 
         return (
-            <div className="h-full w-full px-1.5 py-1">
-                <div className="font-semibold text-xs mb-0.5">{event.title}</div>
-                <div className="text-[10px] opacity-90">
-                    {format(event.displayStart, 'h:mm a')} - {format(event.displayEnd, 'h:mm a')}
+            <div
+                className="h-full w-full px-2 py-1.5 border-l-4 rounded-r shadow-sm overflow-hidden"
+                style={{
+                    backgroundColor: colors.bgHex,
+                    color: colors.textHex,
+                    borderLeftColor: colors.borderHex,
+                }}
+            >
+                <div className="font-bold text-xs truncate leading-tight">{clubName || event.title}</div>
+                {schoolName && (
+                    <div className="text-[10px] opacity-90 mt-1 font-semibold truncate">{schoolName}</div>
+                )}
+                <div className="text-[10px] opacity-80 mt-1 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-current opacity-50" />
+                    <span className="truncate">{teacherName}</span>
                 </div>
-                <div className="text-[10px] opacity-75 mt-0.5">{teacherName}</div>
-                {schoolName && event.title !== schoolName && (
-                    <div className="text-[10px] opacity-90 mt-0.5 font-medium">{schoolName}</div>
-                )}
-                {clubName && event.title !== clubName && (
-                    <div className="text-[10px] opacity-60">{clubName}</div>
-                )}
             </div>
         );
     };
@@ -449,22 +438,77 @@ export function CalendarView({
         const occ = event.resource as CoverOccurrence;
         const teacher = occ.assignments?.[0]?.teacher;
         const teacherInitials = teacher ? `${teacher.person_details.first_name[0]}${teacher.person_details.last_name[0]}` : null;
-        const startTime = occ.cover_rule?.start_time || '';
+        const schoolName = occ.cover_rule?.school?.school_name || '';
+        const clubName = occ.cover_rule?.club?.club_name || '';
+        const colors = getSchoolColors(schoolName);
 
         return (
-            <div className="flex flex-col text-[10px] h-full w-full px-1 py-0.5">
-                <div className="flex items-center justify-between gap-1">
-                    <span className="truncate font-semibold text-[9px]">{event.title}</span>
+            <div
+                className="flex flex-col text-[10px] h-full w-full px-2 py-1.5 rounded border-l-2 shadow-sm mb-1"
+                style={{
+                    backgroundColor: colors.bgHex,
+                    color: colors.textHex,
+                    borderLeftColor: colors.borderHex,
+                }}
+            >
+                <div className="flex items-center justify-between gap-1 overflow-hidden">
+                    <span className="truncate font-bold text-[10.5px] leading-tight">{clubName || event.title}</span>
                     {teacherInitials && (
-                        <span className="bg-white/50 rounded px-0.5 font-bold text-[9px] whitespace-nowrap">
+                        <span className="bg-black/10 rounded px-1 font-bold text-[8px] whitespace-nowrap opacity-70">
                             {teacherInitials}
                         </span>
                     )}
                 </div>
-                {startTime && (
-                    <div className="text-[9px] opacity-70">{format(event.displayStart, 'h:mm a')}</div>
+                {schoolName && (
+                    <div className="text-[9.5px] opacity-80 truncate leading-tight mt-1">{schoolName}</div>
                 )}
             </div>
+        );
+    };
+
+    // Custom Show More component using Radix Popover for better "open/close" behavior
+    const CustomShowMore = ({ events: dayEvents, label, slotMetrics }: any) => {
+        return (
+            <Popover>
+                <PopoverTrigger asChild>
+                    <button
+                        className="rbc-show-more focus:outline-none w-full text-left"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {label || `+${dayEvents.length - 1} more`}
+                    </button>
+                </PopoverTrigger>
+                <PopoverContent
+                    className="w-72 p-0 shadow-2xl border border-border overflow-hidden rounded-xl z-50 bg-white"
+                    align="center"
+                    sideOffset={5}
+                >
+                    <div className="bg-muted/50 px-3 py-2 border-b flex items-center justify-between">
+                        <span className="font-semibold text-sm text-foreground/80">
+                            {format(slotMetrics?.date || dayEvents?.[0]?.start || new Date(), 'EEEE, MMM d')}
+                        </span>
+                        <PopoverClose asChild>
+                            <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full hover:bg-black/5">
+                                <X className="h-3 w-3" />
+                            </Button>
+                        </PopoverClose>
+                    </div>
+                    <div className="p-2 space-y-1.5 max-h-[300px] overflow-y-auto">
+                        {dayEvents.map((event: any, idx: number) => (
+                            <div
+                                key={event.id || idx}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onSelectEvent(event.resource);
+                                }}
+                                className="cursor-pointer"
+                            >
+                                <MonthEventComponent event={event} />
+                            </div>
+                        ))}
+                    </div>
+                </PopoverContent>
+            </Popover>
         );
     };
 
@@ -486,7 +530,7 @@ export function CalendarView({
                 step={30}
                 showMultiDayTimes
                 min={set(new Date(), { hours: 7, minutes: 0 })}  // 7 AM
-                max={set(new Date(), { hours: 20, minutes: 0 })} // 8 PM
+                max={set(new Date(), { hours: 22, minutes: 0 })} // 10 PM
                 scrollToTime={set(new Date(), { hours: 9, minutes: 0 })}
                 draggableAccessor={() => true}
                 selectable={true}
@@ -508,25 +552,18 @@ export function CalendarView({
                 components={{
                     toolbar: CustomToolbar,
                     event: view === Views.MONTH ? MonthEventComponent : WeekEventComponent,
-                    dateCellWrapper: view === Views.MONTH ? CustomDateCellWrapper : undefined
+                    dateCellWrapper: CustomDateCellWrapper,
+                    showMore: CustomShowMore
                 }}
-                eventPropGetter={(event: any) => {
-                    const colors = getSchoolColors(event.resource.cover_rule?.school?.school_name);
+                eventPropGetter={() => {
                     return {
                         className: cn(
                             "cursor-grab active:cursor-grabbing hover:opacity-90 transition-opacity",
-                            view === Views.MONTH ? "px-1.5 py-1 text-[9px]" : "px-0 py-0"
+                            view === Views.MONTH ? "month-event" : "week-event"
                         ),
                         style: {
-                            backgroundColor: colors.bgHex,
-                            color: colors.textHex,
-                            borderColor: colors.borderHex,
-                            borderRadius: '3px',
-                            borderStyle: 'solid',
-                            borderWidth: '1px',
-                            borderLeftWidth: '3px',
-                            margin: '1px 0',
-                            marginBottom: '1px'
+                            // Basic style reset as we handle colors in components
+                            border: 'none',
                         }
                     };
                 }}

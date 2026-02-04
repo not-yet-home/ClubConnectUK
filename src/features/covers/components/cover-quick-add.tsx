@@ -1,7 +1,7 @@
 import * as React from "react"
 import { toast } from "sonner"
 import { addWeeks, format, getDay, set } from "date-fns"
-import { Building2, Clock, Info, UserMinus } from "lucide-react"
+import { Building2, Clock, Info } from "lucide-react"
 import type { CoverOccurrence } from "@/types/club.types"
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
@@ -84,13 +84,13 @@ export function CoverQuickAdd({
     const filteredTeachers = React.useMemo(() => {
         if (!teachers) return []
         if (!teacherSearch.trim()) return teachers
-        
+
         const search = teacherSearch.toLowerCase().trim()
         return teachers.filter((t: any) => {
             const firstName = t.person_details?.first_name?.toLowerCase() || ""
             const lastName = t.person_details?.last_name?.toLowerCase() || ""
             const fullName = `${firstName} ${lastName}`
-            
+
             // Match at word boundaries - start of first name, last name, or full name
             const words = fullName.split(' ')
             return words.some(word => word.startsWith(search))
@@ -227,25 +227,85 @@ export function CoverQuickAdd({
                     </DialogTitle>
                     {/* "Save" button was here in some designs, but Footer is standard */}
                 </DialogHeader>
-                <div className="px-6 py-4 space-y-3">
-                        {/* Toggle for Cover Type as a pill switch */}
-                        <p className="text-xs font-medium text-muted-foreground">Choose Type of Schedule</p>
-                        <div className="flex bg-muted/50 rounded-md p-0.5 w-fit">
-                            <button
-                                type="button"
-                                onClick={() => setScheduleType('regular')}
-                                className={`px-4 py-1.5 text-xs font-medium rounded-sm transition-all ${scheduleType === 'regular' ? 'bg-white shadow-sm text-red-600' : 'text-muted-foreground hover:text-foreground'}`}
-                            >
-                                Regular
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setScheduleType('covers')}
-                                className={`px-4 py-1.5 text-xs font-medium rounded-sm transition-all ${scheduleType === 'covers' ? 'bg-white shadow-sm text-blue-600' : 'text-muted-foreground hover:text-foreground'}`}
-                            >
-                                Cover
-                            </button>
+                <div className="px-6 py-4 border-b bg-muted/5 space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <p className="text-xs font-medium text-muted-foreground">Choose Type of Schedule</p>
+                            <div className="flex bg-muted/50 rounded-md p-0.5 w-fit">
+                                <button
+                                    type="button"
+                                    onClick={() => setScheduleType('regular')}
+                                    className={`px-4 py-1.5 text-xs font-medium rounded-sm transition-all ${scheduleType === 'regular' ? 'bg-white shadow-sm text-red-600' : 'text-muted-foreground hover:text-foreground'}`}
+                                >
+                                    Regular
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setScheduleType('covers')}
+                                    className={`px-4 py-1.5 text-xs font-medium rounded-sm transition-all ${scheduleType === 'covers' ? 'bg-white shadow-sm text-blue-600' : 'text-muted-foreground hover:text-foreground'}`}
+                                >
+                                    Cover
+                                </button>
+                            </div>
                         </div>
+
+                        <div className="space-y-2">
+                            <p className="text-xs font-medium text-muted-foreground">Teacher (optional)</p>
+                            <Popover open={teacherOpen} onOpenChange={setTeacherOpen}>
+                                <PopoverTrigger asChild>
+                                    <button
+                                        type="button"
+                                        disabled={teachersLoading}
+                                        className="w-full text-sm border-0 border-b border-transparent hover:border-border px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent text-left text-foreground/80 disabled:opacity-50"
+                                    >
+                                        {getTeacherName(teacherId)}
+                                    </button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[200px] p-0" align="start">
+                                    <Command shouldFilter={false}>
+                                        <CommandInput
+                                            placeholder="Search teachers..."
+                                            value={teacherSearch}
+                                            onValueChange={setTeacherSearch}
+                                            className="border-0 border-b"
+                                        />
+                                        {filteredTeachers.length === 0 && teacherSearch ? (
+                                            <CommandEmpty>No teachers found.</CommandEmpty>
+                                        ) : null}
+                                        <CommandList>
+                                            <CommandGroup>
+                                                <CommandItem
+                                                    value="unassigned"
+                                                    onSelect={() => {
+                                                        setTeacherId("unassigned")
+                                                        setTeacherOpen(false)
+                                                        setTeacherSearch("")
+                                                    }}
+                                                    className={`cursor-pointer ${teacherId === "unassigned" ? "bg-primary text-primary-foreground" : ""}`}
+                                                >
+                                                    Unassigned (Pool)
+                                                </CommandItem>
+                                                {filteredTeachers.map((t: any) => (
+                                                    <CommandItem
+                                                        key={t.id}
+                                                        value={`${t.person_details.first_name} ${t.person_details.last_name}`}
+                                                        onSelect={() => {
+                                                            setTeacherId(t.id)
+                                                            setTeacherOpen(false)
+                                                            setTeacherSearch("")
+                                                        }}
+                                                        className={`cursor-pointer ${teacherId === t.id ? "bg-primary text-primary-foreground" : ""}`}
+                                                    >
+                                                        {t.person_details.first_name} {t.person_details.last_name}
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+                    </div>
                 </div>
                 <div className="px-6 py-4 space-y-3">
                     {/* 2. Title / Subject (School & Club) */}
@@ -253,30 +313,36 @@ export function CoverQuickAdd({
                         <div className="mt-2.5 text-muted-foreground/60 w-5 flex justify-center">
                             <Building2 className="w-4 h-4" />
                         </div>
-                        <div className="flex-1 space-y-2">
-                            <div className="text-sm font-medium text-muted-foreground mb-1">School</div>
-                            <Select value={schoolId} onValueChange={(v) => { setSchoolId(v); setClubId("") }}>
-                                <SelectTrigger className="w-full text-sm border-0 border-b border-transparent hover:border-border px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent" id="school-select">
-                                    <SelectValue placeholder="Add School" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {schools?.map(s => (
-                                        <SelectItem key={s.id} value={s.id}>{s.school_name}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                        <div className="flex-1">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <div className="text-sm font-medium text-muted-foreground">School</div>
+                                    <Select value={schoolId} onValueChange={(v) => { setSchoolId(v); setClubId("") }}>
+                                        <SelectTrigger className="w-full text-sm border-0 border-b border-transparent hover:border-border px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent" id="school-select">
+                                            <SelectValue placeholder="Add School" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {schools?.map(s => (
+                                                <SelectItem key={s.id} value={s.id}>{s.school_name}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
 
-                            <div className="text-sm font-medium text-muted-foreground mb-1 mt-2">Club or Activity</div>
-                            <Select value={clubId} onValueChange={setClubId} disabled={!schoolId || clubsLoading}>
-                                <SelectTrigger className={`w-full text-sm border-0 border-b border-transparent hover:border-border px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent ${!schoolId ? 'opacity-50' : ''}`} id="club-select">
-                                    <SelectValue placeholder={!schoolId ? "Select School First" : "Add Club or Activity"} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {clubs?.map(c => (
-                                        <SelectItem key={c.id} value={c.id}>{c.club_name}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                                <div className="space-y-1">
+                                    <div className="text-sm font-medium text-muted-foreground">Club or Activity</div>
+                                    <Select value={clubId} onValueChange={setClubId} disabled={!schoolId || clubsLoading}>
+                                        <SelectTrigger className={`w-full text-sm border-0 border-b border-transparent hover:border-border px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent ${!schoolId ? 'opacity-50' : ''}`} id="club-select">
+                                            <SelectValue placeholder={!schoolId ? "Select School First" : "Add Club"} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {clubs?.map(c => (
+                                                <SelectItem key={c.id} value={c.id}>{c.club_name}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -391,68 +457,6 @@ export function CoverQuickAdd({
                         </div>
                     </div>
 
-                    {/* 4. Details (Teacher replacement) */}
-                    <div className="flex gap-4 items-start">
-                        <div className="mt-2.5 text-muted-foreground/60 w-5 flex justify-center">
-                            <UserMinus className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1">
-                            <div className="text-sm font-medium text-muted-foreground mb-2">Teacher (optional)</div>
-                            <Popover open={teacherOpen} onOpenChange={setTeacherOpen}>
-                                <PopoverTrigger asChild>
-                                    <button
-                                        type="button"
-                                        disabled={teachersLoading}
-                                        className="w-full text-sm border-0 border-b border-transparent hover:border-border px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent text-left text-foreground/80 disabled:opacity-50"
-                                    >
-                                        {getTeacherName(teacherId)}
-                                    </button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-[200px] p-0" align="start">
-                                    <Command shouldFilter={false}>
-                                        <CommandInput
-                                            placeholder="Search teachers..."
-                                            value={teacherSearch}
-                                            onValueChange={setTeacherSearch}
-                                            className="border-0 border-b"
-                                        />
-                                        {filteredTeachers.length === 0 && teacherSearch ? (
-                                            <CommandEmpty>No teachers found.</CommandEmpty>
-                                        ) : null}
-                                        <CommandList>
-                                            <CommandGroup>
-                                                <CommandItem
-                                                    value="unassigned"
-                                                    onSelect={() => {
-                                                        setTeacherId("unassigned")
-                                                        setTeacherOpen(false)
-                                                        setTeacherSearch("")
-                                                    }}
-                                                    className={`cursor-pointer ${teacherId === "unassigned" ? "bg-primary text-primary-foreground" : ""}`}
-                                                >
-                                                    Unassigned (Pool)
-                                                </CommandItem>
-                                                {filteredTeachers.map((t: any) => (
-                                                    <CommandItem
-                                                        key={t.id}
-                                                        value={`${t.person_details.first_name} ${t.person_details.last_name}`}
-                                                        onSelect={() => {
-                                                            setTeacherId(t.id)
-                                                            setTeacherOpen(false)
-                                                            setTeacherSearch("")
-                                                        }}
-                                                        className={`cursor-pointer ${teacherId === t.id ? "bg-primary text-primary-foreground" : ""}`}
-                                                    >
-                                                        {t.person_details.first_name} {t.person_details.last_name}
-                                                    </CommandItem>
-                                                ))}
-                                            </CommandGroup>
-                                        </CommandList>
-                                    </Command>
-                                </PopoverContent>
-                            </Popover>
-                        </div>
-                    </div>
                 </div>
 
                 <DialogFooter className="px-6 py-4 border-t bg-muted/5 flex items-center justify-between sm:justify-between">

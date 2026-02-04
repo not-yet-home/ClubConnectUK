@@ -13,11 +13,13 @@ interface AppHeaderProps {
         label: string
         href?: string
     }>
+    actions?: React.ReactNode
 }
 
-export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
+export function AppHeader({ breadcrumbs = [], actions }: AppHeaderProps) {
     return (
-        <header className="flex sticky top-0 z-50 h-14 shrink-0 items-center gap-2 bg-background rounded-tl-md rounded-tr-md border-b border-border px-4">            <SidebarTrigger />
+        <header className="flex sticky top-0 z-50 h-14 shrink-0 items-center gap-2 bg-background rounded-tl-md rounded-tr-md border-b border-border px-4">
+            <SidebarTrigger />
             <Breadcrumb>
                 <BreadcrumbList>
                     {breadcrumbs.map((crumb, index) => (
@@ -34,6 +36,11 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                     ))}
                 </BreadcrumbList>
             </Breadcrumb>
+            {actions && (
+                <div className="ml-auto flex items-center gap-2">
+                    {actions}
+                </div>
+            )}
         </header>
     )
 }

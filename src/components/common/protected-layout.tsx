@@ -11,7 +11,7 @@ export function ProtectedLayout({ children }: ProtectedLayoutProps) {
     return (
         <SidebarProvider>
             <AppSidebar />
-            <section className="flex min-h-0 w-full flex-1 flex-col bg-secondary p-3">
+            <section className="flex min-h-0 w-full flex-1 flex-col">
                 <SidebarInset>{children}</SidebarInset>
             </section>
             <Toaster richColors position="top-right" />

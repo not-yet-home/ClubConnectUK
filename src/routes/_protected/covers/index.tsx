@@ -17,7 +17,6 @@ import { YearView } from '@/features/covers/components/year-view';
 
 import { PageLayout } from '@/components/common/page-layout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import {
     Dialog,
     DialogContent,
@@ -62,6 +61,7 @@ function CoversCalendarPage() {
     const [quickAddOpen, setQuickAddOpen] = useState(false);
 
     const handleSelectSlot = (date: Date) => {
+        setSelectedOccurrence(null);
         setPreselectedDate(date);
         setQuickAddOpen(true);
     };
@@ -113,6 +113,7 @@ function CoversCalendarPage() {
             toast.success("Cover session deleted");
             setDeleteConfirmationOpen(false);
             setOccurrenceToDelete(null);
+            setSelectedOccurrence(null);
             setQuickViewOpen(false);
         } catch (error) {
             console.error("Failed to delete", error);
@@ -122,98 +123,92 @@ function CoversCalendarPage() {
 
     return (
         <>
-            <PageLayout breadcrumbs={[{ label: 'Covers Scheduling' }]} className="p-3 sm:p-6">
-                <div className="h-[calc(100vh-120px)] flex flex-col">
-                    {/* Header Toolbar */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3 sm:gap-4 px-1 sm:px-0">
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                            {/* School Filter */}
-                            <div className="flex items-center gap-2">
-                                <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap hidden lg:block">
-                                    School:
-                                </Label>
-                                <Select value={schoolId} onValueChange={setSchoolId}>
-                                    <SelectTrigger className="w-full sm:w-[180px] h-9">
-                                        <SelectValue placeholder="All Schools" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Schools</SelectItem>
-                                        {schools?.map((school) => (
-                                            <SelectItem key={school.id} value={school.id}>
-                                                {school.school_name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            {/* View Toggle */}
-                            <div className="flex-shrink-0">
-                                <ViewToggle value={viewType} onChange={setViewType} />
-                            </div>
+            <PageLayout
+                breadcrumbs={[{ label: 'Covers Scheduling' }]}
+                className="p-3"
+                actions={
+                    <div className="flex items-center gap-2 sm:gap-3">
+                        {/* School Filter */}
+                        <div className="flex items-center gap-2">
+                            <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap hidden lg:block">
+                                School:
+                            </Label>
+                            <Select value={schoolId} onValueChange={setSchoolId}>
+                                <SelectTrigger className="w-full sm:w-[180px] h-8 text-xs">
+                                    <SelectValue placeholder="All Schools" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Schools</SelectItem>
+                                    {schools?.map((school) => (
+                                        <SelectItem key={school.id} value={school.id}>
+                                            {school.school_name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
 
-
+                        {/* View Toggle */}
+                        <div className="flex-shrink-0">
+                            <ViewToggle value={viewType} onChange={setViewType} />
+                        </div>
                     </div>
+                }
+            >
+                <div className="flex-1 h-[calc(100vh-56px-24px)] overflow-hidden flex flex-col bg-white rounded-xl border border-border shadow-sm">
+                    <div className="flex-1 flex min-h-0">
+                        <div className={cn(
+                            "flex-1 h-full overflow-hidden",
+                            (viewType === 'schedule' || viewType === 'year') ? "p-0" : "p-0"
+                        )}>
+                            {/* Calendar Views */}
+                            {(viewType === 'day' || viewType === 'week' || viewType === 'month' || viewType === '4days') && (
+                                <CalendarView
+                                    events={events}
+                                    onSelectEvent={(occ) => handleSelectOccurrence(occ)}
+                                    onSelectSlot={handleSelectSlot}
+                                    onDrillDown={handleSelectSlot}
+                                    onEventDrop={handleEventDrop}
+                                    viewMode={viewType}
+                                    onViewChange={setViewType}
+                                    date={selectedDate}
+                                    onNavigate={setSelectedDate}
+                                />
+                            )}
 
-                    {/* Main Content Area */}
-                    <div className="flex-1 flex gap-4 min-h-0">
-                        <Card className="flex-1 border-gray-200 overflow-hidden flex flex-col">
-                            <CardContent className="p-0 h-full">
-                                <div className={cn(
-                                    "h-full overflow-auto",
-                                    (viewType === 'schedule' || viewType === 'year') ? "p-0" : "p-0"
-                                )}>
-                                    {/* Calendar Views */}
-                                    {(viewType === 'day' || viewType === 'week' || viewType === 'month' || viewType === '4days') && (
-                                        <CalendarView
-                                            events={events}
-                                            onSelectEvent={(occ) => handleSelectOccurrence(occ)}
-                                            onSelectSlot={handleSelectSlot}
-                                            onDrillDown={handleSelectSlot}
-                                            onEventDrop={handleEventDrop}
-                                            viewMode={viewType}
-                                            onViewChange={setViewType}
-                                            date={selectedDate}
-                                            onNavigate={setSelectedDate}
-                                        />
-                                    )}
-
-                                    {/* Schedule (Agenda) View */}
-                                    {viewType === 'schedule' && (
-                                        <div className="p-6">
-                                            <CoversListView
-                                                occurrences={events}
-                                                onSelectOccurrence={handleSelectOccurrence}
-                                            />
-                                        </div>
-                                    )}
-
-                                    {/* Year View */}
-                                    {viewType === 'year' && (
-                                        <YearView
-                                            occurrences={events}
-                                            selectedYear={selectedDate.getFullYear()}
-                                            onSelectMonth={(month) => {
-                                                const newDate = new Date(selectedDate)
-                                                newDate.setMonth(month)
-                                                setSelectedDate(newDate)
-                                                setViewType('month')
-                                            }}
-                                        />
-                                    )}
-
-                                    {isLoading && (
-                                        <div className="flex items-center justify-center h-full">
-                                            <div className="text-center">
-                                                <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-3"></div>
-                                                <p className="text-sm text-gray-500">Loading covers...</p>
-                                            </div>
-                                        </div>
-                                    )}
+                            {/* Schedule (Agenda) View */}
+                            {viewType === 'schedule' && (
+                                <div className="p-6">
+                                    <CoversListView
+                                        occurrences={events}
+                                        onSelectOccurrence={handleSelectOccurrence}
+                                    />
                                 </div>
-                            </CardContent>
-                        </Card>
+                            )}
+
+                            {/* Year View */}
+                            {viewType === 'year' && (
+                                <YearView
+                                    occurrences={events}
+                                    selectedYear={selectedDate.getFullYear()}
+                                    onSelectMonth={(month) => {
+                                        const newDate = new Date(selectedDate)
+                                        newDate.setMonth(month)
+                                        setSelectedDate(newDate)
+                                        setViewType('month')
+                                    }}
+                                />
+                            )}
+
+                            {isLoading && (
+                                <div className="flex items-center justify-center h-full">
+                                    <div className="text-center">
+                                        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-3"></div>
+                                        <p className="text-sm text-gray-500">Loading covers...</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </PageLayout>
