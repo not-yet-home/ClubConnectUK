@@ -155,11 +155,11 @@ function CoversCalendarPage() {
                     </div>
                 }
             >
-                <div className="flex-1 h-[calc(100vh-56px-24px)] overflow-hidden flex flex-col bg-white rounded-xl border border-border shadow-sm">
+                <div className="flex-1 h-[calc(100vh-56px-24px)] overflow-hidden flex flex-col">
                     <div className="flex-1 flex min-h-0">
                         <div className={cn(
                             "flex-1 h-full overflow-hidden",
-                            (viewType === 'schedule' || viewType === 'year') ? "p-0" : "p-0"
+                            (viewType === 'schedule' || viewType === 'year') ? "bg-white rounded-xl border border-border shadow-sm" : ""
                         )}>
                             {/* Calendar Views */}
                             {(viewType === 'day' || viewType === 'week' || viewType === 'month' || viewType === '4days') && (

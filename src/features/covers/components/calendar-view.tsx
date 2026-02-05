@@ -33,13 +33,18 @@ const rbcStyleOverrides = `
 
 /* Day/Month Header styling */
 .rbc-header {
-    border-bottom: 1px solid #f1f3f4 !important;
-    padding: 12px 0 !important;
-    font-weight: 500 !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    border-left: 1px solid #e5e7eb !important;
+    padding: 10px 0 !important;
+    font-weight: 600 !important;
     font-size: 11px !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-    color: #70757a !important;
+    letter-spacing: 0.8px !important;
+    color: #5f6368 !important;
+}
+
+.rbc-header:first-child {
+    border-left: none !important;
 }
 
 /* Event styling */
@@ -68,12 +73,11 @@ const rbcStyleOverrides = `
 .rbc-month-view {
     border: 1px solid #e5e7eb !important;
     border-radius: 8px !important;
-    overflow: hidden !important;
+    overflow: auto !important;
 }
 
 .rbc-month-row {
     border-top: 1px solid #e5e7eb !important;
-    min-height: 125px !important;
 }
 
 .rbc-day-bg {
@@ -163,6 +167,10 @@ const rbcStyleOverrides = `
     border-radius: 8px !important;
 }
 
+.rbc-time-header-content {
+    border-left: 1px solid #e5e7eb !important;
+}
+
 .rbc-time-gutter .rbc-timeslot-group {
     border-bottom: none !important;
     font-size: 11px !important;
@@ -171,11 +179,11 @@ const rbcStyleOverrides = `
 
 .rbc-timeslot-group {
     min-height: 48px !important;
-    border-bottom: 1px solid #f1f3f4 !important;
+    border-bottom: 1px solid #e5e7eb !important;
 }
 
 .rbc-day-slot .rbc-timeslot-group {
-    border-left: 1px solid #f1f3f4 !important;
+    border-left: 1px solid #e5e7eb !important;
 }
 
 /* Mobile responsive tweaks */
