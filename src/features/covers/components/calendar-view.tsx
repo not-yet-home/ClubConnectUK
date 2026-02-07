@@ -265,7 +265,7 @@ export function CalendarView({
                         className="rbc-show-more focus:outline-none w-full text-left"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        {label || `+${dayEvents.length - 1} more`}
+                        {label || `+${dayEvents.length-1} more`}
                     </button>
                 </PopoverTrigger>
                 <PopoverContent

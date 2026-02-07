@@ -467,7 +467,7 @@ export function CoverQuickAdd({
                                                                 </div>
                                                             ))}
                                                             {occurrenceDates.length > 6 && (
-                                                                <div className="text-[13px]">and {occurrenceDates.length - 6} more…</div>
+                                                                <div className="text-[13px]">and {occurrenceDates.length-6} more…</div>
                                                             )}
                                                         </div>
                                                     ) : (

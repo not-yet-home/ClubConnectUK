@@ -161,7 +161,7 @@ export function StepCompose({ formData, updateField, setChannel, onNext, onBack 
                                     ))}
                                     {formData.selectedCovers.length > 3 && (
                                         <div className="text-xs text-center text-zinc-400">
-                                            +{formData.selectedCovers.length - 3} more
+                                            +{formData.selectedCovers.length-3} more
                                         </div>
                                     )}
                                 </div>

@@ -42,7 +42,7 @@ export function BroadcastStepperNav({ currentStep }: BroadcastStepperNavProps) {
                 : 'pending'
           const statusText = getStatusText(status)
           const StepIcon = step.icon
-          const isLast = index === steps.length - 1
+          const isLast = index === steps.length-1
 
           return (
             <React.Fragment key={step.id}>

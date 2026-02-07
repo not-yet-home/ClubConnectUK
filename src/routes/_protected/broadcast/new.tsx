@@ -27,7 +27,7 @@ function BroadcastNewPage() {
     scrollToTop()
   }
   const handleBack = () => {
-    setStep(state.step - 1)
+    setStep(state.step-1)
     scrollToTop()
   }
 

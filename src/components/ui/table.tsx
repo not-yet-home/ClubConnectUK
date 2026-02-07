@@ -124,7 +124,7 @@ function DataTablePagination({
   className,
 }: DataTablePaginationProps) {
   const canGoPrevious = pageIndex > 0
-  const canGoNext = pageIndex < pageCount - 1
+  const canGoNext = pageIndex < pageCount-1
 
   const startRow = totalRows === 0 ? 0 : pageIndex * pageSize + 1
   const endRow = Math.min((pageIndex + 1) * pageSize, totalRows)
@@ -146,20 +146,20 @@ function DataTablePagination({
       }
 
       // Pages around current
-      const start = Math.max(1, pageIndex - 1)
-      const end = Math.min(pageCount - 2, pageIndex + 1)
+      const start = Math.max(1, pageIndex-1)
+      const end = Math.min(pageCount-2, pageIndex + 1)
 
       for (let i = start; i <= end; i++) {
         pages.push(i)
       }
 
-      if (pageIndex < pageCount - 3) {
+      if (pageIndex < pageCount-3) {
         pages.push("ellipsis")
       }
 
       // Always show last page
       if (pageCount > 1) {
-        pages.push(pageCount - 1)
+        pages.push(pageCount-1)
       }
     }
 
@@ -193,7 +193,7 @@ function DataTablePagination({
         <Button
           variant="outline"
           size="icon-sm"
-          onClick={() => onPageChange(pageIndex - 1)}
+          onClick={() => onPageChange(pageIndex-1)}
           disabled={!canGoPrevious}
         >
           <span className="text-xs">{"<"}</span>
@@ -230,7 +230,7 @@ function DataTablePagination({
         <Button
           variant="outline"
           size="icon-sm"
-          onClick={() => onPageChange(pageCount - 1)}
+          onClick={() => onPageChange(pageCount-1)}
           disabled={!canGoNext}
         >
           <span className="text-xs">{">>"}</span>
