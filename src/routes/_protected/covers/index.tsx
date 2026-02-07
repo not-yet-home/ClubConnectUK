@@ -14,6 +14,7 @@ import { CoverQuickAdd } from '@/features/covers/components/cover-quick-add';
 import { CoversListView } from '@/features/covers/components/covers-list-view';
 import { ViewToggle } from '@/features/covers/components/view-toggle';
 import { YearView } from '@/features/covers/components/year-view';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { PageLayout } from '@/components/common/page-layout';
 import { Button } from '@/components/ui/button';
@@ -125,16 +126,60 @@ function CoversCalendarPage() {
         <>
             <PageLayout
                 breadcrumbs={[{ label: 'Covers Scheduling' }]}
-                className="p-3"
-                actions={
-                    <div className="flex items-center gap-2 sm:gap-3">
-                        {/* School Filter */}
+                className="flex flex-col h-full p-0"
+            >
+                {/* Unified Toolbar */}
+                <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-2 border-b bg-white gap-3 z-10 shrink-0">
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                        <div className="flex items-center gap-1">
+                            <Button
+                                variant="outline"
+                                size="icon-sm"
+                                onClick={() => {
+                                    const newDate = new Date(selectedDate);
+                                    if (viewType === 'month') newDate.setMonth(newDate.getMonth() - 1);
+                                    else if (viewType === 'week' || viewType === '4days') newDate.setDate(newDate.getDate() - 7);
+                                    else newDate.setDate(newDate.getDate() - 1);
+                                    setSelectedDate(newDate);
+                                }}
+                            >
+                                <ChevronLeft />
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="icon-sm"
+                                onClick={() => {
+                                    const newDate = new Date(selectedDate);
+                                    if (viewType === 'month') newDate.setMonth(newDate.getMonth() + 1);
+                                    else if (viewType === 'week' || viewType === '4days') newDate.setDate(newDate.getDate() + 7);
+                                    else newDate.setDate(newDate.getDate() + 1);
+                                    setSelectedDate(newDate);
+                                }}
+                            >
+                                <ChevronRight />
+                            </Button>
+                        </div>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSelectedDate(new Date())}
+                        >
+                            Today
+                        </Button>
+                        <h2 className="text-lg font-semibold text-foreground ml-1 truncate">
+                            {viewType === 'month' ? format(selectedDate, 'MMMM yyyy') :
+                                viewType === 'year' ? selectedDate.getFullYear() :
+                                    format(selectedDate, 'MMM d, yyyy')}
+                        </h2>
+                    </div>
+
+                    <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
                         <div className="flex items-center gap-2">
                             <Label className="text-sm font-medium text-muted-foreground whitespace-nowrap hidden lg:block">
                                 School:
                             </Label>
                             <Select value={schoolId} onValueChange={setSchoolId}>
-                                <SelectTrigger className="w-full sm:w-[180px] h-8 text-xs">
+                                <SelectTrigger size="sm" className="w-full sm:w-[180px]">
                                     <SelectValue placeholder="All Schools" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -148,15 +193,14 @@ function CoversCalendarPage() {
                             </Select>
                         </div>
 
-                        {/* View Toggle */}
                         <div className="flex-shrink-0">
                             <ViewToggle value={viewType} onChange={setViewType} />
                         </div>
                     </div>
-                }
-            >
-                <div className="flex-1 h-[calc(100vh-56px-24px)] overflow-hidden flex flex-col">
-                    <div className="flex-1 flex min-h-0">
+                </div>
+
+                <div className="flex-1 min-h-0 overflow-hidden">
+                    <div className="h-full flex flex-col">
                         <div className={cn(
                             "flex-1 h-full overflow-hidden",
                             (viewType === 'schedule' || viewType === 'year') ? "bg-white rounded-xl border border-border shadow-sm" : ""
