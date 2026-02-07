@@ -114,7 +114,7 @@ export function CoverQuickAdd({
         if (id === "unassigned") return "Unassigned (Pool)"
         const teacher = teachers?.find((t: Teacher) => t.id === id)
         if (teacher) {
-            return `${teacher.person_details.first_name} ${teacher.person_details.last_name} `
+            return `${teacher.person_details.first_name} ${teacher.person_details.last_name}`
         }
         return "Select Teacher"
     }
@@ -186,7 +186,7 @@ export function CoverQuickAdd({
             const dayOfOccurence = getDay(new Date(meetingDate))
 
             if (editingOccurrence) {
-                console.log("Updating occurrence:", editingOccurrence.id, "with date:", - meetingDate);
+                console.log("Updating occurrence:", editingOccurrence.id, "with date:", meetingDate);
                 await updateRequest.mutateAsync({
                     occurrence_id: editingOccurrence.id,
                     rule_id: editingOccurrence.cover_rule_id,
@@ -231,7 +231,7 @@ export function CoverQuickAdd({
             }
             onOpenChange(false)
         } catch (error: any) {
-            toast.error(`Failed to ${editingOccurrence ? 'update' : 'create'} request: ${error.message || "Unknown error"} `)
+            toast.error(`Failed to ${editingOccurrence ? 'update' : 'create'} request: ${error.message || "Unknown error"}`)
             console.error(error)
         }
     }
@@ -256,14 +256,14 @@ export function CoverQuickAdd({
                                 <button
                                     type="button"
                                     onClick={() => setScheduleType('regular')}
-                                    className={`px - 4 py - 1.5 text - xs font - semibold rounded - sm transition - all ${scheduleType === 'regular' ? 'bg-white shadow-sm text-red-600' : 'text-muted-foreground hover:text-foreground'} `}
+                                    className={`px-4 py-1.5 text-xs font-semibold rounded-sm transition-all ${scheduleType === 'regular' ? 'bg-white shadow-sm text-red-600' : 'text-muted-foreground hover:text-foreground'}`}
                                 >
                                     Regular
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setScheduleType('covers')}
-                                    className={`px - 4 py - 1.5 text - xs font - semibold rounded - sm transition - all ${scheduleType === 'covers' ? 'bg-white shadow-sm text-blue-600' : 'text-muted-foreground hover:text-foreground'} `}
+                                    className={`px-4 py-1.5 text-xs font-semibold rounded-sm transition-all ${scheduleType === 'covers' ? 'bg-white shadow-sm text-blue-600' : 'text-muted-foreground hover:text-foreground'}`}
                                 >
                                     Cover
                                 </button>
@@ -303,20 +303,20 @@ export function CoverQuickAdd({
                                                         setTeacherOpen(false)
                                                         setTeacherSearch("")
                                                     }}
-                                                    className={`cursor - pointer ${teacherId === "unassigned" ? "bg-primary text-primary-foreground" : ""} `}
+                                                    className={`cursor-pointer ${teacherId === "unassigned" ? "bg-primary text-primary-foreground" : ""}`}
                                                 >
                                                     Unassigned (Pool)
                                                 </CommandItem>
                                                 {filteredTeachers.map((t: Teacher) => (
                                                     <CommandItem
                                                         key={t.id}
-                                                        value={`${t.person_details.first_name} ${t.person_details.last_name} `}
+                                                        value={`${t.person_details.first_name} ${t.person_details.last_name}`}
                                                         onSelect={() => {
                                                             setTeacherId(t.id)
                                                             setTeacherOpen(false)
                                                             setTeacherSearch("")
                                                         }}
-                                                        className={`cursor - pointer ${teacherId === t.id ? "bg-primary text-primary-foreground" : ""} `}
+                                                        className={`cursor-pointer ${teacherId === t.id ? "bg-primary text-primary-foreground" : ""}`}
                                                     >
                                                         {t.person_details.first_name} {t.person_details.last_name}
                                                     </CommandItem>
@@ -354,7 +354,7 @@ export function CoverQuickAdd({
                                 <div className="space-y-1">
                                     <Label htmlFor="club-select" className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider">Club or Activity</Label>
                                     <Select value={clubId} onValueChange={setClubId} disabled={!schoolId || clubsLoading}>
-                                        <SelectTrigger className={`w - full text - sm border - 0 border - b border - muted / 50 hover: border - muted px - 0 h - 9 shadow - none focus: ring - 0 rounded - none bg - transparent ${!schoolId ? 'opacity-50' : ''} `} id="club-select">
+                                        <SelectTrigger className={`w-full text-sm border-0 border-b border-muted/50 hover:border-muted px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent ${!schoolId ? 'opacity-50' : ''}`} id="club-select">
                                             <SelectValue placeholder={!schoolId ? "Select School First" : "Add Club"} />
                                         </SelectTrigger>
                                         <SelectContent>

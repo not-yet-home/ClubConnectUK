@@ -7,8 +7,8 @@
 INSERT INTO public.clubs (id, school_id, club_name, club_code, description, members_count, status)
 VALUES
     (
-        'c0000004-0004-0004-0004-000000000004'::uuid,
-        'b0000002-0002-0002-0002-000000000002'::uuid,  -- St. Mary's Secondary
+        'c0000004-0004-0004-0004-000000000004'::UUID,
+        'b0000002-0002-0002-0002-000000000002'::UUID,  -- St. Mary's Secondary
         'Chess Club',
         'CHESS',
         'Strategic thinking and competitive chess tournaments.',
@@ -16,8 +16,8 @@ VALUES
         'active'
     ),
     (
-        'c0000005-0005-0005-0005-000000000005'::uuid,
-        'b0000002-0002-0002-0002-000000000002'::uuid,  -- St. Mary's Secondary
+        'c0000005-0005-0005-0005-000000000005'::UUID,
+        'b0000002-0002-0002-0002-000000000002'::UUID,  -- St. Mary's Secondary
         'Music Ensemble',
         'MUSIC',
         'Orchestra, band practice, and musical performances.',
@@ -25,8 +25,8 @@ VALUES
         'active'
     ),
     (
-        'c0000006-0006-0006-0006-000000000006'::uuid,
-        'b0000002-0002-0002-0002-000000000002'::uuid,  -- St. Mary's Secondary
+        'c0000006-0006-0006-0006-000000000006'::UUID,
+        'b0000002-0002-0002-0002-000000000002'::UUID,  -- St. Mary's Secondary
         'Science Club',
         'SCI',
         'Experiments, science fair projects, and STEM activities.',
@@ -40,8 +40,8 @@ VALUES
 INSERT INTO public.clubs (id, school_id, club_name, club_code, description, members_count, status)
 VALUES
     (
-        'c0000007-0007-0007-0007-000000000007'::uuid,
-        'b0000003-0003-0003-0003-000000000003'::uuid,  -- Riverside High
+        'c0000007-0007-0007-0007-000000000007'::UUID,
+        'b0000003-0003-0003-0003-000000000003'::UUID,  -- Riverside High
         'Art Workshop',
         'ART',
         'Painting, sculpture, and creative arts classes.',
@@ -49,8 +49,8 @@ VALUES
         'active'
     ),
     (
-        'c0000008-0008-0008-0008-000000000008'::uuid,
-        'b0000003-0003-0003-0003-000000000003'::uuid,  -- Riverside High
+        'c0000008-0008-0008-0008-000000000008'::UUID,
+        'b0000003-0003-0003-0003-000000000003'::UUID,  -- Riverside High
         'Basketball Team',
         'BBALL',
         'School basketball team practice and competitions.',
@@ -58,8 +58,8 @@ VALUES
         'active'
     ),
     (
-        'c0000009-0009-0009-0009-000000000009'::uuid,
-        'b0000003-0003-0003-0003-000000000003'::uuid,  -- Riverside High
+        'c0000009-0009-0009-0009-000000000009'::UUID,
+        'b0000003-0003-0003-0003-000000000003'::UUID,  -- Riverside High
         'Debate Society',
         'DEBATE',
         'Debate competitions and public speaking skills.',
@@ -67,8 +67,8 @@ VALUES
         'active'
     ),
     (
-        'c0000010-0010-0010-0010-000000000010'::uuid,
-        'b0000003-0003-0003-0003-000000000003'::uuid,  -- Riverside High
+        'c000010-0010-0010-0010-000000000010'::UUID,
+        'b0000003-0003-0003-0003-000000000003'::UUID,  -- Riverside High
         'Environmental Club',
         'ECO',
         'Sustainability projects and environmental awareness.',
