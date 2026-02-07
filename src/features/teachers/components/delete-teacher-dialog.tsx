@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import type { Teacher } from "@/types/teacher.types"
+import type { Teacher } from '@/types/teacher.types'
 import {
   Dialog,
   DialogContent,
@@ -8,8 +8,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 
 interface DeleteTeacherDialogProps {
   open: boolean
@@ -37,7 +37,7 @@ export function DeleteTeacherDialog({
         <DialogHeader>
           <DialogTitle>Delete Teacher</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete{" "}
+            Are you sure you want to delete{' '}
             <strong>
               {teacher?.first_name} {teacher?.last_name}
             </strong>

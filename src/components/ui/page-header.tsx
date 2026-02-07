@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { PlusCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import * as React from 'react'
+import { PlusCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 interface PageHeaderProps {
   title: string
@@ -32,8 +32,8 @@ function PageHeader({
     <div
       data-slot="page-header"
       className={cn(
-        "flex flex-col gap-4 md:flex-row md:items-center md:justify-between",
-        className
+        'flex flex-col gap-4 md:flex-row md:items-center md:justify-between',
+        className,
       )}
     >
       <div className="space-y-1">

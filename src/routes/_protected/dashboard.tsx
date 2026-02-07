@@ -1,4 +1,13 @@
-import { ActivityIcon, Alert01Icon, Calendar02Icon, Message01Icon, PlusSignIcon, School01Icon, Tick01Icon, UserGroupIcon } from '@hugeicons/core-free-icons'
+import {
+  ActivityIcon,
+  Alert01Icon,
+  Calendar02Icon,
+  Message01Icon,
+  PlusSignIcon,
+  School01Icon,
+  Tick01Icon,
+  UserGroupIcon,
+} from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { createFileRoute } from '@tanstack/react-router'
 import { format } from 'date-fns'

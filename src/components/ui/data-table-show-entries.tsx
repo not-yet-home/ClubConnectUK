@@ -1,12 +1,12 @@
-"use client"
+'use client'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { cn } from "@/lib/utils"
+} from '@/components/ui/select'
+import { cn } from '@/lib/utils'
 
 interface DataTableShowEntriesProps {
   pageSize: number
@@ -28,7 +28,7 @@ function DataTableShowEntries({
   return (
     <div
       data-slot="data-table-show-entries"
-      className={cn("flex items-center gap-2", className)}
+      className={cn('flex items-center gap-2', className)}
     >
       <span className="text-sm text-muted-foreground whitespace-nowrap">
         Show entries

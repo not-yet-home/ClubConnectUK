@@ -27,7 +27,7 @@ function BroadcastNewPage() {
     scrollToTop()
   }
   const handleBack = () => {
-    setStep(state.step-1)
+    setStep(state.step - 1)
     scrollToTop()
   }
 
@@ -75,7 +75,7 @@ function BroadcastNewPage() {
         { label: 'Broadcasts', href: '/broadcast' },
         { label: 'New Broadcast' },
       ]}
-      className='pt-0'
+      className="pt-0"
     >
       <div
         ref={containerRef}

@@ -7,8 +7,18 @@
 body {
   @apply m-0;
   font-family:
-    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   @apply bg-background text-foreground;
@@ -28,8 +38,8 @@ code {
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.141 0.005 285.823);
   --primary: #eec366;
-  --primary-light: #F0E0AA;
-  --primary-dark: #AA934C;
+  --primary-light: #f0e0aa;
+  --primary-dark: #aa934c;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: #f7f7f7;
   --secondary-foreground: oklch(96.419% 0.05365 114.225);
@@ -68,8 +78,8 @@ code {
   --popover: oklch(0.141 0.005 285.823);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.985 0 0);
-  --primary-light: #F0E0AA;
-  --primary-dark: #AA934C;
+  --primary-light: #f0e0aa;
+  --primary-dark: #aa934c;
   --primary-foreground: oklch(0.21 0.006 285.885);
   --secondary: oklch(0.274 0.006 286.033);
   --secondary-foreground: oklch(0.985 0 0);
@@ -163,21 +173,21 @@ code {
 }
 
 /* Hide native checkbox */
-.custom-checkbox input:checked+div {
+.custom-checkbox input:checked + div {
   background-color: #18181b;
   border-color: #18181b;
 }
 
-.custom-checkbox input:checked+div svg {
+.custom-checkbox input:checked + div svg {
   display: block;
 }
 
 /* Custom Switch */
-.custom-switch input:checked+div {
+.custom-switch input:checked + div {
   background-color: #18181b;
 }
 
-.custom-switch input:checked+div span {
+.custom-switch input:checked + div span {
   transform: translateX(100%);
   background-color: white;
 }
@@ -203,7 +213,9 @@ code {
   right: 0px;
   width: 100px;
   height: 100%;
-  box-shadow: 0 0 10px var(--primary), 0 0 5px var(--primary);
+  box-shadow:
+    0 0 10px var(--primary),
+    0 0 5px var(--primary);
   opacity: 1;
   transform: rotate(3deg) translate(0px, -4px);
 }

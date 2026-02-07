@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import * as React from 'react'
+import { cn } from '@/lib/utils'
 
 interface DataTableToolbarProps {
   children?: React.ReactNode
@@ -12,17 +12,11 @@ interface DataTableToolbarProps {
  * Wrapper component for table toolbar elements.
  * Arranges children in a flexible layout with responsive spacing.
  */
-function DataTableToolbar({
-  children,
-  className,
-}: DataTableToolbarProps) {
+function DataTableToolbar({ children, className }: DataTableToolbarProps) {
   return (
     <div
       data-slot="data-table-toolbar"
-      className={cn(
-        "flex flex-wrap items-center gap-2",
-        className
-      )}
+      className={cn('flex flex-wrap items-center gap-2', className)}
     >
       {children}
     </div>
@@ -43,7 +37,7 @@ function DataTableToolbarLeft({
   return (
     <div
       data-slot="data-table-toolbar-left"
-      className={cn("flex flex-wrap items-center gap-2", className)}
+      className={cn('flex flex-wrap items-center gap-2', className)}
     >
       {children}
     </div>
@@ -64,15 +58,11 @@ function DataTableToolbarRight({
   return (
     <div
       data-slot="data-table-toolbar-right"
-      className={cn("ml-auto flex flex-wrap items-center gap-2", className)}
+      className={cn('ml-auto flex flex-wrap items-center gap-2', className)}
     >
       {children}
     </div>
   )
 }
 
-export {
-  DataTableToolbar,
-  DataTableToolbarLeft,
-  DataTableToolbarRight,
-}
+export { DataTableToolbar, DataTableToolbarLeft, DataTableToolbarRight }

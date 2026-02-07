@@ -289,7 +289,7 @@ export function StepAudience({
                   ))}
                   {selectedCount > 3 && (
                     <div className="w-7 h-7 rounded-full bg-zinc-100 text-zinc-600 flex items-center justify-center text-[10px] font-medium ring-2 ring-white">
-                      +{selectedCount-3}
+                      +{selectedCount - 3}
                     </div>
                   )}
                 </div>

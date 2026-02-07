@@ -1,6 +1,6 @@
 /**
  * Data Table Components Index
- * 
+ *
  * Composable table toolbar components for TanStack Table integration.
  * Import individual components or use the barrel export.
  */
@@ -10,20 +10,20 @@ export {
   DataTableToolbar,
   DataTableToolbarLeft,
   DataTableToolbarRight,
-} from "./data-table-toolbar"
+} from './data-table-toolbar'
 
 // Search component
-export { DataTableSearch } from "./data-table-search"
+export { DataTableSearch } from './data-table-search'
 
 // Filter components
 export {
   DataTableFilter,
   type FilterOption,
   type DataTableFilterProps,
-} from "./data-table-filter"
+} from './data-table-filter'
 
 // Show entries (page size selector)
-export { DataTableShowEntries } from "./data-table-show-entries"
+export { DataTableShowEntries } from './data-table-show-entries'
 
 // Export functionality
 export {
@@ -31,16 +31,13 @@ export {
   exportToCsv,
   type ExportFormat,
   type DataTableExportProps,
-} from "./data-table-export"
+} from './data-table-export'
 
 // Action button (for Templates, etc.)
 export {
   DataTableActionButton,
   type DataTableActionButtonProps,
-} from "./data-table-action-button"
+} from './data-table-action-button'
 
 // Page header
-export {
-  PageHeader,
-  type PageHeaderProps,
-} from "./page-header"
+export { PageHeader, type PageHeaderProps } from './page-header'

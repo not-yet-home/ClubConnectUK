@@ -45,6 +45,7 @@ supabase link --project-ref your-project-ref
 ```
 
 **Finding your project-ref:**
+
 - Go to: https://supabase.com/dashboard/project/**your-project-ref**
 - Or: Settings → General → Project ID
 
@@ -61,6 +62,7 @@ This will run all migrations in order.
 ### `20250101000000_initial_schema.sql`
 
 Creates the core database schema:
+
 - **profiles** - Extended user information
 - **clubs** - University clubs and societies
 - **memberships** - User membership in clubs
@@ -68,6 +70,7 @@ Creates the core database schema:
 - **event_attendees** - Event RSVPs and attendance
 
 Includes triggers for:
+
 - Auto-creating profiles on user signup
 - Auto-updating timestamps
 - Auto-counting members and attendees
@@ -75,6 +78,7 @@ Includes triggers for:
 ### `20250101000001_rls_policies.sql`
 
 Enables Row Level Security with policies for:
+
 - Public read access to profiles and active clubs
 - Member-only access to private events
 - Admin-only club management
@@ -83,6 +87,7 @@ Enables Row Level Security with policies for:
 ### `20250101000002_seed_data.sql`
 
 Creates sample data:
+
 - 5 test clubs (CS, Football, Drama, ISA, Environmental)
 - 6 upcoming events
 
@@ -123,6 +128,7 @@ After applying migrations:
 ## 📚 Documentation
 
 See [../docs/DATABASE.md](../docs/DATABASE.md) for:
+
 - Detailed schema documentation
 - Table relationships
 - Common queries
@@ -142,16 +148,19 @@ This creates a new timestamped SQL file in `migrations/`.
 ## 🛠 Troubleshooting
 
 **Migrations fail?**
+
 - Check your internet connection
 - Verify project-ref: `supabase projects list`
 - Check database password in Supabase dashboard
 
 **Tables not showing?**
+
 - Wait a few seconds and refresh
 - Check for SQL errors in terminal output
 - Verify in SQL Editor: `\dt public.*`
 
 **RLS blocking access?**
+
 - Ensure you're logged in (RLS uses `auth.uid()`)
 - Check user has correct role/membership
 - Review policies in DATABASE.md

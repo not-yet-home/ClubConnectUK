@@ -5,7 +5,7 @@ export interface PersonDetails {
   last_name: string
   email?: string | null
   address?: string | null
-  contact?: string | null  
+  contact?: string | null
   image?: string | null
   created_at: string
   updated_at: string

@@ -19,7 +19,9 @@ const config = defineConfig({
     // This avoids the Nitro dev worker running during local Vite dev which
     // can cause the "Vite environment \"nitro\" is unavailable" error
     // when the environment or registry doesn't support the nitro worker.
-    (process.env.NODE_ENV === 'production' || process.env.ENABLE_NITRO === 'true') ? nitro() : undefined,
+    process.env.NODE_ENV === 'production' || process.env.ENABLE_NITRO === 'true'
+      ? nitro()
+      : undefined,
     viteReact({
       babel: {
         plugins: ['babel-plugin-react-compiler'],

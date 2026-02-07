@@ -101,7 +101,9 @@ export const useUpcomingAgenda = () => {
       if (error) throw error
       return (data as Array<any>).map((d) => ({
         ...d,
-        cover_rule: Array.isArray(d.cover_rule) ? d.cover_rule[0] : d.cover_rule,
+        cover_rule: Array.isArray(d.cover_rule)
+          ? d.cover_rule[0]
+          : d.cover_rule,
         assignments: d.assignments || [],
       }))
     },

@@ -1,23 +1,29 @@
-"use client"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { Delete02Icon, Edit02Icon } from "@hugeicons/core-free-icons"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip"
-import type { ColumnDef } from "@tanstack/react-table"
-import type { Teacher } from "@/types/teacher.types"
-import { DataTableColumnHeader } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { ICON_SIZES } from "@/constants/sizes"
+'use client'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Delete02Icon, Edit02Icon } from '@hugeicons/core-free-icons'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@radix-ui/react-tooltip'
+import type { ColumnDef } from '@tanstack/react-table'
+import type { Teacher } from '@/types/teacher.types'
+import { DataTableColumnHeader } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { ICON_SIZES } from '@/constants/sizes'
 
 export const columns: Array<ColumnDef<Teacher>> = [
   {
-    id: "select",
+    id: 'select',
     header: ({ table }) => (
       <input
         type="checkbox"
         checked={table.getIsAllPageRowsSelected()}
         ref={(input) => {
           if (input) {
-            input.indeterminate = table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected()
+            input.indeterminate =
+              table.getIsSomePageRowsSelected() &&
+              !table.getIsAllPageRowsSelected()
           }
         }}
         onChange={(e) => table.toggleAllPageRowsSelected(!!e.target.checked)}
@@ -38,61 +44,63 @@ export const columns: Array<ColumnDef<Teacher>> = [
     enableHiding: false,
   },
   {
-    id: "first_name",
+    id: 'first_name',
     accessorFn: (row) => row.person_details.first_name,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="First Name" />
     ),
   },
   {
-    id: "last_name",
+    id: 'last_name',
     accessorFn: (row) => row.person_details.last_name,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Last Name" />
     ),
   },
   {
-    id: "email",
-    accessorFn: (row) => (row.person_details.email as string) || "",
+    id: 'email',
+    accessorFn: (row) => (row.person_details.email as string) || '',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Email" />
     ),
   },
   {
-    id: "contact",
-    accessorFn: (row) => (row.person_details.contact as string) || "",
+    id: 'contact',
+    accessorFn: (row) => (row.person_details.contact as string) || '',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Contact" />
     ),
   },
   {
-    accessorKey: "primary_styles",
+    accessorKey: 'primary_styles',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Primary Styles" />
     ),
   },
   {
-    accessorKey: "secondary_styles",
+    accessorKey: 'secondary_styles',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Secondary Styles" />
     ),
   },
   {
-    id: "is_blocked",
-    accessorFn: (row) => row.is_blocked ? "Blocked" : "Active",
+    id: 'is_blocked',
+    accessorFn: (row) => (row.is_blocked ? 'Blocked' : 'Active'),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),
   },
   {
-    id: "actions",
-    header: "Actions",
+    id: 'actions',
+    header: 'Actions',
     cell: ({ row, table }) => {
       const teacher = row.original
-      const meta = table.options.meta as {
-        onEdit?: (teacher: Teacher) => void
-        onDelete?: (teacher: Teacher) => void
-      } | undefined
+      const meta = table.options.meta as
+        | {
+            onEdit?: (teacher: Teacher) => void
+            onDelete?: (teacher: Teacher) => void
+          }
+        | undefined
 
       return (
         <div className="flex items-center gap-2">

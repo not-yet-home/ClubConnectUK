@@ -4,106 +4,105 @@ import type { AuthError, AuthState, LoginCredentials } from './types'
 import { supabase } from '@/services/supabase'
 
 const initialState: AuthState = {
-    user: null,
-    isAuthenticated: false,
-    isLoading: true,
+  user: null,
+  isAuthenticated: false,
+  isLoading: true,
 }
 
 export const authStore = new Store<AuthState>(initialState)
 
 // Initialize auth state from Supabase session
 export async function initializeAuth() {
-    try {
-        const {
-            data: { session },
-        } = await supabase.auth.getSession()
+  try {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
 
-        authStore.setState(() => ({
-            user: session?.user ?? null,
-            isAuthenticated: !!session?.user,
-            isLoading: false,
-        }))
+    authStore.setState(() => ({
+      user: session?.user ?? null,
+      isAuthenticated: !!session?.user,
+      isLoading: false,
+    }))
 
-        supabase.auth.onAuthStateChange((_event: any, newSession: any) => {
-            authStore.setState(() => ({
-                user: newSession?.user ?? null,
-                isAuthenticated: !!newSession?.user,
-                isLoading: false,
-            }))
-        })
-    } catch (error) {
-        console.error('Failed to initialize auth:', error)
-        authStore.setState(() => ({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-        }))
-    }
+    supabase.auth.onAuthStateChange((_event: any, newSession: any) => {
+      authStore.setState(() => ({
+        user: newSession?.user ?? null,
+        isAuthenticated: !!newSession?.user,
+        isLoading: false,
+      }))
+    })
+  } catch (error) {
+    console.error('Failed to initialize auth:', error)
+    authStore.setState(() => ({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+    }))
+  }
 }
 
 export async function login(
-    credentials: LoginCredentials
+  credentials: LoginCredentials,
 ): Promise<{ error?: AuthError }> {
-    try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email: credentials.email,
-            password: credentials.password,
-        })
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: credentials.email,
+      password: credentials.password,
+    })
 
-        if (error) {
-            return { error: { message: error.message, code: error.code } }
-        }
-
-
-        authStore.setState(() => ({
-            user: data.user,
-            isAuthenticated: true,
-            isLoading: false,
-        }))
-
-        return {}
-    } catch (error) {
-        return {
-            error: {
-                message:
-                    error instanceof Error ? error.message : 'An unknown error occurred',
-            },
-        }
+    if (error) {
+      return { error: { message: error.message, code: error.code } }
     }
+
+    authStore.setState(() => ({
+      user: data.user,
+      isAuthenticated: true,
+      isLoading: false,
+    }))
+
+    return {}
+  } catch (error) {
+    return {
+      error: {
+        message:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      },
+    }
+  }
 }
 
 // Logout function
 export async function logout(): Promise<{ error?: AuthError }> {
-    try {
-        const { error } = await supabase.auth.signOut()
+  try {
+    const { error } = await supabase.auth.signOut()
 
-        if (error) {
-            return { error: { message: error.message } }
-        }
-
-        authStore.setState(() => ({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-        }))
-
-        return {}
-    } catch (error) {
-        return {
-            error: {
-                message:
-                    error instanceof Error ? error.message : 'An unknown error occurred',
-            },
-        }
+    if (error) {
+      return { error: { message: error.message } }
     }
+
+    authStore.setState(() => ({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+    }))
+
+    return {}
+  } catch (error) {
+    return {
+      error: {
+        message:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      },
+    }
+  }
 }
 
 // Get current user
 export function getCurrentUser(): User | null {
-    return authStore.state.user
+  return authStore.state.user
 }
 
 // Check if authenticated
 export function isAuthenticated(): boolean {
-    return authStore.state.isAuthenticated
+  return authStore.state.isAuthenticated
 }

@@ -26,7 +26,14 @@ export interface Club {
 }
 
 export type CoverFrequency = 'weekly' | 'bi-weekly' | 'monthly'
-export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday'
+export type DayOfWeek =
+  | 'monday'
+  | 'tuesday'
+  | 'wednesday'
+  | 'thursday'
+  | 'friday'
+  | 'saturday'
+  | 'sunday'
 export type CoverRuleStatus = 'active' | 'inactive' | 'cancelled'
 
 export interface CoverRule {
@@ -44,7 +51,12 @@ export interface CoverRule {
   school?: School
 }
 
-export type AssignmentStatus = 'invited' | 'accepted' | 'declined' | 'pending' | 'confirmed'
+export type AssignmentStatus =
+  | 'invited'
+  | 'accepted'
+  | 'declined'
+  | 'pending'
+  | 'confirmed'
 export type OccurrenceStatus = 'not_started' | 'in_progress' | 'completed'
 export type Priority = 'low' | 'medium' | 'high'
 

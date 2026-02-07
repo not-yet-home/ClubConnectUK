@@ -1,11 +1,11 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { Check, PlusCircle } from "lucide-react"
-import type {Column} from "@tanstack/react-table";
-import { cn } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import * as React from 'react'
+import { Check, PlusCircle } from 'lucide-react'
+import type { Column } from '@tanstack/react-table'
+import { cn } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   Command,
   CommandEmpty,
@@ -14,13 +14,13 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui/command"
+} from '@/components/ui/command'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { Separator } from "@/components/ui/separator"
+} from '@/components/ui/popover'
+import { Separator } from '@/components/ui/separator'
 
 interface FilterOption {
   label: string
@@ -49,7 +49,8 @@ function DataTableFilter<TData, TValue>({
 }: DataTableFilterProps<TData, TValue>) {
   // Use column filter values if available, otherwise use external state
   const facets = column?.getFacetedUniqueValues()
-  const selectedValues = externalSelectedValues ?? 
+  const selectedValues =
+    externalSelectedValues ??
     new Set(column?.getFilterValue() as Array<string> | undefined)
 
   const handleSelect = (value: string) => {
@@ -132,10 +133,10 @@ function DataTableFilter<TData, TValue>({
                   >
                     <div
                       className={cn(
-                        "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                        'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
                         isSelected
-                          ? "bg-primary text-primary-foreground"
-                          : "opacity-50 [&_svg]:invisible"
+                          ? 'bg-primary text-primary-foreground'
+                          : 'opacity-50 [&_svg]:invisible',
                       )}
                     >
                       <Check className="h-4 w-4" />
