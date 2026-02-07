@@ -1,6 +1,6 @@
 
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
-import type {Column} from "@tanstack/react-table";
+import type { Column } from "@tanstack/react-table";
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
@@ -183,8 +183,7 @@ function DataTablePagination({
         {/* First page */}
         <Button
           variant="outline"
-          size="icon"
-          className="h-8 w-8"
+          size="icon-sm"
           onClick={() => onPageChange(0)}
           disabled={!canGoPrevious}
         >
@@ -193,8 +192,7 @@ function DataTablePagination({
         {/* Previous page */}
         <Button
           variant="outline"
-          size="icon"
-          className="h-8 w-8"
+          size="icon-sm"
           onClick={() => onPageChange(pageIndex - 1)}
           disabled={!canGoPrevious}
         >
@@ -211,8 +209,7 @@ function DataTablePagination({
             <Button
               key={page}
               variant={pageIndex === page ? "default" : "outline"}
-              size="icon"
-              className="h-8 w-8"
+              size="icon-sm"
               onClick={() => onPageChange(page)}
             >
               {page + 1}
@@ -223,8 +220,7 @@ function DataTablePagination({
         {/* Next page */}
         <Button
           variant="outline"
-          size="icon"
-          className="h-8 w-8"
+          size="icon-sm"
           onClick={() => onPageChange(pageIndex + 1)}
           disabled={!canGoNext}
         >
@@ -233,8 +229,7 @@ function DataTablePagination({
         {/* Last page */}
         <Button
           variant="outline"
-          size="icon"
-          className="h-8 w-8"
+          size="icon-sm"
           onClick={() => onPageChange(pageCount - 1)}
           disabled={!canGoNext}
         >
@@ -264,7 +259,7 @@ function DataTableColumnHeader<TData, TValue>({
     <Button
       variant="ghost"
       size="sm"
-      className={cn("-ml-3 h-8 data-[state=open]:bg-accent group", className)}
+      className={cn("-ml-3 data-[state=open]:bg-accent group", className)}
       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
     >
       {title}

@@ -96,7 +96,7 @@ export function useClubUpcomingMeetings(clubId: string) {
                 .eq('club_id', clubId)
 
             if (rulesError) throw rulesError
-            if (!rules || rules.length === 0) return []
+            if (rules.length === 0) return []
 
             const ruleIds = rules.map((r: { id: string }) => r.id)
 

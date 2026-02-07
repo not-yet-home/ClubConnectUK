@@ -11,7 +11,7 @@ export function PageLayout({ children, breadcrumbs = [], className }: PageLayout
     return (
         <>
             <AppHeader breadcrumbs={breadcrumbs} />
-            <main className={cn("flex-1 overflow-auto p-6 rounded-b-md bg-background", className)}>
+            <main className={cn("flex-1 overflow-auto p-3 sm:p-4 rounded-b-md bg-background", className)}>
                 {children}
             </main>
         </>

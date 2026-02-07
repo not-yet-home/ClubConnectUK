@@ -7,9 +7,14 @@ import {
     UserGroupIcon
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+
+import { useNavigate } from '@tanstack/react-router'
 import { ICON_SIZES } from '@/constants/sizes'
+import { MiniCalendar } from '@/features/covers/components/mini-calendar'
+
 import { NavMain } from '@/components/common/nav-main'
 import { NavUser } from '@/components/common/nav-user'
+
 import {
     Sidebar,
     SidebarContent,
@@ -20,9 +25,19 @@ import {
     SidebarRail,
 } from '@/components/ui/sidebar'
 import { useAuth } from '@/hooks/use-auth'
+import { useCoverOccurrences } from '@/hooks/use-covers'
+
+
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { user } = useAuth()
+    const navigate = useNavigate()
+    const [selectedDate, setSelectedDate] = React.useState(new Date())
+
+
+    // Fetch cover occurrences for mini calendar and upcoming covers
+    const { data: occurrences } = useCoverOccurrences({ schoolId: 'all' })
+    const events = React.useMemo(() => occurrences || [], [occurrences])
 
     const navItems = [
         {
@@ -63,6 +78,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         avatar: '',
     }
 
+    const handleSelectDate = (date: Date) => {
+        setSelectedDate(date)
+        // Navigate to covers page with the selected date
+        navigate({ to: '/covers' })
+    }
+
+
+
     return (
         <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
@@ -83,6 +106,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <SidebarGroupLabel>Application</SidebarGroupLabel>
                     <NavMain items={navItems} />
                 </SidebarGroup>
+
+                {/* Mini Calendar - Hidden when sidebar collapsed */}
+                <SidebarGroup className="group-data-[collapsible=icon]:hidden mt-4">
+                    <MiniCalendar
+                        selectedDate={selectedDate}
+                        onSelectDate={handleSelectDate}
+                        occurrences={events}
+                    />
+                </SidebarGroup>
+
+
             </SidebarContent>
             <SidebarFooter>
                 <NavUser user={userData} />
