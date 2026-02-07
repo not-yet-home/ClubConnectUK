@@ -12,10 +12,10 @@ import {
     startOfWeek,
     subMonths,
 } from 'date-fns'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-
+import { HugeiconsIcon } from '@hugeicons/react'
+import { ArrowLeft01Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons'
 import type { CoverOccurrence } from '@/types/club.types'
-
+import { ICON_SIZES } from '@/constants/sizes'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -78,7 +78,7 @@ export function MiniCalendar({ selectedDate, onSelectDate, occurrences }: MiniCa
                         className="h-6 w-6 hover:bg-gray-100 rounded-full"
                         onClick={handlePrevMonth}
                     >
-                        <ChevronLeft className="h-4 w-4 text-gray-600" />
+                        <HugeiconsIcon icon={ArrowLeft01Icon} className={ICON_SIZES.sm + " text-gray-600"} />
                     </Button>
                     <Button
                         variant="ghost"
@@ -86,7 +86,7 @@ export function MiniCalendar({ selectedDate, onSelectDate, occurrences }: MiniCa
                         className="h-6 w-6 hover:bg-gray-100 rounded-full"
                         onClick={handleNextMonth}
                     >
-                        <ChevronRight className="h-4 w-4 text-gray-600" />
+                        <HugeiconsIcon icon={ArrowRight01Icon} className={ICON_SIZES.sm + " text-gray-600"} />
                     </Button>
                 </div>
             </div>

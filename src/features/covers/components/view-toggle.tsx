@@ -1,4 +1,6 @@
-import { ChevronDown } from 'lucide-react'
+import { ArrowDown01Icon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { ICON_SIZES } from '@/constants/sizes'
 import { Button } from '@/components/ui/button'
 import {
     DropdownMenu,
@@ -30,7 +32,7 @@ export function ViewToggle({ value, onChange }: ViewToggleProps) {
             <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
                     {viewLabels[value].label}
-                    <ChevronDown className="ml-2" />
+                    <HugeiconsIcon icon={ArrowDown01Icon} className={"ml-2 " + ICON_SIZES.sm} />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">

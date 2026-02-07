@@ -2,11 +2,11 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-
-
-import type { CoverOccurrence } from '@/types/club.types';
-
+import { HugeiconsIcon } from '@hugeicons/react';
+import { ArrowLeft01Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons';
 import type { ViewType } from '@/features/covers/components/view-toggle';
+import type { CoverOccurrence } from '@/types/club.types';
+import { ICON_SIZES } from '@/constants/sizes';
 import { useDeleteCoverOccurrence, useMoveCoverOccurrence } from '@/features/covers/api/mutations';
 import { CalendarView } from '@/features/covers/components/calendar-view';
 import { CoverQuickView } from '@/features/covers/components/cover-quick-view';
@@ -14,7 +14,7 @@ import { CoverQuickAdd } from '@/features/covers/components/cover-quick-add';
 import { CoversListView } from '@/features/covers/components/covers-list-view';
 import { ViewToggle } from '@/features/covers/components/view-toggle';
 import { YearView } from '@/features/covers/components/year-view';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+
 
 import { PageLayout } from '@/components/common/page-layout';
 import { Button } from '@/components/ui/button';
@@ -143,7 +143,7 @@ function CoversCalendarPage() {
                                     setSelectedDate(newDate);
                                 }}
                             >
-                                <ChevronLeft />
+                                <HugeiconsIcon icon={ArrowLeft01Icon} size={ICON_SIZES.sm} />
                             </Button>
                             <Button
                                 variant="outline"
@@ -156,7 +156,7 @@ function CoversCalendarPage() {
                                     setSelectedDate(newDate);
                                 }}
                             >
-                                <ChevronRight />
+                                <HugeiconsIcon icon={ArrowRight01Icon} size={ICON_SIZES.sm} />
                             </Button>
                         </div>
                         <Button

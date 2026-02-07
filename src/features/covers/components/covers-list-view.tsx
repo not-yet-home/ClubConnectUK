@@ -1,12 +1,19 @@
 import { endOfWeek, format, isSameDay, isToday, isTomorrow, isWithinInterval, startOfWeek } from 'date-fns'
-import { Calendar as CalendarIcon, ChevronRight, Clock, User } from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+    ArrowRight01Icon,
+    Calendar02Icon,
+    Clock01Icon,
+    UserGroupIcon
+} from '@hugeicons/core-free-icons'
 
-import { formatEventTime, getClubColors } from '../utils/formatters';
+import { formatEventTime, getClubColors } from '../utils/formatters'
 import type { CoverOccurrence } from '@/types/club.types'
 
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
+import { ICON_SIZES } from '@/constants/sizes'
 
 interface CoversListViewProps {
     occurrences: Array<CoverOccurrence>
@@ -20,7 +27,6 @@ export function CoversListView({ occurrences, onSelectOccurrence }: CoversListVi
     const weekStart = startOfWeek(today)
     const weekEnd = endOfWeek(today)
 
-    // Group occurrences by time period
     const todayOccurrences = occurrences.filter(occ =>
         isSameDay(new Date(occ.meeting_date), today)
     )
@@ -60,7 +66,7 @@ export function CoversListView({ occurrences, onSelectOccurrence }: CoversListVi
 
             {occurrences.length === 0 && (
                 <div className="text-center py-16">
-                    <CalendarIcon className="mx-auto h-12 w-12 text-gray-300" />
+                    <HugeiconsIcon icon={Calendar02Icon} className="mx-auto h-12 w-12 text-gray-300" />
                     <h3 className="mt-4 text-sm font-medium text-gray-900">No cover sessions</h3>
                     <p className="mt-1 text-sm text-gray-500">
                         No cover sessions scheduled for the selected period.
@@ -135,17 +141,17 @@ function OccurrenceCard({ occurrence, onClick }: { occurrence: CoverOccurrence, 
 
                     <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                         <div className="flex items-center gap-1.5">
-                            <CalendarIcon className="h-4 w-4 text-gray-400" />
+                            <HugeiconsIcon icon={Calendar02Icon} className={ICON_SIZES.sm + " text-gray-400"} />
                             <span>{format(new Date(occurrence.meeting_date), 'EEE, d MMM')}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
-                            <Clock className="h-4 w-4 text-gray-400" />
+                            <HugeiconsIcon icon={Clock01Icon} className={ICON_SIZES.sm + " text-gray-400"} />
                             <span>
                                 {formatEventTime(cover_rule?.start_time)} - {formatEventTime(cover_rule?.end_time)}
                             </span>
                         </div>
                         <div className="flex items-center gap-1.5">
-                            <User className="h-4 w-4 text-gray-400" />
+                            <HugeiconsIcon icon={UserGroupIcon} className={ICON_SIZES.sm + " text-gray-400"} />
                             <span className={!teacher ? 'text-orange-600 italic' : ''}>
                                 {teacherName}
                             </span>
@@ -153,7 +159,7 @@ function OccurrenceCard({ occurrence, onClick }: { occurrence: CoverOccurrence, 
                     </div>
                 </div>
 
-                <ChevronRight className="h-5 w-5 text-gray-400 flex-shrink-0 ml-4" />
+                <HugeiconsIcon icon={ArrowRight01Icon} className={ICON_SIZES.md + " text-gray-400 flex-shrink-0 ml-4"} />
             </div>
         </Card>
     );

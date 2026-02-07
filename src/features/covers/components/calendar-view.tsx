@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Calendar, Views, dateFnsLocalizer } from 'react-big-calendar';
 import withDragAndDropAcccent from 'react-big-calendar/lib/addons/dragAndDrop';
 import { addHours, format, getDay, parse, set, startOfWeek } from 'date-fns';
@@ -9,8 +9,6 @@ import { Cancel01Icon } from '@hugeicons/core-free-icons';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import '../styles/calendar-overrides.css';
-
-import { ICON_SIZES } from '@/constants/sizes';
 
 import { getSchoolColors, parseLocalDate } from '../utils/formatters';
 import type { SlotInfo, View } from 'react-big-calendar';
@@ -24,6 +22,7 @@ import type {
     EventDropInfo,
     ShowMoreProps,
 } from '@/types/calendar.types';
+import { ICON_SIZES } from '@/constants/sizes';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -37,9 +36,8 @@ import {
 // Note: Type assertions to 'any' are required here due to react-big-calendar's 
 // drag-and-drop addon having incomplete/incompatible TypeScript definitions.
 // The addon may export as default or named export depending on bundler configuration.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const withDragAndDrop: any = (withDragAndDropAcccent as any).default || withDragAndDropAcccent;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const DragAndDropCalendar = withDragAndDrop(Calendar as any);
 
 const locales = {
@@ -53,6 +51,28 @@ const localizer = dateFnsLocalizer({
     getDay,
     locales,
 });
+
+const getCalendarView = (mode: ViewType): View => {
+    switch (mode) {
+        case 'day': return Views.DAY;
+        case 'week': return Views.WEEK;
+        case 'month': return Views.MONTH;
+        case 'schedule': return Views.AGENDA;
+        case '4days': return Views.WORK_WEEK;
+        default: return Views.WEEK;
+    }
+};
+
+const getViewTypeFromRBC = (rbcView: View): ViewType => {
+    switch (rbcView) {
+        case Views.DAY: return 'day';
+        case Views.WEEK: return 'week';
+        case Views.MONTH: return 'month';
+        case Views.AGENDA: return 'schedule';
+        case Views.WORK_WEEK: return '4days';
+        default: return 'week';
+    }
+};
 
 interface CalendarViewProps {
     events: Array<CoverOccurrence>;
@@ -77,28 +97,6 @@ export function CalendarView({
     onNavigate: onControlledNavigate,
     onViewChange
 }: CalendarViewProps) {
-    const getCalendarView = (mode: ViewType): View => {
-        switch (mode) {
-            case 'day': return Views.DAY;
-            case 'week': return Views.WEEK;
-            case 'month': return Views.MONTH;
-            case 'schedule': return Views.AGENDA;
-            case '4days': return Views.WORK_WEEK;
-            default: return Views.WEEK;
-        }
-    };
-
-    const getViewTypeFromRBC = (rbcView: View): ViewType => {
-        switch (rbcView) {
-            case Views.DAY: return 'day';
-            case Views.WEEK: return 'week';
-            case Views.MONTH: return 'month';
-            case Views.AGENDA: return 'schedule';
-            case Views.WORK_WEEK: return '4days';
-            default: return 'week';
-        }
-    };
-
     const [view, setView] = useState<View>(() => {
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
         if ((viewMode === 'week' || viewMode === 'month') && isMobile) return Views.DAY;
@@ -125,19 +123,19 @@ export function CalendarView({
         setView(newView);
     }, [viewMode]);
 
-    const handleViewChange = (newView: View) => {
+    const handleViewChange = useCallback((newView: View) => {
         setView(newView);
         if (onViewChange) {
             onViewChange(getViewTypeFromRBC(newView));
         }
-    };
+    }, [onViewChange]);
 
     useEffect(() => {
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
         if ((viewMode === 'week' || viewMode === 'month') && isMobile && onViewChange) {
             onViewChange('day');
         }
-    }, []);
+    }, [viewMode, onViewChange]);
 
 
 
@@ -176,7 +174,7 @@ export function CalendarView({
     }, [events]);
 
     const handleEventDrop = (info: EventDropInfo) => {
-        if (onEventDrop && info.event.resource) {
+        if (onEventDrop) {
             onEventDrop(info.event.resource, info.start);
         }
     };
@@ -277,7 +275,7 @@ export function CalendarView({
                 >
                     <div className="bg-muted/50 px-3 py-2 border-b flex items-center justify-between">
                         <span className="font-semibold text-sm text-foreground/80">
-                            {format(slotMetrics?.date || dayEvents[0]?.start || new Date(), 'EEEE, MMM d')}
+                            {format(slotMetrics?.date || (dayEvents.length > 0 ? dayEvents[0].start : new Date()), 'EEEE, MMM d')}
                         </span>
                         <PopoverClose asChild>
                             <Button variant="ghost" size="icon-xs" className="rounded-full hover:bg-black/5">

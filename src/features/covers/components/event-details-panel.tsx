@@ -1,6 +1,12 @@
-
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, CheckCircle2, Clock, User, X } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import {
+    Calendar02Icon,
+    Cancel01Icon,
+    Clock01Icon,
+    Tick01Icon,
+    UserGroupIcon
+} from '@hugeicons/core-free-icons';
 import type { CoverOccurrence } from '@/types/club.types';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -8,6 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { formatEventTime } from '@/features/covers/utils/formatters';
 import { cn } from '@/lib/utils';
+import { ICON_SIZES } from '@/constants/sizes';
 
 interface EventDetailsPanelProps {
     occurrence: CoverOccurrence | null;
@@ -19,7 +26,7 @@ export function EventDetailsPanel({ occurrence, onClose }: EventDetailsPanelProp
         return (
             <div className="h-full flex items-center justify-center text-gray-400 p-8 border-l bg-gray-50/50">
                 <div className="text-center">
-                    <CalendarIcon className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                    <HugeiconsIcon icon={Calendar02Icon} className="w-12 h-12 mx-auto mb-3 opacity-20" />
                     <p>Select a session to view details</p>
                 </div>
             </div>
@@ -43,7 +50,7 @@ export function EventDetailsPanel({ occurrence, onClose }: EventDetailsPanelProp
                 <div className="flex justify-between items-start mb-1">
                     <h2 className="text-2xl font-bold text-gray-900">{clubName}</h2>
                     <Button variant="ghost" size="icon-sm" onClick={onClose} className="-mt-1 -mr-2">
-                        <X className="w-4 h-4" />
+                        <HugeiconsIcon icon={Cancel01Icon} className={ICON_SIZES.xs} />
                     </Button>
                 </div>
                 <p className="text-gray-500">{schoolName}</p>
@@ -53,17 +60,17 @@ export function EventDetailsPanel({ occurrence, onClose }: EventDetailsPanelProp
                 {/* Date / Time */}
                 <div className="space-y-3">
                     <div className="flex items-center gap-3 text-gray-700">
-                        <CalendarIcon className="w-5 h-5 text-gray-400" />
+                        <HugeiconsIcon icon={Calendar02Icon} className={ICON_SIZES.sm + " text-gray-400"} />
                         <span className="font-medium">{format(new Date(occurrence.meeting_date), 'EEEE, d MMM yyyy')}</span>
                     </div>
                     <div className="flex items-center gap-3 text-gray-700">
-                        <Clock className="w-5 h-5 text-gray-400" />
+                        <HugeiconsIcon icon={Clock01Icon} className={ICON_SIZES.sm + " text-gray-400"} />
                         <span className="font-medium">
                             {formatEventTime(cover_rule?.start_time)} - {formatEventTime(cover_rule?.end_time)}
                         </span>
                     </div>
                     <div className="flex items-center gap-3 text-gray-700">
-                        <User className="w-5 h-5 text-gray-400" />
+                        <HugeiconsIcon icon={UserGroupIcon} className={ICON_SIZES.sm + " text-gray-400"} />
                         <span className={cn("font-medium", !assignedTeacher && "text-orange-500 italic")}>
                             {teacherName}
                         </span>
@@ -74,11 +81,9 @@ export function EventDetailsPanel({ occurrence, onClose }: EventDetailsPanelProp
                 <div className="flex flex-wrap items-center gap-3 pt-2">
                     <div className="flex items-center gap-2">
                         {occurrence.status === 'completed' ? (
-                            <CheckCircle2 className="w-5 h-5 text-green-500" />
-                        ) : occurrence.status === 'in_progress' ? (
-                            <Clock className="w-5 h-5 text-blue-500" />
+                            <HugeiconsIcon icon={Tick01Icon} className={ICON_SIZES.sm + " text-green-500"} />
                         ) : (
-                            <Clock className="w-5 h-5 text-gray-400" />
+                            <HugeiconsIcon icon={Clock01Icon} className={cn(ICON_SIZES.sm, occurrence.status === 'in_progress' ? "text-blue-500" : "text-gray-400")} />
                         )}
                         <Badge
                             variant="secondary"
@@ -86,10 +91,10 @@ export function EventDetailsPanel({ occurrence, onClose }: EventDetailsPanelProp
                                 "capitalize",
                                 occurrence.status === 'completed' && "bg-green-100 text-green-700 hover:bg-green-200",
                                 occurrence.status === 'in_progress' && "bg-blue-100 text-blue-700 hover:bg-blue-200",
-                                (occurrence.status === 'not_started' || !occurrence.status) && "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                occurrence.status === 'not_started' && "bg-gray-100 text-gray-700 hover:bg-gray-200"
                             )}
                         >
-                            {(occurrence.status || 'not_started').replace('_', ' ')}
+                            {occurrence.status.replace('_', ' ')}
                         </Badge>
                     </div>
 
@@ -103,7 +108,7 @@ export function EventDetailsPanel({ occurrence, onClose }: EventDetailsPanelProp
                                 occurrence.priority === 'low' && "border-blue-200 text-blue-700 bg-blue-50"
                             )}
                         >
-                            {occurrence.priority || 'medium'} Priority
+                            {occurrence.priority} Priority
                         </Badge>
                     </div>
                 </div>

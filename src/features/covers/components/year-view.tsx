@@ -1,7 +1,7 @@
-import { Calendar as CalendarIcon } from 'lucide-react'
-
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Calendar02Icon } from '@hugeicons/core-free-icons'
 import type { CoverOccurrence } from '@/types/club.types'
-
+import { ICON_SIZES } from '@/constants/sizes'
 import { Card } from '@/components/ui/card'
 
 interface YearViewProps {
@@ -42,7 +42,7 @@ export function YearView({ occurrences, selectedYear, onSelectMonth }: YearViewP
                         >
                             <div className="flex items-center justify-between mb-2">
                                 <h3 className="font-semibold text-gray-900">{month}</h3>
-                                <CalendarIcon className="h-5 w-5 text-gray-400" />
+                                <HugeiconsIcon icon={Calendar02Icon} className={ICON_SIZES.sm + " text-gray-400"} />
                             </div>
                             <p className="text-2xl font-bold text-blue-600">{count}</p>
                             <p className="text-xs text-gray-500">

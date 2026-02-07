@@ -1,9 +1,9 @@
 import { format, isAfter, startOfDay } from 'date-fns';
-import { Calendar as CalendarIcon, Clock, User } from 'lucide-react';
-
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Calendar02Icon, Clock01Icon, UserGroupIcon } from '@hugeicons/core-free-icons';
 import { formatEventTime, getClubColors, parseLocalDate } from '../utils/formatters';
 import type { CoverOccurrence } from '@/types/club.types';
-
+import { ICON_SIZES } from '@/constants/sizes';
 import { cn } from '@/lib/utils';
 
 interface UpcomingCoversListProps {
@@ -31,7 +31,7 @@ export function UpcomingCoversList({ occurrences, onSelectOccurrence }: Upcoming
     return (
         <div className="flex flex-col h-full">
             <h3 className="text-sm font-semibold text-gray-900 mb-4 px-1 flex items-center gap-2">
-                <CalendarIcon className="h-4 w-4 text-primary" />
+                <HugeiconsIcon icon={Calendar02Icon} className={ICON_SIZES.sm + " text-primary"} />
                 <span>Upcoming Covers</span>
             </h3>
             <div className="flex-1 -mx-4 px-4 overflow-y-auto">
@@ -65,15 +65,15 @@ export function UpcomingCoversList({ occurrences, onSelectOccurrence }: Upcoming
 
                                 <div className="space-y-1.5">
                                     <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-700">
-                                        <CalendarIcon className="h-3 w-3 opacity-70" />
+                                        <HugeiconsIcon icon={Calendar02Icon} className={ICON_SIZES.xs + " opacity-70"} />
                                         {format(displayDate, 'EEEE, MMM d, yyyy')}
                                     </div>
                                     <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-700">
-                                        <Clock className="h-3 w-3 opacity-70" />
+                                        <HugeiconsIcon icon={Clock01Icon} className={ICON_SIZES.xs + " opacity-70"} />
                                         {formatEventTime(occ.cover_rule?.start_time)} - {formatEventTime(occ.cover_rule?.end_time)}
                                     </div>
                                     <div className="flex items-center gap-2 text-[11px] text-gray-800 font-bold mt-1">
-                                        <User className="h-3 w-3 opacity-70" />
+                                        <HugeiconsIcon icon={UserGroupIcon} className={ICON_SIZES.xs + " opacity-70"} />
                                         <span className={!teacher ? 'text-orange-700 italic' : ''}>
                                             {teacherName}
                                         </span>

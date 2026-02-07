@@ -1,10 +1,19 @@
-import * as React from "react"
+import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
 import { addWeeks, format, getDay, set } from "date-fns"
-import { Building2, Clock, Info, ChevronDown, Calendar } from "lucide-react"
-import type { CoverOccurrence } from "@/types/club.types"
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+    Alert01Icon,
+    ArrowDown01Icon,
+    Calendar02Icon,
+    Clock01Icon,
+    School01Icon
+} from "@hugeicons/core-free-icons"
 
+import type { CoverFrequency, CoverOccurrence, OccurrenceStatus, Priority } from "@/types/club.types"
+import type { Teacher } from "@/types/teacher.types"
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { ICON_SIZES } from "@/constants/sizes"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -61,21 +70,21 @@ export function CoverQuickAdd({
     editingOccurrence,
 }: CoverQuickAddProps) {
     // Context State
-    const [schoolId, setSchoolId] = React.useState<string>(initialSchoolId === 'all' ? "" : initialSchoolId || "")
-    const [clubId, setClubId] = React.useState<string>("")
-    const [startTime, setStartTime] = React.useState<string>("09:00")
-    const [endTime, setEndTime] = React.useState<string>("10:00")
-    const [requestType, setRequestType] = React.useState<'one-off' | 'recurring'>('one-off')
-    const [scheduleType, setScheduleType] = React.useState<'regular' | 'covers'>('covers')
-    const [teacherId, setTeacherId] = React.useState<string>("unassigned")
-    const [frequency, setFrequency] = React.useState<'weekly' | 'bi-weekly'>('weekly')
-    const [occurrenceCount, setOccurrenceCount] = React.useState<number>(4)
-    const [meetingDate, setMeetingDate] = React.useState<string>("")
-    const [teacherSearch, setTeacherSearch] = React.useState<string>("")
-    const [teacherOpen, setTeacherOpen] = React.useState(false)
-    const [notes, setNotes] = React.useState<string>("")
-    const [status, setStatus] = React.useState<string>("not_started")
-    const [priority, setPriority] = React.useState<string>("medium")
+    const [schoolId, setSchoolId] = useState<string>(initialSchoolId === 'all' ? "" : initialSchoolId || "")
+    const [clubId, setClubId] = useState<string>("")
+    const [startTime, setStartTime] = useState<string>("09:00")
+    const [endTime, setEndTime] = useState<string>("10:00")
+    const [requestType, setRequestType] = useState<'one-off' | 'recurring'>('one-off')
+    const [scheduleType, setScheduleType] = useState<'regular' | 'covers'>('covers')
+    const [teacherId, setTeacherId] = useState<string>("unassigned")
+    const [frequency, setFrequency] = useState<CoverFrequency>('weekly')
+    const [occurrenceCount, setOccurrenceCount] = useState<number>(4)
+    const [meetingDate, setMeetingDate] = useState<string>("")
+    const [teacherSearch, setTeacherSearch] = useState<string>("")
+    const [teacherOpen, setTeacherOpen] = useState(false)
+    const [notes, setNotes] = useState<string>("")
+    const [status, setStatus] = useState<string>("not_started")
+    const [priority, setPriority] = useState<string>("medium")
 
     // Data Hooks
     const { data: schools } = useSchools()
@@ -85,7 +94,7 @@ export function CoverQuickAdd({
     const updateRequest = useUpdateCoverRequest()
 
     // Filter teachers based on search with pattern matching
-    const filteredTeachers = React.useMemo(() => {
+    const filteredTeachers = useMemo(() => {
         if (!teachers) return []
         if (!teacherSearch.trim()) return teachers
 
@@ -93,7 +102,7 @@ export function CoverQuickAdd({
         return teachers.filter((t: any) => {
             const firstName = t.person_details?.first_name?.toLowerCase() || ""
             const lastName = t.person_details?.last_name?.toLowerCase() || ""
-            const fullName = `${firstName} ${lastName}`
+            const fullName = `${firstName} ${lastName} `
 
             // Match at word boundaries - start of first name, last name, or full name
             const words = fullName.split(' ')
@@ -101,18 +110,16 @@ export function CoverQuickAdd({
         })
     }, [teachers, teacherSearch])
 
-    // Get selected teacher name
     const getTeacherName = (id: string) => {
         if (id === "unassigned") return "Unassigned (Pool)"
-        const teacher = teachers?.find((t: any) => t.id === id)
+        const teacher = teachers?.find((t: Teacher) => t.id === id)
         if (teacher) {
-            return `${teacher.person_details.first_name} ${teacher.person_details.last_name}`
+            return `${teacher.person_details.first_name} ${teacher.person_details.last_name} `
         }
         return "Select Teacher"
     }
 
-    // Compute occurrence dates for preview (based on meetingDate, frequency and occurrenceCount)
-    const occurrenceDates = React.useMemo(() => {
+    const occurrenceDates = useMemo(() => {
         if (!meetingDate) return []
         const start = new Date(meetingDate)
         const count = requestType === 'recurring' ? Math.max(1, occurrenceCount) : 1
@@ -131,8 +138,7 @@ export function CoverQuickAdd({
         return format(dt, 'h:mm a')
     }
 
-    // Reset when opening
-    React.useEffect(() => {
+    useEffect(() => {
         if (open) {
             if (editingOccurrence) {
                 setSchoolId(editingOccurrence.cover_rule?.school_id || "")
@@ -143,14 +149,14 @@ export function CoverQuickAdd({
                 setStartTime(startTimeStr.substring(0, 5))
                 setEndTime(endTimeStr.substring(0, 5))
                 setTeacherId(editingOccurrence.assignments?.[0]?.teacher_id || "unassigned")
-                setFrequency((editingOccurrence.cover_rule?.frequency as any) || "weekly")
+                setFrequency(editingOccurrence.cover_rule?.frequency || "weekly")
                 // Heuristic: If we are editing, default to 'one-off' view unless we explicitly want to support series edit in UI
                 // For now, let's just show the current values.
                 setRequestType('one-off')
                 setMeetingDate(editingOccurrence.meeting_date ? format(new Date(editingOccurrence.meeting_date), 'yyyy-MM-dd') : "")
                 setNotes(editingOccurrence.notes || "")
-                setStatus(editingOccurrence.status || "not_started")
-                setPriority(editingOccurrence.priority || "medium")
+                setStatus(editingOccurrence.status)
+                setPriority(editingOccurrence.priority)
                 setScheduleType('covers') // Default to covers view for editing
             } else {
                 setSchoolId(initialSchoolId === 'all' ? "" : initialSchoolId || "")
@@ -193,10 +199,10 @@ export function CoverQuickAdd({
                     frequency: frequency,
                     day_of_occurence: dayOfOccurence,
                     updateType: 'single', // Default to single update for now
-                    status,
-                    priority,
+                    status: status as OccurrenceStatus,
+                    priority: priority as Priority,
                     notes,
-                } as any)
+                })
                 toast.success("Cover request updated")
             } else {
                 const payload = {
@@ -225,7 +231,7 @@ export function CoverQuickAdd({
             }
             onOpenChange(false)
         } catch (error: any) {
-            toast.error(`Failed to ${editingOccurrence ? 'update' : 'create'} request: ${error.message || "Unknown error"}`)
+            toast.error(`Failed to ${editingOccurrence ? 'update' : 'create'} request: ${error.message || "Unknown error"} `)
             console.error(error)
         }
     }
@@ -250,14 +256,14 @@ export function CoverQuickAdd({
                                 <button
                                     type="button"
                                     onClick={() => setScheduleType('regular')}
-                                    className={`px-4 py-1.5 text-xs font-semibold rounded-sm transition-all ${scheduleType === 'regular' ? 'bg-white shadow-sm text-red-600' : 'text-muted-foreground hover:text-foreground'}`}
+                                    className={`px - 4 py - 1.5 text - xs font - semibold rounded - sm transition - all ${scheduleType === 'regular' ? 'bg-white shadow-sm text-red-600' : 'text-muted-foreground hover:text-foreground'} `}
                                 >
                                     Regular
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setScheduleType('covers')}
-                                    className={`px-4 py-1.5 text-xs font-semibold rounded-sm transition-all ${scheduleType === 'covers' ? 'bg-white shadow-sm text-blue-600' : 'text-muted-foreground hover:text-foreground'}`}
+                                    className={`px - 4 py - 1.5 text - xs font - semibold rounded - sm transition - all ${scheduleType === 'covers' ? 'bg-white shadow-sm text-blue-600' : 'text-muted-foreground hover:text-foreground'} `}
                                 >
                                     Cover
                                 </button>
@@ -274,7 +280,7 @@ export function CoverQuickAdd({
                                         className="w-full text-sm border-0 border-b border-muted/50 hover:border-muted px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent text-left text-foreground/80 disabled:opacity-50 flex items-center justify-between"
                                     >
                                         <span className="truncate">{getTeacherName(teacherId)}</span>
-                                        <ChevronDown className="h-4 w-4 opacity-50 shrink-0 ml-2" />
+                                        <HugeiconsIcon icon={ArrowDown01Icon} className={ICON_SIZES.sm + " opacity-50 shrink-0 ml-2"} />
                                     </button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-[200px] p-0" align="start">
@@ -297,20 +303,20 @@ export function CoverQuickAdd({
                                                         setTeacherOpen(false)
                                                         setTeacherSearch("")
                                                     }}
-                                                    className={`cursor-pointer ${teacherId === "unassigned" ? "bg-primary text-primary-foreground" : ""}`}
+                                                    className={`cursor - pointer ${teacherId === "unassigned" ? "bg-primary text-primary-foreground" : ""} `}
                                                 >
                                                     Unassigned (Pool)
                                                 </CommandItem>
-                                                {filteredTeachers.map((t: any) => (
+                                                {filteredTeachers.map((t: Teacher) => (
                                                     <CommandItem
                                                         key={t.id}
-                                                        value={`${t.person_details.first_name} ${t.person_details.last_name}`}
+                                                        value={`${t.person_details.first_name} ${t.person_details.last_name} `}
                                                         onSelect={() => {
                                                             setTeacherId(t.id)
                                                             setTeacherOpen(false)
                                                             setTeacherSearch("")
                                                         }}
-                                                        className={`cursor-pointer ${teacherId === t.id ? "bg-primary text-primary-foreground" : ""}`}
+                                                        className={`cursor - pointer ${teacherId === t.id ? "bg-primary text-primary-foreground" : ""} `}
                                                     >
                                                         {t.person_details.first_name} {t.person_details.last_name}
                                                     </CommandItem>
@@ -327,7 +333,7 @@ export function CoverQuickAdd({
                     {/* 2. Title / Subject (School & Club) */}
                     <div className="flex gap-4 items-start">
                         <div className="mt-1 text-muted-foreground/40 w-5 flex justify-center">
-                            <Building2 className="w-4 h-4" />
+                            <HugeiconsIcon icon={School01Icon} className={ICON_SIZES.sm} />
                         </div>
                         <div className="flex-1">
                             <div className="grid grid-cols-2 gap-6">
@@ -348,7 +354,7 @@ export function CoverQuickAdd({
                                 <div className="space-y-1">
                                     <Label htmlFor="club-select" className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider">Club or Activity</Label>
                                     <Select value={clubId} onValueChange={setClubId} disabled={!schoolId || clubsLoading}>
-                                        <SelectTrigger className={`w-full text-sm border-0 border-b border-muted/50 hover:border-muted px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent ${!schoolId ? 'opacity-50' : ''}`} id="club-select">
+                                        <SelectTrigger className={`w - full text - sm border - 0 border - b border - muted / 50 hover: border - muted px - 0 h - 9 shadow - none focus: ring - 0 rounded - none bg - transparent ${!schoolId ? 'opacity-50' : ''} `} id="club-select">
                                             <SelectValue placeholder={!schoolId ? "Select School First" : "Add Club"} />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -365,7 +371,7 @@ export function CoverQuickAdd({
                     {/* 3. Date & Time */}
                     <div className="flex gap-4 items-start">
                         <div className="mt-1 text-muted-foreground/40 w-5 flex justify-center">
-                            <Calendar className="w-4 h-4" />
+                            <HugeiconsIcon icon={Calendar02Icon} className={ICON_SIZES.sm} />
                         </div>
                         <div className="flex-1 space-y-3">
                             <div className="space-y-1">
@@ -382,7 +388,7 @@ export function CoverQuickAdd({
                                         />
                                     </div>
                                     <div className="flex items-center gap-2.5 w-auto">
-                                        <Clock className="w-3.5 h-3.5 text-muted-foreground/40 mr-1" />
+                                        <HugeiconsIcon icon={Clock01Icon} className={ICON_SIZES.xs + " text-muted-foreground/40 mr-1"} />
                                         <Input
                                             id="start-time"
                                             type="time"
@@ -408,7 +414,7 @@ export function CoverQuickAdd({
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <button type="button" className="p-0.5 rounded text-muted-foreground/60 hover:text-foreground mt-0.5">
-                                                <Info className="w-3.5 h-3.5" />
+                                                <HugeiconsIcon icon={Alert01Icon} className={ICON_SIZES.xs} />
                                             </button>
                                         </TooltipTrigger>
                                         <TooltipContent sideOffset={6} className="max-w-xs bg-background text-foreground border border-border">
@@ -479,7 +485,7 @@ export function CoverQuickAdd({
 
                     <div className="flex gap-4 items-start pt-1">
                         <div className="mt-1 text-muted-foreground/40 w-5 flex justify-center">
-                            <Info className="w-4 h-4" />
+                            <HugeiconsIcon icon={Alert01Icon} className={ICON_SIZES.sm} />
                         </div>
                         <div className="flex-1 space-y-4">
                             <div className="grid grid-cols-2 gap-6">
