@@ -3,12 +3,23 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Add01Icon } from '@hugeicons/core-free-icons'
 import type { Club } from '@/types/club.types'
-import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { PageLayout } from '@/components/common/page-layout'
 import { useClubs } from '@/hooks/use-clubs'
 import { DataTable } from '@/features/clubs/components/data-table'
 import { columns } from '@/features/clubs/components/column'
-import { DataTableExport, DataTableFilter, DataTableSearch, DataTableShowEntries, DataTableToolbar } from "@/components/ui/data-table-components"
+import {
+  DataTableExport,
+  DataTableFilter,
+  DataTableSearch,
+  DataTableShowEntries,
+  DataTableToolbar,
+} from '@/components/ui/data-table-components'
 import { Button } from '@/components/ui/button'
 import { ICON_SIZES } from '@/constants/sizes'
 import { ClubFormDialog } from '@/features/clubs/components/club-form-dialog'
@@ -45,7 +56,7 @@ function RouteComponent() {
       try {
         await deleteClub.mutateAsync(club.id)
       } catch (error) {
-        console.error("Failed to delete club:", error)
+        console.error('Failed to delete club:', error)
       }
     }
   }
@@ -100,7 +111,7 @@ function RouteComponent() {
                     <section className="flex flex-1 flex-col justify-between items-center gap-2">
                       <div className="flex w-full items-end justify-end ">
                         <DataTableSearch
-                          value={(table.getState().globalFilter as string)}
+                          value={table.getState().globalFilter as string}
                           onChange={(value) => table.setGlobalFilter(value)}
                           placeholder="Search clubs..."
                         />
@@ -112,24 +123,31 @@ function RouteComponent() {
                         />
                         <div className="flex flex-row gap-2">
                           <DataTableExport
-                            data={table.getFilteredRowModel().rows.map((row) => row.original)}
+                            data={table
+                              .getFilteredRowModel()
+                              .rows.map((row) => row.original)}
                             filename="clubs"
                           />
                           <DataTableFilter
-                            column={table.getColumn("status")}
+                            column={table.getColumn('status')}
                             title="Status"
                             options={[
-                              { label: "Active", value: "active" },
-                              { label: "Inactive", value: "inactive" },
-                              { label: "Cancelled", value: "cancelled" },
+                              { label: 'Active', value: 'active' },
+                              { label: 'Inactive', value: 'inactive' },
+                              { label: 'Cancelled', value: 'cancelled' },
                             ]}
                           />
                           <DataTableFilter
-                            column={table.getColumn("school")}
+                            column={table.getColumn('school')}
                             title="School"
-                            options={Array.from(table.getColumn("school")?.getFacetedUniqueValues().keys() ?? []).map((value) => ({
-                              label: value ?? "N/A",
-                              value: value ?? "",
+                            options={Array.from(
+                              table
+                                .getColumn('school')
+                                ?.getFacetedUniqueValues()
+                                .keys() ?? [],
+                            ).map((value) => ({
+                              label: value ?? 'N/A',
+                              value: value ?? '',
                             }))}
                           />
                         </div>

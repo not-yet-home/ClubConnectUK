@@ -1,5 +1,3 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { HugeiconsIcon } from '@hugeicons/react'
 import {
   ActivityIcon,
   Alert01Icon,
@@ -10,7 +8,10 @@ import {
   Tick01Icon,
   UserGroupIcon,
 } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { createFileRoute } from '@tanstack/react-router'
 import { format } from 'date-fns'
+
 import type { CoverOccurrence } from '@/types/club.types'
 import { PageLayout } from '@/components/common/page-layout'
 import { Button } from '@/components/ui/button'
@@ -25,7 +26,6 @@ import {
   useDashboardStats,
   useUpcomingAgenda,
 } from '@/features/dashboard/api/queries'
-import { useAuth } from '@/hooks/use-auth'
 import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/_protected/dashboard')({
@@ -33,9 +33,8 @@ export const Route = createFileRoute('/_protected/dashboard')({
 })
 
 function DashboardPage() {
-  const { user } = useAuth()
   const { data: stats, isLoading: statsLoading } = useDashboardStats()
-  const { data: agenda, isLoading: agendaLoading } = useUpcomingAgenda()
+  const { data: agenda } = useUpcomingAgenda()
 
   const kpis = [
     {
@@ -71,16 +70,6 @@ function DashboardPage() {
   return (
     <PageLayout breadcrumbs={[{ label: 'Dashboard' }]}>
       <div className="mx-auto space-y-8">
-        {/* Header Section */}
-        {/* <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-            Welcome back, {user?.email?.split('@')[0]}!
-          </h1>
-          <p className="text-muted-foreground">
-            Here's an overview of today's club operations and cover status.
-          </p>
-        </div> */}
-
         {/* KPI Grid */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {kpis.map((kpi) => (
@@ -131,14 +120,14 @@ function DashboardPage() {
               </CardHeader>
               <CardContent className="px-0">
                 <div className="divide-y divide-gray-50">
-                  {agendaLoading ? (
+                  {agenda === undefined ? (
                     [1, 2, 3].map((i) => (
                       <div
                         key={i}
                         className="p-6 h-20 bg-gray-50/50 animate-pulse"
                       />
                     ))
-                  ) : agenda && agenda.length > 0 ? (
+                  ) : agenda.length > 0 ? (
                     agenda.map((item: CoverOccurrence) => {
                       const statusId = (item.assignments?.[0]?.status ??
                         'unstaffed') as

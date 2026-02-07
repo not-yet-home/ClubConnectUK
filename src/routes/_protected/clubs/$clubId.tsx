@@ -2,7 +2,11 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowLeft02Icon } from '@hugeicons/core-free-icons'
 import { PageLayout } from '@/components/common/page-layout'
-import { useClub, useClubCoverRules, useClubUpcomingMeetings } from '@/hooks/use-clubs'
+import {
+  useClub,
+  useClubCoverRules,
+  useClubUpcomingMeetings,
+} from '@/hooks/use-clubs'
 import { Button } from '@/components/ui/button'
 import { ICON_SIZES } from '@/constants/sizes'
 import { ClubDetailsView } from '@/features/clubs/components/club-details-view'
@@ -15,8 +19,10 @@ function RouteComponent() {
   const { clubId } = Route.useParams()
   const navigate = useNavigate()
   const { data: club, isLoading: clubLoading } = useClub(clubId)
-  const { data: coverRules, isLoading: rulesLoading } = useClubCoverRules(clubId)
-  const { data: upcomingMeetings, isLoading: meetingsLoading } = useClubUpcomingMeetings(clubId)
+  const { data: coverRules, isLoading: rulesLoading } =
+    useClubCoverRules(clubId)
+  const { data: upcomingMeetings, isLoading: meetingsLoading } =
+    useClubUpcomingMeetings(clubId)
 
   const handleBack = () => {
     navigate({ to: '/clubs/club-list' })
@@ -24,7 +30,12 @@ function RouteComponent() {
 
   if (clubLoading) {
     return (
-      <PageLayout breadcrumbs={[{ label: 'Clubs', href: '/_protected/clubs/club-list' }, { label: 'Loading...' }]}>
+      <PageLayout
+        breadcrumbs={[
+          { label: 'Clubs', href: '/_protected/clubs/club-list' },
+          { label: 'Loading...' },
+        ]}
+      >
         <p>Loading club details...</p>
       </PageLayout>
     )
@@ -32,7 +43,12 @@ function RouteComponent() {
 
   if (!club) {
     return (
-      <PageLayout breadcrumbs={[{ label: 'Clubs', href: '/_protected/clubs/club-list' }, { label: 'Not Found' }]}>
+      <PageLayout
+        breadcrumbs={[
+          { label: 'Clubs', href: '/_protected/clubs/club-list' },
+          { label: 'Not Found' },
+        ]}
+      >
         <p>Club not found.</p>
         <Button onClick={handleBack} variant="outline" className="mt-4">
           <HugeiconsIcon icon={ArrowLeft02Icon} className={ICON_SIZES.md} />

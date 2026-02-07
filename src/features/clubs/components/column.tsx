@@ -1,23 +1,25 @@
-"use client"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { Delete02Icon, Edit02Icon, ViewIcon } from "@hugeicons/core-free-icons"
-import type { ColumnDef } from "@tanstack/react-table"
-import type { Club } from "@/types/club.types"
-import { DataTableColumnHeader } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { ICON_SIZES } from "@/constants/sizes"
-import { Badge } from "@/components/ui/badge"
+'use client'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Delete02Icon, Edit02Icon, ViewIcon } from '@hugeicons/core-free-icons'
+import type { ColumnDef } from '@tanstack/react-table'
+import type { Club } from '@/types/club.types'
+import { DataTableColumnHeader } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { ICON_SIZES } from '@/constants/sizes'
+import { Badge } from '@/components/ui/badge'
 
 export const columns: Array<ColumnDef<Club>> = [
   {
-    id: "select",
+    id: 'select',
     header: ({ table }) => (
       <input
         type="checkbox"
         checked={table.getIsAllPageRowsSelected()}
         ref={(input) => {
           if (input) {
-            input.indeterminate = table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected()
+            input.indeterminate =
+              table.getIsSomePageRowsSelected() &&
+              !table.getIsAllPageRowsSelected()
           }
         }}
         onChange={(e) => table.toggleAllPageRowsSelected(!!e.target.checked)}
@@ -38,42 +40,42 @@ export const columns: Array<ColumnDef<Club>> = [
     enableHiding: false,
   },
   {
-    accessorKey: "club_name",
+    accessorKey: 'club_name',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Club Name" />
     ),
   },
   {
-    accessorKey: "club_code",
+    accessorKey: 'club_code',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Code" />
     ),
   },
   {
-    id: "school",
-    accessorFn: (row) => row.school?.school_name ?? "",
+    id: 'school',
+    accessorFn: (row) => row.school?.school_name ?? '',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="School" />
     ),
   },
   {
-    accessorKey: "members_count",
+    accessorKey: 'members_count',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Members" />
     ),
     cell: ({ row }) => (
-      <span className="font-medium">{row.getValue("members_count") ?? 0}</span>
+      <span className="font-medium">{row.getValue('members_count') ?? 0}</span>
     ),
   },
   {
-    accessorKey: "status",
+    accessorKey: 'status',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const status = row.getValue("status")
+      const status = row.getValue('status')
       return (
-        <Badge variant={status === "active" ? "default" : "secondary"}>
+        <Badge variant={status === 'active' ? 'default' : 'secondary'}>
           {status}
         </Badge>
       )
@@ -83,15 +85,17 @@ export const columns: Array<ColumnDef<Club>> = [
     },
   },
   {
-    id: "actions",
-    header: "Actions",
+    id: 'actions',
+    header: 'Actions',
     cell: ({ row, table }) => {
       const club = row.original
-      const meta = table.options.meta as {
-        onView?: (club: Club) => void
-        onEdit?: (club: Club) => void
-        onDelete?: (club: Club) => void
-      } | undefined
+      const meta = table.options.meta as
+        | {
+            onView?: (club: Club) => void
+            onEdit?: (club: Club) => void
+            onDelete?: (club: Club) => void
+          }
+        | undefined
 
       return (
         <div className="flex items-center gap-2">

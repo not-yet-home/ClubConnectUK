@@ -30,18 +30,18 @@ profiles (extended user info)
 
 Extended user information that links to Supabase Auth users.
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | UUID | Primary key, references `auth.users.id` |
-| `email` | TEXT | User's email (unique) |
-| `full_name` | TEXT | User's full name |
-| `avatar_url` | TEXT | Profile picture URL |
-| `bio` | TEXT | User biography |
-| `university` | TEXT | University name |
-| `course` | TEXT | Course/major |
-| `graduation_year` | INTEGER | Expected graduation year |
-| `created_at` | TIMESTAMPTZ | Account creation timestamp |
-| `updated_at` | TIMESTAMPTZ | Last update timestamp |
+| Column            | Type        | Description                             |
+| ----------------- | ----------- | --------------------------------------- |
+| `id`              | UUID        | Primary key, references `auth.users.id` |
+| `email`           | TEXT        | User's email (unique)                   |
+| `full_name`       | TEXT        | User's full name                        |
+| `avatar_url`      | TEXT        | Profile picture URL                     |
+| `bio`             | TEXT        | User biography                          |
+| `university`      | TEXT        | University name                         |
+| `course`          | TEXT        | Course/major                            |
+| `graduation_year` | INTEGER     | Expected graduation year                |
+| `created_at`      | TIMESTAMPTZ | Account creation timestamp              |
+| `updated_at`      | TIMESTAMPTZ | Last update timestamp                   |
 
 **Auto-created:** A profile is automatically created when a user signs up via a database trigger.
 
@@ -51,23 +51,23 @@ Extended user information that links to Supabase Auth users.
 
 University clubs and societies.
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | UUID | Primary key |
-| `name` | TEXT | Club name |
-| `slug` | TEXT | URL-friendly slug (unique) |
-| `description` | TEXT | Club description |
-| `category` | ENUM | sports, academic, arts, cultural, technology, social, volunteering, other |
-| `logo_url` | TEXT | Club logo image |
-| `banner_url` | TEXT | Club banner image |
-| `contact_email` | TEXT | Contact email |
-| `website_url` | TEXT | Club website |
-| `social_links` | JSONB | Social media links |
-| `is_active` | BOOLEAN | Whether club is active |
-| `member_count` | INTEGER | Number of active members (auto-updated) |
-| `created_by` | UUID | Creator's profile ID |
-| `created_at` | TIMESTAMPTZ | Creation timestamp |
-| `updated_at` | TIMESTAMPTZ | Last update timestamp |
+| Column          | Type        | Description                                                               |
+| --------------- | ----------- | ------------------------------------------------------------------------- |
+| `id`            | UUID        | Primary key                                                               |
+| `name`          | TEXT        | Club name                                                                 |
+| `slug`          | TEXT        | URL-friendly slug (unique)                                                |
+| `description`   | TEXT        | Club description                                                          |
+| `category`      | ENUM        | sports, academic, arts, cultural, technology, social, volunteering, other |
+| `logo_url`      | TEXT        | Club logo image                                                           |
+| `banner_url`    | TEXT        | Club banner image                                                         |
+| `contact_email` | TEXT        | Contact email                                                             |
+| `website_url`   | TEXT        | Club website                                                              |
+| `social_links`  | JSONB       | Social media links                                                        |
+| `is_active`     | BOOLEAN     | Whether club is active                                                    |
+| `member_count`  | INTEGER     | Number of active members (auto-updated)                                   |
+| `created_by`    | UUID        | Creator's profile ID                                                      |
+| `created_at`    | TIMESTAMPTZ | Creation timestamp                                                        |
+| `updated_at`    | TIMESTAMPTZ | Last update timestamp                                                     |
 
 ---
 
@@ -75,16 +75,16 @@ University clubs and societies.
 
 User membership in clubs.
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | UUID | Primary key |
-| `club_id` | UUID | References `clubs.id` |
-| `user_id` | UUID | References `profiles.id` |
-| `role` | ENUM | member, admin, owner |
-| `status` | ENUM | pending, active, inactive |
-| `joined_at` | TIMESTAMPTZ | When user joined |
-| `created_at` | TIMESTAMPTZ | Record creation |
-| `updated_at` | TIMESTAMPTZ | Last update |
+| Column       | Type        | Description               |
+| ------------ | ----------- | ------------------------- |
+| `id`         | UUID        | Primary key               |
+| `club_id`    | UUID        | References `clubs.id`     |
+| `user_id`    | UUID        | References `profiles.id`  |
+| `role`       | ENUM        | member, admin, owner      |
+| `status`     | ENUM        | pending, active, inactive |
+| `joined_at`  | TIMESTAMPTZ | When user joined          |
+| `created_at` | TIMESTAMPTZ | Record creation           |
+| `updated_at` | TIMESTAMPTZ | Last update               |
 
 **Unique constraint:** (`club_id`, `user_id`) - a user can only have one membership per club.
 
@@ -96,26 +96,26 @@ User membership in clubs.
 
 Club events and activities.
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | UUID | Primary key |
-| `club_id` | UUID | References `clubs.id` |
-| `title` | TEXT | Event title |
-| `description` | TEXT | Event description |
-| `event_type` | ENUM | meeting, social, workshop, competition, fundraiser, other |
-| `status` | ENUM | draft, published, cancelled, completed |
-| `location` | TEXT | Physical location |
-| `is_online` | BOOLEAN | Whether event is online |
-| `meeting_url` | TEXT | Online meeting link |
-| `start_time` | TIMESTAMPTZ | Event start time |
-| `end_time` | TIMESTAMPTZ | Event end time |
-| `capacity` | INTEGER | Max attendees (NULL = unlimited) |
-| `is_public` | BOOLEAN | Public or members-only |
-| `image_url` | TEXT | Event image |
-| `attendee_count` | INTEGER | Number attending (auto-updated) |
-| `created_by` | UUID | Creator's profile ID |
-| `created_at` | TIMESTAMPTZ | Creation timestamp |
-| `updated_at` | TIMESTAMPTZ | Last update timestamp |
+| Column           | Type        | Description                                               |
+| ---------------- | ----------- | --------------------------------------------------------- |
+| `id`             | UUID        | Primary key                                               |
+| `club_id`        | UUID        | References `clubs.id`                                     |
+| `title`          | TEXT        | Event title                                               |
+| `description`    | TEXT        | Event description                                         |
+| `event_type`     | ENUM        | meeting, social, workshop, competition, fundraiser, other |
+| `status`         | ENUM        | draft, published, cancelled, completed                    |
+| `location`       | TEXT        | Physical location                                         |
+| `is_online`      | BOOLEAN     | Whether event is online                                   |
+| `meeting_url`    | TEXT        | Online meeting link                                       |
+| `start_time`     | TIMESTAMPTZ | Event start time                                          |
+| `end_time`       | TIMESTAMPTZ | Event end time                                            |
+| `capacity`       | INTEGER     | Max attendees (NULL = unlimited)                          |
+| `is_public`      | BOOLEAN     | Public or members-only                                    |
+| `image_url`      | TEXT        | Event image                                               |
+| `attendee_count` | INTEGER     | Number attending (auto-updated)                           |
+| `created_by`     | UUID        | Creator's profile ID                                      |
+| `created_at`     | TIMESTAMPTZ | Creation timestamp                                        |
+| `updated_at`     | TIMESTAMPTZ | Last update timestamp                                     |
 
 ---
 
@@ -123,14 +123,14 @@ Club events and activities.
 
 Event attendance tracking and RSVPs.
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | UUID | Primary key |
-| `event_id` | UUID | References `events.id` |
-| `user_id` | UUID | References `profiles.id` |
-| `status` | ENUM | going, maybe, not_going, attended |
-| `created_at` | TIMESTAMPTZ | RSVP timestamp |
-| `updated_at` | TIMESTAMPTZ | Last update |
+| Column       | Type        | Description                       |
+| ------------ | ----------- | --------------------------------- |
+| `id`         | UUID        | Primary key                       |
+| `event_id`   | UUID        | References `events.id`            |
+| `user_id`    | UUID        | References `profiles.id`          |
+| `status`     | ENUM        | going, maybe, not_going, attended |
+| `created_at` | TIMESTAMPTZ | RSVP timestamp                    |
+| `updated_at` | TIMESTAMPTZ | Last update                       |
 
 **Unique constraint:** (`event_id`, `user_id`) - a user can only RSVP once per event.
 
@@ -139,18 +139,20 @@ Event attendance tracking and RSVPs.
 ### Prerequisites
 
 1. Install Supabase CLI:
-   
+
    **Windows (Scoop - Recommended):**
+
    ```bash
    # Install Scoop if needed:
    iwr -useb get.scoop.sh | iex
-   
+
    # Install Supabase CLI:
    scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
    scoop install supabase
    ```
-   
+
    **Or use npx (no install):**
+
    ```bash
    # Just use npx before commands:
    npx supabase link --project-ref your-ref
@@ -183,6 +185,7 @@ This will apply all SQL files in `supabase/migrations/` in order.
 ### Verify Migrations
 
 Check in Supabase Dashboard:
+
 - **Database** → **Tables** - Should see all 5 tables
 - **Database** → **Policies** - Should see RLS policies enabled
 
@@ -191,6 +194,7 @@ Check in Supabase Dashboard:
 ### Using Migration Seed Data
 
 The migration `20250101000002_seed_data.sql` automatically creates:
+
 - 5 sample clubs
 - 6 sample events
 
@@ -205,6 +209,7 @@ supabase db reset
 ```
 
 Or manually run in SQL Editor:
+
 1. Go to Supabase Dashboard → SQL Editor
 2. Copy contents of `supabase/seed.sql`
 3. Click "Run"
@@ -225,28 +230,33 @@ Or manually run in SQL Editor:
 All tables have RLS enabled. Here's what each policy allows:
 
 ### Profiles
+
 - ✅ Everyone can **read** all profiles
 - ✅ Users can **update** only their own profile
 - ✅ Profiles auto-created on signup
 
 ### Clubs
+
 - ✅ Everyone can **read** active clubs
 - ✅ Authenticated users can **create** clubs
 - ✅ Club admins/owners can **update** their clubs
 - ✅ Club owners can **delete** their clubs
 
 ### Memberships
+
 - ✅ Users can **view** memberships of clubs they belong to
 - ✅ Users can **join** clubs (create membership)
 - ✅ Club admins can **update/remove** memberships
 - ✅ Users can **leave** clubs (delete their membership)
 
 ### Events
+
 - ✅ Everyone can **read** public events
 - ✅ Club members can **read** private club events
 - ✅ Club admins can **create/update/delete** events
 
 ### Event Attendees
+
 - ✅ Users can **view** attendees of events they can see
 - ✅ Users can **RSVP** to events they have access to
 - ✅ Users can **update/cancel** their own RSVP
@@ -265,7 +275,7 @@ ORDER BY member_count DESC;
 ### Get upcoming events
 
 ```sql
-SELECT 
+SELECT
     e.title,
     e.start_time,
     e.location,
@@ -283,7 +293,7 @@ ORDER BY e.start_time;
 ### Get user's memberships
 
 ```sql
-SELECT 
+SELECT
     c.name as club_name,
     m.role,
     m.joined_at
@@ -296,7 +306,7 @@ AND m.status = 'active';
 ### Get club's upcoming events
 
 ```sql
-SELECT 
+SELECT
     title,
     start_time,
     end_time,
@@ -314,7 +324,7 @@ ORDER BY start_time;
 
 ```sql
 SELECT EXISTS (
-    SELECT 1 
+    SELECT 1
     FROM memberships
     WHERE club_id = 'club-uuid-here'
     AND user_id = auth.uid()

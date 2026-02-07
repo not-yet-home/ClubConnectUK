@@ -6,7 +6,12 @@ import { toast } from 'sonner'
 import type { Teacher } from '@/types/teacher.types'
 import { PageLayout } from '@/components/common/page-layout'
 import { Button } from '@/components/ui/button'
-import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import {
   DataTableExport,
   DataTableFilter,
@@ -15,7 +20,11 @@ import {
   DataTableToolbar,
 } from '@/components/ui/data-table-components'
 import { ICON_SIZES } from '@/constants/sizes'
-import { useCreateTeacher, useDeleteTeacher, useUpdateTeacher } from '@/features/teachers/api/mutations'
+import {
+  useCreateTeacher,
+  useDeleteTeacher,
+  useUpdateTeacher,
+} from '@/features/teachers/api/mutations'
 import { columns } from '@/features/teachers/components/column'
 import { DataTable } from '@/features/teachers/components/data-table'
 import { DeleteTeacherDialog } from '@/features/teachers/components/delete-teacher-dialog'
@@ -28,7 +37,7 @@ export const Route = createFileRoute('/_protected/teachers/teacher-list')({
 })
 
 function RouteComponent() {
-  const { data: teachers } = useTeachers();
+  const { data: teachers } = useTeachers()
   const [formSheetOpen, setFormSheetOpen] = useState(false)
   const [viewSheetOpen, setViewSheetOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -107,11 +116,18 @@ function RouteComponent() {
         setViewSheetOpen(true)
       }
 
-      toast.success(selectedTeacher ? 'Teacher updated successfully' : 'Teacher created successfully')
+      toast.success(
+        selectedTeacher
+          ? 'Teacher updated successfully'
+          : 'Teacher created successfully',
+      )
     } catch (error) {
       console.error('Error saving teacher:', error)
       toast.error('Failed to save teacher', {
-        description: error instanceof Error ? error.message : 'An unexpected error occurred',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'An unexpected error occurred',
       })
     }
   }
@@ -128,7 +144,10 @@ function RouteComponent() {
     } catch (error) {
       console.error('Error deleting teacher:', error)
       toast.error('Failed to delete teacher', {
-        description: error instanceof Error ? error.message : 'An unexpected error occurred',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'An unexpected error occurred',
       })
     }
   }
@@ -146,9 +165,13 @@ function RouteComponent() {
                 </CardDescription>
               </section>
               <section>
-                <Button onClick={handleAddTeacher} disabled={createTeacher.isPending}>
+                <Button
+                  onClick={handleAddTeacher}
+                  disabled={createTeacher.isPending}
+                >
                   <HugeiconsIcon icon={Add01Icon} className={ICON_SIZES.lg} />
-                  Add Teacher</Button>
+                  Add Teacher
+                </Button>
               </section>
             </CardHeader>
             <CardContent>
@@ -165,7 +188,7 @@ function RouteComponent() {
                     <section className="flex flex-1 flex-col justify-between items-center gap-2">
                       <div className="flex w-full items-end justify-end ">
                         <DataTableSearch
-                          value={table.getState().globalFilter ?? ""}
+                          value={table.getState().globalFilter ?? ''}
                           onChange={(value) => table.setGlobalFilter(value)}
                           placeholder="Search teachers..."
                         />
@@ -177,15 +200,22 @@ function RouteComponent() {
                         />
                         <div className="flex flex-row gap-2">
                           <DataTableExport
-                            data={table.getFilteredRowModel().rows.map((row) => row.original)}
+                            data={table
+                              .getFilteredRowModel()
+                              .rows.map((row) => row.original)}
                             filename="teachers"
                           />
                           <DataTableFilter
-                            column={table.getColumn("primary_styles")}
+                            column={table.getColumn('primary_styles')}
                             title="Primary Styles"
-                            options={Array.from(table.getColumn("primary_styles")?.getFacetedUniqueValues().keys() ?? []).map((value) => ({
-                              label: (value as string) || "N/A",
-                              value: (value as string) || "",
+                            options={Array.from(
+                              table
+                                .getColumn('primary_styles')
+                                ?.getFacetedUniqueValues()
+                                .keys() ?? [],
+                            ).map((value) => ({
+                              label: (value as string) || 'N/A',
+                              value: (value as string) || '',
                             }))}
                           />
                         </div>
@@ -228,6 +258,3 @@ function RouteComponent() {
     </>
   )
 }
-
-
-

@@ -75,7 +75,7 @@ function BroadcastNewPage() {
         { label: 'Broadcasts', href: '/broadcast' },
         { label: 'New Broadcast' },
       ]}
-      className='pt-0'
+      className="pt-0"
     >
       <div
         ref={containerRef}

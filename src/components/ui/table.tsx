@@ -1,10 +1,9 @@
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react'
+import type { Column } from '@tanstack/react-table'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
-import type {Column} from "@tanstack/react-table";
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-
-function Table({ className, ...props }: React.ComponentProps<"table">) {
+function Table({ className, ...props }: React.ComponentProps<'table'>) {
   return (
     <div
       data-slot="table-container"
@@ -12,81 +11,89 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
     >
       <table
         data-slot="table"
-        className={cn("w-full caption-bottom text-sm", className)}
+        className={cn('w-full caption-bottom text-sm', className)}
         {...props}
       />
     </div>
   )
 }
 
-function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
+function TableHeader({ className, ...props }: React.ComponentProps<'thead'>) {
   return (
     <thead
       data-slot="table-header"
-      className={cn("[&_tr]:border-b p-3", className)}
+      className={cn('[&_tr]:border-b p-3', className)}
       {...props}
     />
   )
 }
 
-function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
+function TableBody({ className, ...props }: React.ComponentProps<'tbody'>) {
   return (
     <tbody
       data-slot="table-body"
-      className={cn("[&_tr:last-child]:border-0", className)}
+      className={cn('[&_tr:last-child]:border-0', className)}
       {...props}
     />
   )
 }
 
-function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
+function TableFooter({ className, ...props }: React.ComponentProps<'tfoot'>) {
   return (
     <tfoot
       data-slot="table-footer"
       className={cn(
-        "bg-muted/50 border-t font-semibold [&>tr]:last:border-b-0",
-        className
+        'bg-muted/50 border-t font-semibold [&>tr]:last:border-b-0',
+        className,
       )}
       {...props}
     />
   )
 }
 
-function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
+function TableRow({ className, ...props }: React.ComponentProps<'tr'>) {
   return (
     <tr
       data-slot="table-row"
       className={cn(
-        "bg-[var(--secondary)] hover:bg-muted/50 data-[state=selected]:bg-muted border-b border-[var(--primary-dark)] transition-colors",
-        className
+        'bg-[var(--secondary)] hover:bg-muted/50 data-[state=selected]:bg-muted border-b border-[var(--primary-dark)] transition-colors',
+        className,
       )}
       {...props}
     />
   )
 }
 
-function TableHead({ className, checkbox, ...props }: React.ComponentProps<"th"> & { checkbox?: boolean }) {
+function TableHead({
+  className,
+  checkbox,
+  ...props
+}: React.ComponentProps<'th'> & { checkbox?: boolean }) {
   return (
     <th
       data-slot="table-head"
       className={cn(
-        "bg-[var(--primary-light)] text-foreground h-10 p-3 text-left align-middle font-bold whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-        checkbox && "w-12 px-4 pr-0",
-        className
+        'bg-[var(--primary-light)] text-foreground h-10 p-3 text-left align-middle font-bold whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
+        checkbox && 'w-12 px-4 pr-0',
+        className,
       )}
       {...props}
     />
   )
 }
 
-function TableCell({ className, checkbox, ...props }: React.ComponentProps<"td"> & { checkbox?: boolean }) {
+function TableCell({
+  className,
+  checkbox,
+  ...props
+}: React.ComponentProps<'td'> & { checkbox?: boolean }) {
   return (
     <td
       data-slot="table-cell"
       className={cn(
-        "border-r border-[var(--primary-dark)] last:border-r-0 p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-        checkbox && "w-12 px-4 pr-0",
-        className
+        'border-r border-[var(--primary-dark)] last:border-r-0 p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
+        checkbox && 'w-12 px-4 pr-0',
+        className,
       )}
       {...props}
     />
@@ -96,11 +103,11 @@ function TableCell({ className, checkbox, ...props }: React.ComponentProps<"td">
 function TableCaption({
   className,
   ...props
-}: React.ComponentProps<"caption">) {
+}: React.ComponentProps<'caption'>) {
   return (
     <caption
       data-slot="table-caption"
-      className={cn("text-muted-foreground mt-4 text-sm", className)}
+      className={cn('text-muted-foreground mt-4 text-sm', className)}
       {...props}
     />
   )
@@ -130,8 +137,8 @@ function DataTablePagination({
   const endRow = Math.min((pageIndex + 1) * pageSize, totalRows)
 
   // Generate page numbers with ellipsis
-  const getPageNumbers = (): Array<number | "ellipsis"> => {
-    const pages: Array<number | "ellipsis"> = []
+  const getPageNumbers = (): Array<number | 'ellipsis'> => {
+    const pages: Array<number | 'ellipsis'> = []
 
     if (pageCount <= 7) {
       for (let i = 0; i < pageCount; i++) {
@@ -142,7 +149,7 @@ function DataTablePagination({
       pages.push(0)
 
       if (pageIndex > 2) {
-        pages.push("ellipsis")
+        pages.push('ellipsis')
       }
 
       // Pages around current
@@ -154,7 +161,7 @@ function DataTablePagination({
       }
 
       if (pageIndex < pageCount - 3) {
-        pages.push("ellipsis")
+        pages.push('ellipsis')
       }
 
       // Always show last page
@@ -167,14 +174,11 @@ function DataTablePagination({
   }
 
   return (
-    <div className={cn("flex items-center justify-between py-4", className)}>
+    <div className={cn('flex items-center justify-between py-4', className)}>
       {/* Left side - Showing X-Y from Z */}
       <div className="text-sm text-muted-foreground">
-        Showing{" "}
-        <span className="font-medium">{startRow}</span>
-        -
-        <span className="font-medium">{endRow}</span>
-        {" "}from{" "}
+        Showing <span className="font-medium">{startRow}</span>-
+        <span className="font-medium">{endRow}</span> from{' '}
         <span className="font-medium">{totalRows}</span>
       </div>
 
@@ -183,62 +187,60 @@ function DataTablePagination({
         {/* First page */}
         <Button
           variant="outline"
-          size="icon"
-          className="h-8 w-8"
+          size="icon-sm"
           onClick={() => onPageChange(0)}
           disabled={!canGoPrevious}
         >
-          <span className="text-xs">{"<<"}</span>
+          <span className="text-xs">{'<<'}</span>
         </Button>
         {/* Previous page */}
         <Button
           variant="outline"
-          size="icon"
-          className="h-8 w-8"
+          size="icon-sm"
           onClick={() => onPageChange(pageIndex - 1)}
           disabled={!canGoPrevious}
         >
-          <span className="text-xs">{"<"}</span>
+          <span className="text-xs">{'<'}</span>
         </Button>
 
         {/* Page numbers */}
         {getPageNumbers().map((page, idx) =>
-          page === "ellipsis" ? (
-            <span key={`ellipsis-${idx}`} className="px-2 text-muted-foreground">
+          page === 'ellipsis' ? (
+            <span
+              key={`ellipsis-${idx}`}
+              className="px-2 text-muted-foreground"
+            >
               ...
             </span>
           ) : (
             <Button
               key={page}
-              variant={pageIndex === page ? "default" : "outline"}
-              size="icon"
-              className="h-8 w-8"
+              variant={pageIndex === page ? 'default' : 'outline'}
+              size="icon-sm"
               onClick={() => onPageChange(page)}
             >
               {page + 1}
             </Button>
-          )
+          ),
         )}
 
         {/* Next page */}
         <Button
           variant="outline"
-          size="icon"
-          className="h-8 w-8"
+          size="icon-sm"
           onClick={() => onPageChange(pageIndex + 1)}
           disabled={!canGoNext}
         >
-          <span className="text-xs">{">"}</span>
+          <span className="text-xs">{'>'}</span>
         </Button>
         {/* Last page */}
         <Button
           variant="outline"
-          size="icon"
-          className="h-8 w-8"
+          size="icon-sm"
           onClick={() => onPageChange(pageCount - 1)}
           disabled={!canGoNext}
         >
-          <span className="text-xs">{">>"}</span>
+          <span className="text-xs">{'>>'}</span>
         </Button>
       </div>
     </div>
@@ -264,14 +266,14 @@ function DataTableColumnHeader<TData, TValue>({
     <Button
       variant="ghost"
       size="sm"
-      className={cn("-ml-3 h-8 data-[state=open]:bg-accent group", className)}
-      onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      className={cn('-ml-3 data-[state=open]:bg-accent group', className)}
+      onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
     >
       {title}
       <span className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
-        {column.getIsSorted() === "desc" ? (
+        {column.getIsSorted() === 'desc' ? (
           <ArrowDown className="h-4 w-4" />
-        ) : column.getIsSorted() === "asc" ? (
+        ) : column.getIsSorted() === 'asc' ? (
           <ArrowUp className="h-4 w-4" />
         ) : (
           <ArrowUpDown className="h-4 w-4" />

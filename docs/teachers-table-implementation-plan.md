@@ -7,6 +7,7 @@ This plan enhances the existing Teachers table with advanced features including 
 ## Current State
 
 The current implementation includes:
+
 - Basic TanStack Table setup in `data-table.tsx` with only `getCoreRowModel`
 - Simple column definitions in `column.tsx` for Teacher data
 - Teacher type with fields: id, email, first_name, last_name, department, phone, school_id, created_at, updated_at
@@ -17,6 +18,7 @@ The current implementation includes:
 
 > [!IMPORTANT]
 > User requested faceted filters (like Example #4 from shadcnstudio.com) for:
+>
 > - **Department/Subject Specialization** - Filter by specific departments or subjects (e.g., "Science", "Physical Education", "Arts")
 > - **Location/City** - Filter by school city (e.g., "London", "Manchester", "Edinburgh")
 > - **Responsive Design** - Let Tailwind CSS handle all responsiveness automatically
@@ -28,15 +30,15 @@ The current implementation includes:
 #### [MODIFY] [use-teachers.tsx](file:///c:/Users/Admin/Documents/GitHub/ClubConnectUK/src/hooks/use-teachers.tsx)
 
 **Changes:**
+
 1. Update the Supabase query to join with `schools` table to get city information
 2. Return enhanced teacher data including school city and name
 3. Keep the query optimized with select only needed fields
 
 **Updated query:**
+
 ```typescript
-const { data, error } = await supabase
-  .from('teachers')
-  .select(`
+const { data, error } = await supabase.from('teachers').select(`
     *,
     schools:school_id (
       name,
@@ -48,6 +50,7 @@ const { data, error } = await supabase
 #### [MODIFY] [teacher.types.ts](file:///c:/Users/Admin/Documents/GitHub/ClubConnectUK/src/types/teacher.types.ts)
 
 **Changes:**
+
 1. Add nested school data to the Teacher interface
 2. Support for joined data structure
 
@@ -58,10 +61,11 @@ const { data, error } = await supabase
 #### [MODIFY] [data-table.tsx](file:///c:/Users/Admin/Documents/GitHub/ClubConnectUK/src/routes/_protected/teachers/data-table.tsx)
 
 **Changes:**
+
 1. Add state management for sorting, filtering, and pagination using React `useState`
 2. Import and configure additional TanStack Table features:
    - `getPaginationRowModel` - for pagination
-   - `getSortedRowModel` - for column sorting  
+   - `getSortedRowModel` - for column sorting
    - `getFilteredRowModel` - for global and column filtering
    - `getFacetedRowModel` - for faceted filter support
    - `getFacetedUniqueValues` - to get unique values for filter dropdowns
@@ -73,6 +77,7 @@ const { data, error } = await supabase
 #### [MODIFY] [column.tsx](file:///c:/Users/Admin/Documents/GitHub/ClubConnectUK/src/routes/_protected/teachers/column.tsx)
 
 **Changes:**
+
 1. Make column headers sortable with sort indicators using shadcn Button component
 2. Improve cell formatting:
    - Combine `first_name` and `last_name` into single "Name" column
@@ -83,6 +88,7 @@ const { data, error } = await supabase
 3. Add `filterFn` for columns that support faceted filtering
 
 **New column structure:**
+
 - **Name** (first_name + last_name) - sortable
 - **Email** - sortable, mailto link
 - **Department** - sortable, faceted filterable
@@ -95,13 +101,15 @@ const { data, error } = await supabase
 **Purpose:** Toolbar with global search and faceted filters
 
 **Features:**
+
 1. **Global search input** - Search across all columns with magnifying glass icon
 2. **Department faceted filter** - Multi-select dropdown showing all unique departments with count badges
-3. **City faceted filter** - Multi-select dropdown showing all unique cities with count badges  
+3. **City faceted filter** - Multi-select dropdown showing all unique cities with count badges
 4. **Clear filters button** - Reset all active filters (only shown when filters are applied)
 5. **Responsive layout** - Stack vertically on mobile using Tailwind `flex-col md:flex-row`
 
 **Implementation:**
+
 - Use `table.getColumn('department').getFacetedUniqueValues()` to get unique departments
 - Use shadcn `DropdownMenu` with checkboxes for multi-select
 - Show active filter count as badges
@@ -112,6 +120,7 @@ const { data, error } = await supabase
 **Purpose:** Reusable pagination controls
 
 **Features:**
+
 - Page info (e.g., "Showing 1-10 of 45 teachers")
 - Previous/Next buttons with disabled states
 - Page size selector dropdown (10, 20, 50, 100 rows per page)
@@ -122,6 +131,7 @@ const { data, error } = await supabase
 **Purpose:** Reusable faceted filter component (like shadcnstudio example)
 
 **Features:**
+
 - Generic multi-select dropdown for any column
 - Display options with checkboxes
 - Show selected count as badge
@@ -142,6 +152,7 @@ No existing automated tests were found for the teachers table. For this enhancem
 > All manual testing should be performed in the browser with the development server running.
 
 **Prerequisites:**
+
 1. Start the development server: `npm run dev`
 2. Navigate to the Teachers page at `http://localhost:3000/teachers/teacher-list`
 3. Ensure the database has teachers from multiple departments and cities (seed data provides this)

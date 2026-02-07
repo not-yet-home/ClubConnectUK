@@ -1,15 +1,15 @@
-"use client"
-import { Download } from "lucide-react"
-import { Button } from "@/components/ui/button"
+'use client'
+import { Download } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { cn } from "@/lib/utils"
+} from '@/components/ui/dropdown-menu'
+import { cn } from '@/lib/utils'
 
-type ExportFormat = "csv" | "xlsx" | "pdf"
+type ExportFormat = 'csv' | 'xlsx' | 'pdf'
 
 interface DataTableExportProps<TData> {
   data: Array<TData>
@@ -25,15 +25,15 @@ interface DataTableExportProps<TData> {
  */
 function DataTableExport<TData>({
   data,
-  filename = "export",
+  filename = 'export',
   onExport,
-  formats = ["csv", "xlsx", "pdf"],
+  formats = ['csv', 'xlsx', 'pdf'],
   className,
 }: DataTableExportProps<TData>) {
   const formatLabels: Record<ExportFormat, string> = {
-    csv: "CSV",
-    xlsx: "Excel (XLSX)",
-    pdf: "PDF",
+    csv: 'CSV',
+    xlsx: 'Excel (XLSX)',
+    pdf: 'PDF',
   }
 
   const handleExport = (format: ExportFormat) => {
@@ -41,7 +41,7 @@ function DataTableExport<TData>({
       onExport(format, data)
     } else {
       // Default CSV export
-      if (format === "csv") {
+      if (format === 'csv') {
         exportToCsv(data, filename)
       }
     }
@@ -53,7 +53,7 @@ function DataTableExport<TData>({
       <Button
         variant="outline"
         size="sm"
-        className={cn("h-9", className)}
+        className={cn('h-9', className)}
         onClick={() => handleExport(formats[0])}
       >
         <Download className="h-4 w-4" />
@@ -65,7 +65,7 @@ function DataTableExport<TData>({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className={cn("h-9", className)}>
+        <Button variant="outline" size="sm" className={cn('h-9', className)}>
           <Download className="h-4 w-4" />
           Export
         </Button>
@@ -88,28 +88,28 @@ function exportToCsv<TData>(data: Array<TData>, filename: string) {
   if (data.length === 0) return
 
   const firstRow = data[0]
-  if (typeof firstRow !== "object" || firstRow === null) return
+  if (typeof firstRow !== 'object' || firstRow === null) return
 
   const headers = Object.keys(firstRow as Record<string, unknown>)
   const csvContent = [
-    headers.join(","),
+    headers.join(','),
     ...data.map((row) =>
       headers
         .map((header) => {
           const value = (row as Record<string, unknown>)[header]
-          const stringValue = value?.toString() ?? ""
+          const stringValue = value?.toString() ?? ''
           // Escape quotes and wrap in quotes if contains comma
-          if (stringValue.includes(",") || stringValue.includes('"')) {
+          if (stringValue.includes(',') || stringValue.includes('"')) {
             return `"${stringValue.replace(/"/g, '""')}"`
           }
           return stringValue
         })
-        .join(",")
+        .join(','),
     ),
-  ].join("\n")
+  ].join('\n')
 
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
-  const link = document.createElement("a")
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
   link.href = URL.createObjectURL(blob)
   link.download = `${filename}.csv`
   link.click()

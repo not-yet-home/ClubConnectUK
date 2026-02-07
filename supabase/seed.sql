@@ -12,7 +12,7 @@
 INSERT INTO public.person_details (id, first_name, middle_name, last_name, email, address, contact, image)
 VALUES
     (
-        'a0000001-0001-0001-0001-000000000001'::uuid,
+        'a0000001-0001-0001-0001-000000000001'::UUID,
         'John',
         'Michael',
         'Smith',
@@ -22,7 +22,7 @@ VALUES
         NULL
     ),
     (
-        'a0000002-0002-0002-0002-000000000002'::uuid,
+        'a0000002-0002-0002-0002-000000000002'::UUID,
         'Sarah',
         NULL,
         'Johnson',
@@ -32,7 +32,7 @@ VALUES
         NULL
     ),
     (
-        'a0000003-0003-0003-0003-000000000003'::uuid,
+        'a0000003-0003-0003-0003-000000000003'::UUID,
         'David',
         'James',
         'Williams',
@@ -81,19 +81,19 @@ VALUES
 INSERT INTO public.schools (id, school_name, address, status)
 VALUES
     (
-        'b0000001-0001-0001-0001-000000000001'::uuid,
+        'b0000001-0001-0001-0001-000000000001'::UUID,
         'Greenwood Academy',
         '123 High Street, London SW1A 1AA',
         'active'
     ),
     (
-        'b0000002-0002-0002-0002-000000000002'::uuid,
+        'b0000002-0002-0002-0002-000000000002'::UUID,
         'St. Mary''s Secondary',
         '45 Church Road, Manchester M1 1AD',
         'active'
     ),
     (
-        'b0000003-0003-0003-0003-000000000003'::uuid,
+        'b0000003-0003-0003-0003-000000000003'::UUID,
         'Riverside High',
         '78 River Lane, Edinburgh EH1 1YZ',
         'active'
@@ -105,8 +105,8 @@ VALUES
 INSERT INTO public.clubs (id, school_id, club_name, club_code, description, members_count, status)
 VALUES
     (
-        'c0000001-0001-0001-0001-000000000001'::uuid,
-        'b0000001-0001-0001-0001-000000000001'::uuid,
+        'c0000001-0001-0001-0001-000000000001'::UUID,
+        'b0000001-0001-0001-0001-000000000001'::UUID,
         'Coding Club',
         'CODE',
         'Learn programming fundamentals, build projects, and explore robotics.',
@@ -114,8 +114,8 @@ VALUES
         'active'
     ),
     (
-        'c0000002-0002-0002-0002-000000000002'::uuid,
-        'b0000001-0001-0001-0001-000000000001'::uuid,
+        'c0000002-0002-0002-0002-000000000002'::UUID,
+        'b0000001-0001-0001-0001-000000000001'::UUID,
         'Football Team',
         'FB',
         'School football team training and matches.',
@@ -123,8 +123,8 @@ VALUES
         'active'
     ),
     (
-        'c0000003-0003-0003-0003-000000000003'::uuid,
-        'b0000001-0001-0001-0001-000000000001'::uuid,
+        'c0000003-0003-0003-0003-000000000003'::UUID,
+        'b0000001-0001-0001-0001-000000000001'::UUID,
         'Drama Club',
         'DRAMA',
         'Theatre productions, acting workshops, and public speaking.',
@@ -139,8 +139,8 @@ VALUES
 INSERT INTO public.teachers (id, persons_details_id, documents_id, primary_styles, secondary_styles, general_notes, is_blocked)
 VALUES
     (
-        'd0000001-0001-0001-0001-000000000001'::uuid,
-        'a0000001-0001-0001-0001-000000000001'::uuid,
+        'd0000001-0001-0001-0001-000000000001'::UUID,
+        'a0000001-0001-0001-0001-000000000001'::UUID,
         NULL,
         'STEM, Computing',
         'Mathematics',
@@ -148,8 +148,8 @@ VALUES
         false
     ),
     (
-        'd0000002-0002-0002-0002-000000000002'::uuid,
-        'a0000002-0002-0002-0002-000000000002'::uuid,
+        'd0000002-0002-0002-0002-000000000002'::UUID,
+        'a0000002-0002-0002-0002-000000000002'::UUID,
         NULL,
         'Sports, PE',
         'Health Education',
@@ -157,8 +157,8 @@ VALUES
         false
     ),
     (
-        'd0000003-0003-0003-0003-000000000003'::uuid,
-        'a0000003-0003-0003-0003-000000000003'::uuid,
+        'd0000003-0003-0003-0003-000000000003'::UUID,
+        'a0000003-0003-0003-0003-000000000003'::UUID,
         NULL,
         'Drama, Arts',
         'English',
@@ -171,7 +171,7 @@ VALUES
 -- ============================================
 INSERT INTO public.teacher_documents (teacher_id, document_id)
 VALUES
-    ('d0000001-0001-0001-0001-000000000001'::uuid, 3);
+    ('d0000001-0001-0001-0001-000000000001'::UUID, 3);
 
 -- ============================================
 -- SAMPLE COVER RULES (Schedules)
@@ -180,9 +180,9 @@ INSERT INTO public.cover_rules (id, school_id, club_id, frequency, day_of_week, 
 VALUES
     -- Coding Club: Weekly on Wednesdays 15:30-16:30
     (
-        'e0000001-0001-0001-0001-000000000001'::uuid,
-        'b0000001-0001-0001-0001-000000000001'::uuid,
-        'c0000001-0001-0001-0001-000000000001'::uuid,
+        'e0000001-0001-0001-0001-000000000001'::UUID,
+        'b0000001-0001-0001-0001-000000000001'::UUID,
+        'c0000001-0001-0001-0001-000000000001'::UUID,
         'weekly',
         'wednesday',
         '15:30:00',
@@ -191,9 +191,9 @@ VALUES
     ),
     -- Football: Bi-weekly on Tuesdays 16:00-17:30
     (
-        'e0000002-0002-0002-0002-000000000002'::uuid,
-        'b0000001-0001-0001-0001-000000000001'::uuid,
-        'c0000002-0002-0002-0002-000000000002'::uuid,
+        'e0000002-0002-0002-0002-000000000002'::UUID,
+        'b0000001-0001-0001-0001-000000000001'::UUID,
+        'c0000002-0002-0002-0002-000000000002'::UUID,
         'bi-weekly',
         'tuesday',
         '16:00:00',
@@ -208,8 +208,8 @@ INSERT INTO public.cover_occurrences (id, cover_rule_id, meeting_date, actual_st
 VALUES
     -- A session from last week for Coding Club
     (
-        'f0000001-0001-0001-0001-000000000001'::uuid,
-        'e0000001-0001-0001-0001-000000000001'::uuid,
+        'f0000001-0001-0001-0001-000000000001'::UUID,
+        'e0000001-0001-0001-0001-000000000001'::UUID,
         NOW() - INTERVAL '7 days',
         '15:35:00',
         '16:30:00',
@@ -217,8 +217,8 @@ VALUES
     ),
     -- Upcoming session for Football
     (
-        'f0000002-0002-0002-0002-000000000002'::uuid,
-        'e0000002-0002-0002-0002-000000000002'::uuid,
+        'f0000002-0002-0002-0002-000000000002'::UUID,
+        'e0000002-0002-0002-0002-000000000002'::UUID,
         NOW() + INTERVAL '3 days',
         NULL,
         NULL,
@@ -232,9 +232,9 @@ INSERT INTO public.teacher_cover_assignments (id, teacher_id, cover_occurrence_i
 VALUES
     -- John Smith confirmed for past Coding Club session
     (
-        'aa000001-0001-0001-0001-000000000001'::uuid,
-        'd0000001-0001-0001-0001-000000000001'::uuid,
-        'f0000001-0001-0001-0001-000000000001'::uuid,
+        'aa000001-0001-0001-0001-000000000001'::UUID,
+        'd0000001-0001-0001-0001-000000000001'::UUID,
+        'f0000001-0001-0001-0001-000000000001'::UUID,
         'confirmed',
         NULL,
         NOW() - INTERVAL '10 days',
@@ -242,9 +242,9 @@ VALUES
     ),
     -- Sarah Johnson invited for upcoming Football session
     (
-        'aa000002-0002-0002-0002-000000000002'::uuid,
-        'd0000002-0002-0002-0002-000000000002'::uuid,
-        'f0000002-0002-0002-0002-000000000002'::uuid,
+        'aa000002-0002-0002-0002-000000000002'::UUID,
+        'd0000002-0002-0002-0002-000000000002'::UUID,
+        'f0000002-0002-0002-0002-000000000002'::UUID,
         'invited',
         NULL,
         NOW(),
@@ -257,9 +257,9 @@ VALUES
 INSERT INTO public.broadcasts (id, template_id, assignment_id, subject, body, channel_used, recipients_count, status, sent_by_user_id)
 VALUES
     (
-        'bb000001-0001-0001-0001-000000000001'::uuid,
+        'bb000001-0001-0001-0001-000000000001'::UUID,
         1,
-        'aa000002-0002-0002-0002-000000000002'::uuid,
+        'aa000002-0002-0002-0002-000000000002'::UUID,
         'Cover Request: Football Team - Tuesday',
         'Dear Sarah, we have a cover opportunity for Football Team on Tuesday...',
         'email',
@@ -274,9 +274,9 @@ VALUES
 INSERT INTO public.messages (id, teacher_id, broadcast_id, document_id, channel, direction, subject, body, status, external_id)
 VALUES
     (
-        'cc000001-0001-0001-0001-000000000001'::uuid,
-        'd0000002-0002-0002-0002-000000000002'::uuid,
-        'bb000001-0001-0001-0001-000000000001'::uuid,
+        'cc000001-0001-0001-0001-000000000001'::UUID,
+        'd0000002-0002-0002-0002-000000000002'::UUID,
+        'bb000001-0001-0001-0001-000000000001'::UUID,
         NULL,
         'email',
         'outbound',

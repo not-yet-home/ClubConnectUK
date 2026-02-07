@@ -54,9 +54,9 @@ export function BroadcastStepperNav({ currentStep }: BroadcastStepperNavProps) {
                     'w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300',
                     status === 'completed' && 'bg-emerald-300 text-white',
                     status === 'active' &&
-                    'bg-primary text-primary-foreground shadow-lg',
+                      'bg-primary text-primary-foreground shadow-lg',
                     status === 'pending' &&
-                    'bg-muted border-2 border-border text-muted-foreground',
+                      'bg-muted border-2 border-border text-muted-foreground',
                   )}
                 >
                   {status === 'completed' ? (
@@ -83,7 +83,7 @@ export function BroadcastStepperNav({ currentStep }: BroadcastStepperNavProps) {
                   className={cn(
                     'text-xs font-medium px-2.5 py-1 rounded-md mt-2 transition-all duration-300',
                     status === 'completed' &&
-                    'bg-emerald-500/20 text-emerald-400',
+                      'bg-emerald-500/20 text-emerald-400',
                     status === 'active' && 'bg-primary/20 text-primary',
                     status === 'pending' && 'bg-muted text-muted-foreground',
                   )}

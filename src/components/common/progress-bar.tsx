@@ -3,17 +3,17 @@ import NProgress from 'nprogress'
 import { useEffect } from 'react'
 
 export function ProgressBar() {
-    const isLoading = useRouterState({
-        select: (s) => s.status === 'pending',
-    })
+  const isLoading = useRouterState({
+    select: (s) => s.status === 'pending',
+  })
 
-    useEffect(() => {
-        if (isLoading) {
-            NProgress.start()
-        } else {
-            NProgress.done()
-        }
-    }, [isLoading])
+  useEffect(() => {
+    if (isLoading) {
+      NProgress.start()
+    } else {
+      NProgress.done()
+    }
+  }, [isLoading])
 
-    return null
+  return null
 }

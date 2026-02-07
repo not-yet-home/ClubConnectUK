@@ -1,15 +1,21 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import * as React from 'react'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 interface DataTableActionButtonProps {
   label: string
   icon?: React.ReactNode
   onClick: () => void
-  variant?: "default" | "outline" | "ghost" | "secondary" | "destructive" | "link"
-  size?: "default" | "sm" | "lg" | "icon"
+  variant?:
+    | 'default'
+    | 'outline'
+    | 'ghost'
+    | 'secondary'
+    | 'destructive'
+    | 'link'
+  size?: 'default' | 'sm' | 'lg' | 'icon'
   className?: string
 }
 
@@ -21,8 +27,8 @@ function DataTableActionButton({
   label,
   icon,
   onClick,
-  variant = "outline",
-  size = "sm",
+  variant = 'outline',
+  size = 'sm',
   className,
 }: DataTableActionButtonProps) {
   return (
@@ -30,7 +36,7 @@ function DataTableActionButton({
       variant={variant}
       size={size}
       onClick={onClick}
-      className={cn("h-9", className)}
+      className={cn('h-9', className)}
     >
       {icon}
       {label}

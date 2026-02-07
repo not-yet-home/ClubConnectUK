@@ -1,15 +1,7 @@
-import {
-  BadgeCheck,
-  ChevronsUpDown,
-  LogOut,
-} from 'lucide-react'
+import { BadgeCheck, ChevronsUpDown, LogOut } from 'lucide-react'
 import { useRouter } from '@tanstack/react-router'
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
