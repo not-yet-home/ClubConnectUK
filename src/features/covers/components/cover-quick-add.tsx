@@ -1,7 +1,7 @@
 import * as React from "react"
 import { toast } from "sonner"
 import { addWeeks, format, getDay, set } from "date-fns"
-import { Building2, Clock, Info } from "lucide-react"
+import { Building2, Clock, Info, ChevronDown } from "lucide-react"
 import type { CoverOccurrence } from "@/types/club.types"
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
@@ -65,7 +65,6 @@ export function CoverQuickAdd({
     const [endTime, setEndTime] = React.useState<string>("10:00")
     const [requestType, setRequestType] = React.useState<'one-off' | 'recurring'>('one-off')
     const [scheduleType, setScheduleType] = React.useState<'regular' | 'covers'>('covers')
-    // New Fields
     const [teacherId, setTeacherId] = React.useState<string>("unassigned")
     const [frequency, setFrequency] = React.useState<'weekly' | 'bi-weekly'>('weekly')
     const [occurrenceCount, setOccurrenceCount] = React.useState<number>(4)
@@ -223,7 +222,7 @@ export function CoverQuickAdd({
                 {/* 1. Header with minimal title and close only (Close is auto in DialogContent usually, but we want clean) */}
                 <DialogHeader className="px-6 py-4 flex flex-row items-center justify-between border-b bg-muted/5">
                     <DialogTitle className="text-lg font-normal text-foreground/80 flex items-center gap-2">
-                        {editingOccurrence ? 'Edit Schedule' : 'New Schedule'}
+                        {editingOccurrence ? 'Edit Schedule Request' : 'New Schedule Request'}
                     </DialogTitle>
                     {/* "Save" button was here in some designs, but Footer is standard */}
                 </DialogHeader>
@@ -256,9 +255,10 @@ export function CoverQuickAdd({
                                     <button
                                         type="button"
                                         disabled={teachersLoading}
-                                        className="w-full text-sm border-0 border-b border-transparent hover:border-border px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent text-left text-foreground/80 disabled:opacity-50"
+                                        className="w-full text-sm border-0 border-b border-transparent hover:border-border px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent text-left text-foreground/80 disabled:opacity-50 flex items-center justify-between"
                                     >
-                                        {getTeacherName(teacherId)}
+                                        <span className="truncate">{getTeacherName(teacherId)}</span>
+                                        <ChevronDown className="h-4 w-4 opacity-50 shrink-0 ml-2" />
                                     </button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-[200px] p-0" align="start">

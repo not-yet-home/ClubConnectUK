@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { formatEventTime } from '@/features/covers/utils/formatters';
 import { cn } from '@/lib/utils';
 
 interface EventDetailsPanelProps {
@@ -58,7 +59,7 @@ export function EventDetailsPanel({ occurrence, onClose }: EventDetailsPanelProp
                     <div className="flex items-center gap-3 text-gray-700">
                         <Clock className="w-5 h-5 text-gray-400" />
                         <span className="font-medium">
-                            {cover_rule?.start_time.slice(0, 5)} - {cover_rule?.end_time.slice(0, 5)}
+                            {formatEventTime(cover_rule?.start_time)} - {formatEventTime(cover_rule?.end_time)}
                         </span>
                     </div>
                     <div className="flex items-center gap-3 text-gray-700">

@@ -244,7 +244,7 @@ export function CalendarView({
             case 'day': return Views.DAY;
             case 'week': return Views.WEEK;
             case 'month': return Views.MONTH;
-            case 'year': return Views.MONTH; // Placeholder as RBC has no year view
+            //case 'year': return Views.MONTH; // Placeholder as RBC has no year view
             case 'schedule': return Views.AGENDA;
             case '4days': return Views.WORK_WEEK;
             default: return Views.WEEK;
@@ -270,6 +270,7 @@ export function CalendarView({
     });
 
     const [internalDate, setInternalDate] = useState(new Date());
+    const [draggedOutsideEvent, setDraggedOutsideEvent] = useState<any>(null);
 
     const date = controlledDate ?? internalDate;
     const handleNavigate = (newDate: Date) => {
@@ -452,7 +453,7 @@ export function CalendarView({
 
         return (
             <div
-                className="flex flex-col text-[10px] h-full w-full px-2 py-1.5 rounded border-l-2 shadow-sm mb-1"
+                className="flex flex-col text-[10px] w-full px-2 py-1.5 rounded border-l-2 shadow-sm"
                 style={{
                     backgroundColor: colors.bgHex,
                     color: colors.textHex,
@@ -505,6 +506,10 @@ export function CalendarView({
                         {dayEvents.map((event: any, idx: number) => (
                             <div
                                 key={event.id || idx}
+                                draggable
+                                onDragStart={() => {
+                                    setDraggedOutsideEvent(event);
+                                }}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     onSelectEvent(event.resource);
@@ -557,6 +562,12 @@ export function CalendarView({
                     onDrillDown?.(drillDate);
                 }}
                 onEventDrop={handleEventDrop}
+                onDropFromOutside={({ start }: any) => {
+                    if (draggedOutsideEvent) {
+                        handleEventDrop({ event: draggedOutsideEvent, start });
+                        setDraggedOutsideEvent(null);
+                    }
+                }}
                 components={{
                     toolbar: CustomToolbar,
                     event: view === Views.MONTH ? MonthEventComponent : WeekEventComponent,

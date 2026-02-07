@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import type { CoverOccurrence } from '@/types/club.types';
 
 import { useDeleteCoverOccurrence } from '@/features/covers/api/mutations';
+import { formatEventTime } from '@/features/covers/utils/formatters';
 
 
 import { PageLayout } from '@/components/common/page-layout';
@@ -232,7 +233,7 @@ function CoverDetailsPage() {
                                         <div>
                                             <p className="text-sm font-medium text-gray-500">Time</p>
                                             <p className="font-semibold text-gray-900">
-                                                {cover_rule?.start_time.slice(0, 5)} - {cover_rule?.end_time.slice(0, 5)}
+                                                {formatEventTime(cover_rule?.start_time)} - {formatEventTime(cover_rule?.end_time)}
                                             </p>
                                         </div>
                                     </div>
