@@ -524,7 +524,7 @@ export function CoverQuickAdd({
 
                 </div>
 
-                <DialogFooter className="px-6 py-3 border-t bg-muted/5 flex items-center justify-between sm:justify-between">
+                <DialogFooter className="px-6 py-3 border-t bg-muted/5 flex items-center justify-end sm:justify-end">
                     <div className="flex items-center gap-2">
                         <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} className="text-muted-foreground hover:text-foreground">
                             Cancel
