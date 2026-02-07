@@ -134,7 +134,7 @@ function CoversCalendarPage() {
         className="flex flex-col h-full p-0"
       >
         {/* Unified Toolbar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-2 border-b bg-white gap-3 z-10 shrink-0">
+        <div className="flex flex-col sm:flex-row items-center justify-between py-2 bg-white gap-3 z-10 shrink-0">
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <div className="flex items-center gap-1">
               <Button
