@@ -7,7 +7,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { cn } from '@/lib/utils'
 
 export type ViewType = 'day' | 'week' | 'month' | 'year' | 'schedule' | '4days'
 
@@ -29,9 +28,9 @@ export function ViewToggle({ value, onChange }: ViewToggleProps) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="min-w-[100px]">
+                <Button variant="outline" size="sm">
                     {viewLabels[value].label}
-                    <ChevronDown className="ml-2 h-4 w-4" />
+                    <ChevronDown className="ml-2" />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">

@@ -42,7 +42,7 @@ export function EventDetailsPanel({ occurrence, onClose }: EventDetailsPanelProp
             <div className="p-6 pb-2">
                 <div className="flex justify-between items-start mb-1">
                     <h2 className="text-2xl font-bold text-gray-900">{clubName}</h2>
-                    <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 -mt-1 -mr-2">
+                    <Button variant="ghost" size="icon-sm" onClick={onClose} className="-mt-1 -mr-2">
                         <X className="w-4 h-4" />
                     </Button>
                 </div>

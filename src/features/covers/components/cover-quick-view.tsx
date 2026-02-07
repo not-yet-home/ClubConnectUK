@@ -65,8 +65,8 @@ export function CoverQuickView({
                             <TooltipTrigger asChild>
                                 <Button
                                     variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 rounded-full hover:bg-gray-100"
+                                    size="icon-sm"
+                                    className="rounded-full hover:bg-gray-100"
                                     onClick={() => onEdit(occurrence)}
                                 >
                                     <Pencil className="h-4 w-4 text-gray-600" />
@@ -81,8 +81,8 @@ export function CoverQuickView({
                             <TooltipTrigger asChild>
                                 <Button
                                     variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 rounded-full hover:bg-gray-100"
+                                    size="icon-sm"
+                                    className="rounded-full hover:bg-gray-100"
                                     onClick={() => onDelete(occurrence)}
                                 >
                                     <Trash2 className="h-4 w-4 text-gray-600" />
@@ -96,8 +96,8 @@ export function CoverQuickView({
                             <TooltipTrigger asChild>
                                 <Button
                                     variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 rounded-full hover:bg-gray-100"
+                                    size="icon-sm"
+                                    className="rounded-full hover:bg-gray-100"
                                     onClick={() => {
                                         onOpenChange(false);
                                         navigate({ to: '/covers/$occurrenceId', params: { occurrenceId: occurrence.id } });
@@ -115,8 +115,8 @@ export function CoverQuickView({
                             <TooltipTrigger asChild>
                                 <Button
                                     variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 rounded-full hover:bg-gray-100"
+                                    size="icon-sm"
+                                    className="rounded-full hover:bg-gray-100"
                                     onClick={() => onOpenChange(false)}
                                 >
                                     <X className="h-4 w-4 text-gray-600" />
