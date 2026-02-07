@@ -45,6 +45,8 @@ export interface CoverRule {
 }
 
 export type AssignmentStatus = 'invited' | 'accepted' | 'declined' | 'pending' | 'confirmed'
+export type OccurrenceStatus = 'not_started' | 'in_progress' | 'completed'
+export type Priority = 'low' | 'medium' | 'high'
 
 export interface CoverOccurrence {
   id: string
@@ -53,6 +55,8 @@ export interface CoverOccurrence {
   actual_start?: string | null
   actual_end?: string | null
   notes?: string | null
+  status: OccurrenceStatus
+  priority: Priority
   created_at: string
   updated_at: string
   cover_rule?: CoverRule

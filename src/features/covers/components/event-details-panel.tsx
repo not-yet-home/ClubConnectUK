@@ -70,10 +70,42 @@ export function EventDetailsPanel({ occurrence, onClose }: EventDetailsPanelProp
                     </div>
                 </div>
 
-                {/* Status Badge */}
-                <div className="flex items-center gap-2 pt-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
-                    <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-200">Confirmed</Badge>
+                {/* Progress & Priority Badges */}
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                    <div className="flex items-center gap-2">
+                        {occurrence.status === 'completed' ? (
+                            <CheckCircle2 className="w-5 h-5 text-green-500" />
+                        ) : occurrence.status === 'in_progress' ? (
+                            <Clock className="w-5 h-5 text-blue-500" />
+                        ) : (
+                            <Clock className="w-5 h-5 text-gray-400" />
+                        )}
+                        <Badge
+                            variant="secondary"
+                            className={cn(
+                                "capitalize",
+                                occurrence.status === 'completed' && "bg-green-100 text-green-700 hover:bg-green-200",
+                                occurrence.status === 'in_progress' && "bg-blue-100 text-blue-700 hover:bg-blue-200",
+                                (occurrence.status === 'not_started' || !occurrence.status) && "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            )}
+                        >
+                            {(occurrence.status || 'not_started').replace('_', ' ')}
+                        </Badge>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <Badge
+                            variant="outline"
+                            className={cn(
+                                "capitalize px-2 py-0.5",
+                                occurrence.priority === 'high' && "border-red-200 text-red-700 bg-red-50",
+                                occurrence.priority === 'medium' && "border-amber-200 text-amber-700 bg-amber-50",
+                                occurrence.priority === 'low' && "border-blue-200 text-blue-700 bg-blue-50"
+                            )}
+                        >
+                            {occurrence.priority || 'medium'} Priority
+                        </Badge>
+                    </div>
                 </div>
             </div>
 

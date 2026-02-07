@@ -53,6 +53,9 @@ interface CreateCoverRequestParams {
     teacher_id?: string
     request_type?: 'one-off' | 'recurring'
     occurrences?: number
+    status?: string
+    priority?: string
+    notes?: string
 }
 
 export function useCreateFullCoverRequest() {
@@ -84,7 +87,9 @@ export function useCreateFullCoverRequest() {
             const occurrencesToInsert = Array.from({ length: totalToCreate }).map((_, i) => ({
                 cover_rule_id: ruleData.id,
                 meeting_date: format(addWeeks(startDate, i * weekStep), 'yyyy-MM-dd'),
-                notes: i === 0 ? 'Initial session' : `Recurring session ${i + 1}`
+                notes: params.notes || (i === 0 ? 'Initial session' : `Recurring session ${i + 1}`),
+                status: params.status || 'not_started',
+                priority: params.priority || 'medium'
             }))
 
             const { data: occsData, error: occsError } = await supabase
@@ -156,10 +161,15 @@ export function useUpdateCoverRequest() {
 
                 // For now, let's implement the "Update fields" logic.
 
-                // 1. Update Occurrence Date
+                // 1. Update Occurrence Details
                 const { error: occError } = await supabase
                     .from('cover_occurrences')
-                    .update({ meeting_date: params.meeting_date })
+                    .update({
+                        meeting_date: params.meeting_date,
+                        notes: params.notes,
+                        status: params.status,
+                        priority: params.priority
+                    })
                     .eq('id', params.occurrence_id)
 
                 if (occError) throw occError

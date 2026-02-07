@@ -1,13 +1,15 @@
 import * as React from "react"
 import { toast } from "sonner"
 import { addWeeks, format, getDay, set } from "date-fns"
-import { Building2, Clock, Info, ChevronDown } from "lucide-react"
+import { Building2, Clock, Info, ChevronDown, Calendar } from "lucide-react"
 import type { CoverOccurrence } from "@/types/club.types"
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
 
 import {
     Select,
@@ -71,6 +73,9 @@ export function CoverQuickAdd({
     const [meetingDate, setMeetingDate] = React.useState<string>("")
     const [teacherSearch, setTeacherSearch] = React.useState<string>("")
     const [teacherOpen, setTeacherOpen] = React.useState(false)
+    const [notes, setNotes] = React.useState<string>("")
+    const [status, setStatus] = React.useState<string>("not_started")
+    const [priority, setPriority] = React.useState<string>("medium")
 
     // Data Hooks
     const { data: schools } = useSchools()
@@ -143,6 +148,9 @@ export function CoverQuickAdd({
                 // For now, let's just show the current values.
                 setRequestType('one-off')
                 setMeetingDate(editingOccurrence.meeting_date ? format(new Date(editingOccurrence.meeting_date), 'yyyy-MM-dd') : "")
+                setNotes(editingOccurrence.notes || "")
+                setStatus(editingOccurrence.status || "not_started")
+                setPriority(editingOccurrence.priority || "medium")
                 setScheduleType('covers') // Default to covers view for editing
             } else {
                 setSchoolId(initialSchoolId === 'all' ? "" : initialSchoolId || "")
@@ -154,6 +162,9 @@ export function CoverQuickAdd({
                 setFrequency("weekly")
                 setOccurrenceCount(4)
                 setMeetingDate(date ? format(date, 'yyyy-MM-dd') : "")
+                setNotes("")
+                setStatus("not_started")
+                setPriority("medium")
             }
         }
     }, [open, initialSchoolId, date, editingOccurrence])
@@ -182,6 +193,9 @@ export function CoverQuickAdd({
                     frequency: frequency,
                     day_of_occurence: dayOfOccurence,
                     updateType: 'single', // Default to single update for now
+                    status,
+                    priority,
+                    notes,
                 } as any)
                 toast.success("Cover request updated")
             } else {
@@ -195,7 +209,9 @@ export function CoverQuickAdd({
                     meeting_date: meetingDate,
                     request_type: requestType,
                     occurrences: requestType === 'recurring' ? occurrenceCount : 1,
-                    status: 'not_started',
+                    status: status,
+                    priority: priority,
+                    notes: notes,
                     teacher_id: teacherId === 'unassigned' ? undefined : teacherId,
                 }
 
@@ -220,28 +236,28 @@ export function CoverQuickAdd({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[440px] p-0 gap-0 overflow-hidden shadow-2xl">
                 {/* 1. Header with minimal title and close only (Close is auto in DialogContent usually, but we want clean) */}
-                <DialogHeader className="px-6 py-4 flex flex-row items-center justify-between border-b bg-muted/5">
+                <DialogHeader className="px-6 py-3 flex flex-row items-center justify-between border-b bg-muted/5">
                     <DialogTitle className="text-lg font-normal text-foreground/80 flex items-center gap-2">
                         {editingOccurrence ? 'Edit Schedule Request' : 'New Schedule Request'}
                     </DialogTitle>
                     {/* "Save" button was here in some designs, but Footer is standard */}
                 </DialogHeader>
-                <div className="px-6 py-4 border-b bg-muted/5 space-y-4">
+                <div className="px-6 py-3 border-b bg-muted/5 space-y-3">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <p className="text-xs font-medium text-muted-foreground">Choose Type of Schedule</p>
+                            <p className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider">Schedule Type</p>
                             <div className="flex bg-muted/50 rounded-md p-0.5 w-fit">
                                 <button
                                     type="button"
                                     onClick={() => setScheduleType('regular')}
-                                    className={`px-4 py-1.5 text-xs font-medium rounded-sm transition-all ${scheduleType === 'regular' ? 'bg-white shadow-sm text-red-600' : 'text-muted-foreground hover:text-foreground'}`}
+                                    className={`px-4 py-1.5 text-xs font-semibold rounded-sm transition-all ${scheduleType === 'regular' ? 'bg-white shadow-sm text-red-600' : 'text-muted-foreground hover:text-foreground'}`}
                                 >
                                     Regular
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setScheduleType('covers')}
-                                    className={`px-4 py-1.5 text-xs font-medium rounded-sm transition-all ${scheduleType === 'covers' ? 'bg-white shadow-sm text-blue-600' : 'text-muted-foreground hover:text-foreground'}`}
+                                    className={`px-4 py-1.5 text-xs font-semibold rounded-sm transition-all ${scheduleType === 'covers' ? 'bg-white shadow-sm text-blue-600' : 'text-muted-foreground hover:text-foreground'}`}
                                 >
                                     Cover
                                 </button>
@@ -249,13 +265,13 @@ export function CoverQuickAdd({
                         </div>
 
                         <div className="space-y-2">
-                            <p className="text-xs font-medium text-muted-foreground">Teacher (optional)</p>
+                            <p className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider">Teacher (optional)</p>
                             <Popover open={teacherOpen} onOpenChange={setTeacherOpen}>
                                 <PopoverTrigger asChild>
                                     <button
                                         type="button"
                                         disabled={teachersLoading}
-                                        className="w-full text-sm border-0 border-b border-transparent hover:border-border px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent text-left text-foreground/80 disabled:opacity-50 flex items-center justify-between"
+                                        className="w-full text-sm border-0 border-b border-muted/50 hover:border-muted px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent text-left text-foreground/80 disabled:opacity-50 flex items-center justify-between"
                                     >
                                         <span className="truncate">{getTeacherName(teacherId)}</span>
                                         <ChevronDown className="h-4 w-4 opacity-50 shrink-0 ml-2" />
@@ -307,18 +323,18 @@ export function CoverQuickAdd({
                         </div>
                     </div>
                 </div>
-                <div className="px-6 py-4 space-y-3">
+                <div className="px-6 py-4 space-y-4">
                     {/* 2. Title / Subject (School & Club) */}
-                    <div className="flex gap-4 items-start group">
-                        <div className="mt-2.5 text-muted-foreground/60 w-5 flex justify-center">
+                    <div className="flex gap-4 items-start">
+                        <div className="mt-1 text-muted-foreground/40 w-5 flex justify-center">
                             <Building2 className="w-4 h-4" />
                         </div>
                         <div className="flex-1">
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-1">
-                                    <div className="text-sm font-medium text-muted-foreground">School</div>
+                                    <Label htmlFor="school-select" className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider">School</Label>
                                     <Select value={schoolId} onValueChange={(v) => { setSchoolId(v); setClubId("") }}>
-                                        <SelectTrigger className="w-full text-sm border-0 border-b border-transparent hover:border-border px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent" id="school-select">
+                                        <SelectTrigger className="w-full text-sm border-0 border-b border-muted/50 hover:border-muted px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent" id="school-select">
                                             <SelectValue placeholder="Add School" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -330,9 +346,9 @@ export function CoverQuickAdd({
                                 </div>
 
                                 <div className="space-y-1">
-                                    <div className="text-sm font-medium text-muted-foreground">Club or Activity</div>
+                                    <Label htmlFor="club-select" className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider">Club or Activity</Label>
                                     <Select value={clubId} onValueChange={setClubId} disabled={!schoolId || clubsLoading}>
-                                        <SelectTrigger className={`w-full text-sm border-0 border-b border-transparent hover:border-border px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent ${!schoolId ? 'opacity-50' : ''}`} id="club-select">
+                                        <SelectTrigger className={`w-full text-sm border-0 border-b border-muted/50 hover:border-muted px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent ${!schoolId ? 'opacity-50' : ''}`} id="club-select">
                                             <SelectValue placeholder={!schoolId ? "Select School First" : "Add Club"} />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -348,118 +364,167 @@ export function CoverQuickAdd({
 
                     {/* 3. Date & Time */}
                     <div className="flex gap-4 items-start">
-                        <div className="mt-2.5 text-muted-foreground/60 w-5 flex justify-center">
-                            <Clock className="w-4 h-4" />
+                        <div className="mt-1 text-muted-foreground/40 w-5 flex justify-center">
+                            <Calendar className="w-4 h-4" />
                         </div>
-                        <div className="flex-1 space-y-2">
-                            <div className="text-sm font-medium text-muted-foreground mb-1">Date & Time</div>
-                            <div className="flex items-center gap-3">
-                                {/* Date Picker - Minimalist */}
-                                <div className="relative flex-1">
-                                    <Input
-                                        id="meeting-date"
-                                        type="date"
-                                        value={meetingDate}
-                                        onChange={(e) => setMeetingDate(e.target.value)}
-                                        className="border-0 border-b border-transparent hover:border-border focus:border-primary rounded-sm px-2 py-2 h-9 text-sm shadow-none focus-visible:ring-0 bg-transparent transition-colors w-full"
-                                    />
+                        <div className="flex-1 space-y-3">
+                            <div className="space-y-1">
+                                <Label className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider">Date & Time</Label>
+                                <div className="flex items-center gap-6">
+                                    {/* Date Picker - Minimalist */}
+                                    <div className="relative flex-1">
+                                        <Input
+                                            id="meeting-date"
+                                            type="date"
+                                            value={meetingDate}
+                                            onChange={(e) => setMeetingDate(e.target.value)}
+                                            className="border-0 border-b border-muted/50 hover:border-muted focus:border-primary rounded-none px-0 py-2 h-9 text-sm shadow-none focus-visible:ring-0 bg-transparent transition-colors w-full"
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-2.5 w-auto">
+                                        <Clock className="w-3.5 h-3.5 text-muted-foreground/40 mr-1" />
+                                        <Input
+                                            id="start-time"
+                                            type="time"
+                                            value={startTime}
+                                            onChange={(e) => setStartTime(e.target.value)}
+                                            className="w-[72px] border-0 border-b border-muted/50 hover:border-muted focus:border-primary rounded-none px-0 py-2 h-9 text-sm shadow-none focus-visible:ring-0 bg-transparent text-center"
+                                        />
+                                        <span className="text-muted-foreground/30 text-[11px] font-medium uppercase px-1">to</span>
+                                        <Input
+                                            id="end-time"
+                                            type="time"
+                                            value={endTime}
+                                            onChange={(e) => setEndTime(e.target.value)}
+                                            className="w-[72px] border-0 border-b border-muted/50 hover:border-muted focus:border-primary rounded-none px-0 py-2 h-9 text-sm shadow-none focus-visible:ring-0 bg-transparent text-center"
+                                        />
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2 w-auto">
-                                    <Input
-                                        id="start-time"
-                                        type="time"
-                                        value={startTime}
-                                        onChange={(e) => setStartTime(e.target.value)}
-                                        className="w-20 border-0 border-b border-transparent hover:border-border focus:border-primary rounded-sm px-2 py-2 h-9 text-sm shadow-none focus-visible:ring-0 bg-transparent text-center"
-                                    />
-                                    <span className="text-muted-foreground/60 text-sm">—</span>
-                                    <Input
-                                        id="end-time"
-                                        type="time"
-                                        value={endTime}
-                                        onChange={(e) => setEndTime(e.target.value)}
-                                        className="w-20 border-0 border-b border-transparent hover:border-border focus:border-primary rounded-sm px-2 py-2 h-9 text-sm shadow-none focus-visible:ring-0 bg-transparent text-center"
-                                    />
+                            </div>
+
+                            <div className="space-y-1">
+                                <Label className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider">Repeat</Label>
+                                <div className="flex items-start gap-1.5 mb-1">
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <button type="button" className="p-0.5 rounded text-muted-foreground/60 hover:text-foreground mt-0.5">
+                                                <Info className="w-3.5 h-3.5" />
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent sideOffset={6} className="max-w-xs bg-background text-foreground border border-border">
+                                            Set a start date, choose frequency and how many times it should recur. The preview shows the exact dates.
+                                        </TooltipContent>
+                                    </Tooltip>
+                                    <div className="text-[11px] text-muted-foreground/60">Choose how multiple sessions should be generated.</div>
+                                </div>
+                                {/* Pattern / Repeat */}
+                                <div className="flex items-center gap-4">
+                                    <Select value={requestType} onValueChange={(v: any) => setRequestType(v)}>
+                                        <SelectTrigger className="w-auto h-9 text-sm border-0 border-b border-muted/50 hover:border-muted px-0 shadow-none focus:ring-0 rounded-none bg-transparent" id="repeat-select">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="one-off">Does not repeat</SelectItem>
+                                            <SelectItem value="recurring">Repeats custom...</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+
+                                    {requestType === 'recurring' && (
+                                        <div className="flex items-center gap-2">
+                                            <Select value={frequency} onValueChange={(v: any) => setFrequency(v)}>
+                                                <SelectTrigger className="w-auto h-9 text-sm border-0 border-b border-muted/50 hover:border-muted px-0 shadow-none focus:ring-0 rounded-none bg-transparent">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="weekly">Weekly</SelectItem>
+                                                    <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <span className="text-xs text-muted-foreground/60 font-medium">for</span>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Input
+                                                        type="number"
+                                                        min={2}
+                                                        max={12}
+                                                        value={occurrenceCount}
+                                                        onChange={(e) => setOccurrenceCount(parseInt(e.target.value))}
+                                                        className="w-10 h-9 text-sm border-0 border-b border-muted/50 hover:border-muted px-0 shadow-none focus-visible:ring-0 bg-transparent text-center rounded-none font-semibold"
+                                                    />
+                                                </TooltipTrigger>
+                                                <TooltipContent sideOffset={6} className="max-w-xs bg-background text-foreground border border-border">
+                                                    {meetingDate ? (
+                                                        <div className="space-y-1">
+                                                            {occurrenceDates.slice(0, 6).map((d, idx) => (
+                                                                <div key={idx} className="text-[13px]">
+                                                                    {format(d, 'eee, MMM d, yyyy')} • {formatTimeForDate(d, startTime)} - {formatTimeForDate(d, endTime)}
+                                                                </div>
+                                                            ))}
+                                                            {occurrenceDates.length > 6 && (
+                                                                <div className="text-[13px]">and {occurrenceDates.length - 6} more…</div>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <div className="text-[13px]">Pick a start date to preview dates.</div>
+                                                    )}
+                                                </TooltipContent>
+                                            </Tooltip>
+                                            <span className="text-xs text-muted-foreground/60 font-medium">times</span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
-                            <div className="text-sm font-medium text-muted-foreground mb-1 mt-2">Repeat</div>
-                            <div className="flex items-start gap-1.5 mb-1.5">
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <button type="button" className="p-0.5 rounded text-muted-foreground/80 hover:text-foreground mt-0.5">
-                                            <Info className="w-3.5 h-3.5" />
-                                        </button>
-                                    </TooltipTrigger>
-                                    <TooltipContent sideOffset={6} className="max-w-xs bg-background text-foreground border border-border">
-                                        Set a start date, choose frequency and how many times it should recur. The preview shows the exact dates.
-                                    </TooltipContent>
-                                </Tooltip>
-                                <div className="text-xs text-muted-foreground">Repeat options — choose how the cover should recur.</div>
+                    <div className="flex gap-4 items-start pt-1">
+                        <div className="mt-1 text-muted-foreground/40 w-5 flex justify-center">
+                            <Info className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1 space-y-4">
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-1">
+                                    <Label className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider">Progress</Label>
+                                    <Select value={status} onValueChange={setStatus}>
+                                        <SelectTrigger className="w-full text-sm border-0 border-b border-muted/50 hover:border-muted px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent capitalize">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="not_started">Not Started</SelectItem>
+                                            <SelectItem value="in_progress">In Progress</SelectItem>
+                                            <SelectItem value="completed">Completed</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-1">
+                                    <Label className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider">Priority</Label>
+                                    <Select value={priority} onValueChange={setPriority}>
+                                        <SelectTrigger className="w-full text-sm border-0 border-b border-muted/50 hover:border-muted px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent capitalize">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="low">Low</SelectItem>
+                                            <SelectItem value="medium">Medium</SelectItem>
+                                            <SelectItem value="high">High</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </div>
-                            {/* Pattern / Repeat */}
-                            <div className="flex items-center gap-2">
-                                <Select value={requestType} onValueChange={(v: any) => setRequestType(v)}>
-                                    <SelectTrigger className="w-auto h-9 text-sm border-0 border-b border-transparent hover:border-border px-0 shadow-none focus:ring-0 rounded-none bg-transparent" id="repeat-select">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="one-off">Does not repeat</SelectItem>
-                                        <SelectItem value="recurring">Repeats custom...</SelectItem>
-                                    </SelectContent>
-                                </Select>
-
-                                {requestType === 'recurring' && (
-                                    <>
-                                        <Select value={frequency} onValueChange={(v: any) => setFrequency(v)}>
-                                            <SelectTrigger className="w-auto h-9 text-sm border-0 border-b border-transparent hover:border-border px-0 shadow-none focus:ring-0 rounded-none bg-transparent">
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="weekly">Weekly</SelectItem>
-                                                <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <span className="text-sm text-muted-foreground">for</span>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Input
-                                                    type="number"
-                                                    min={2}
-                                                    max={12}
-                                                    value={occurrenceCount}
-                                                    onChange={(e) => setOccurrenceCount(parseInt(e.target.value))}
-                                                    className="w-12 h-9 text-sm border-0 border-b border-transparent hover:border-border px-0 shadow-none focus-visible:ring-0 bg-transparent text-center rounded-none"
-                                                />
-                                            </TooltipTrigger>
-                                            <TooltipContent sideOffset={6} className="max-w-xs bg-background text-foreground border border-border">
-                                                {meetingDate ? (
-                                                    <div className="space-y-1">
-                                                        {occurrenceDates.slice(0, 6).map((d, idx) => (
-                                                            <div key={idx} className="text-[13px]">
-                                                                {format(d, 'eee, MMM d, yyyy')} • {formatTimeForDate(d, startTime)} - {formatTimeForDate(d, endTime)}
-                                                            </div>
-                                                        ))}
-                                                        {occurrenceDates.length > 6 && (
-                                                            <div className="text-[13px]">and {occurrenceDates.length - 6} more…</div>
-                                                        )}
-                                                    </div>
-                                                ) : (
-                                                    <div className="text-[13px]">Pick a start date to preview dates.</div>
-                                                )}
-                                            </TooltipContent>
-                                        </Tooltip>
-                                        <span className="text-sm text-muted-foreground">times</span>
-                                    </>
-                                )}
+                            <div className="space-y-1">
+                                <Label className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider">Description</Label>
+                                <Textarea
+                                    placeholder="Add details about this cover..."
+                                    value={notes}
+                                    onChange={(e) => setNotes(e.target.value)}
+                                    className="min-h-[60px] text-sm resize-none border-0 border-b border-muted/50 hover:border-muted focus-visible:ring-0 rounded-none bg-transparent px-0 py-1"
+                                />
                             </div>
-
                         </div>
                     </div>
 
                 </div>
 
-                <DialogFooter className="px-6 py-4 border-t bg-muted/5 flex items-center justify-between sm:justify-between">
+                <DialogFooter className="px-6 py-3 border-t bg-muted/5 flex items-center justify-between sm:justify-between">
                     <div className="flex items-center gap-2">
                         <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} className="text-muted-foreground hover:text-foreground">
                             Cancel
@@ -469,7 +534,7 @@ export function CoverQuickAdd({
                         </Button>
                     </div>
                 </DialogFooter>
-            </DialogContent>
-        </Dialog>
+            </DialogContent >
+        </Dialog >
     )
 }
