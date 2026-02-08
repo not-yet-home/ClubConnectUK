@@ -787,17 +787,6 @@ export function CoverQuickAdd({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </DialogContent >
-      </Dialog >
-    <DiscardChangesDialog
-      open={showExitWarning}
-      onConfirm={() => {
-        setShowExitWarning(false)
-        onOpenChange(false)
-      }}
-      onCancel={() => setShowExitWarning(false)}
-    />
-    </>
     </>
   )
 }
