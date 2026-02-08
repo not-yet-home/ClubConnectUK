@@ -79,6 +79,14 @@ pnpm build
 pnpm test
 ```
 
+## 📜 Coding Principles
+
+To maintain a high-quality, maintainable codebase, we follow these core rules:
+
+1. **Strict Type Safety**: Never use `any` or `void` types unless absolutely necessary (e.g., third-party libraries without types). Bypassing the type system is not permitted.
+2. **Consistent UI Components**: Always use defined variants and sizes for common components like input fields. Avoid ad-hoc styling overrides in feature components.
+3. **Plan Before Implementation**: For significant changes or new features, always start with an implementation plan.
+
 ## 🎨 Styling & Icons
 
 - **Tailwind CSS**: We use the latest Tailwind CSS v4 for styling. Configurations can be found in `src/styles.css` and `vite.config.ts`.
