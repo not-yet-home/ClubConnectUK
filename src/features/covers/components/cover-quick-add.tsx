@@ -3,11 +3,12 @@ import { toast } from 'sonner'
 import { addWeeks, format, getDay, set } from 'date-fns'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  Alert01Icon,
   ArrowDown01Icon,
   Calendar02Icon,
+  CalendarSetting01Icon,
   Clock01Icon,
-  School01Icon,
+  Tick02Icon,
+  UserEdit01Icon,
 } from '@hugeicons/core-free-icons'
 
 import type {
@@ -28,6 +29,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { isDirty as checkIsDirty, cn } from '@/lib/utils'
 
 import {
   Select,
@@ -58,6 +60,7 @@ import {
 } from '@/components/ui/popover'
 
 import { useSchools } from '@/hooks/use-schools'
+import { DiscardChangesDialog } from '@/components/common/discard-changes-dialog'
 import { useClubsBySchool } from '@/hooks/use-clubs'
 import useTeachers from '@/hooks/use-teachers'
 import {
@@ -73,6 +76,69 @@ interface CoverQuickAddProps {
   editingOccurrence?: CoverOccurrence | null
 }
 
+function StepperNav({ currentStep }: { currentStep: number }) {
+  const steps = [
+    { id: 1, label: 'Details', icon: UserEdit01Icon },
+    { id: 2, label: 'Schedule', icon: CalendarSetting01Icon },
+  ]
+
+  return (
+    <div className="w-full bg-muted/5 border-b p-4">
+      <div className="relative flex items-start justify-between w-full max-w-md mx-auto px-8">
+        {steps.map((step, index) => {
+          const status =
+            currentStep === step.id
+              ? 'active'
+              : currentStep > step.id
+                ? 'completed'
+                : 'pending'
+          const StepIcon = step.icon
+          const isLast = index === steps.length - 1
+
+          return (
+            <div key={step.id} className="flex flex-1 items-center last:flex-none">
+              <div className="flex flex-col items-center relative z-10">
+                <div
+                  className={cn(
+                    'w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300',
+                    status === 'completed' && 'bg-emerald-500 text-white',
+                    status === 'active' && 'bg-primary text-primary-foreground shadow-lg',
+                    status === 'pending' && 'bg-muted border-2 border-border text-muted-foreground',
+                  )}
+                >
+                  {status === 'completed' ? (
+                    <HugeiconsIcon icon={Tick02Icon} className={ICON_SIZES.sm} />
+                  ) : (
+                    <HugeiconsIcon icon={StepIcon} className={ICON_SIZES.sm} />
+                  )}
+                </div>
+                <span
+                  className={cn(
+                    'text-[10px] font-bold mt-1 uppercase tracking-wider transition-colors duration-300',
+                    status === 'pending' ? 'text-muted-foreground' : 'text-foreground',
+                  )}
+                >
+                  {step.label}
+                </span>
+              </div>
+              {!isLast && (
+                <div className="flex-1 flex items-center px-2 pb-5">
+                  <div
+                    className={cn(
+                      'h-0.5 w-full transition-colors duration-300',
+                      currentStep > step.id ? 'bg-emerald-500' : 'bg-border',
+                    )}
+                  />
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 export function CoverQuickAdd({
   open,
   onOpenChange,
@@ -80,6 +146,9 @@ export function CoverQuickAdd({
   initialSchoolId,
   editingOccurrence,
 }: CoverQuickAddProps) {
+  // Navigation State
+  const [step, setStep] = useState<number>(1)
+
   // Context State
   const [schoolId, setSchoolId] = useState<string>(
     initialSchoolId === 'all' ? '' : initialSchoolId || '',
@@ -102,6 +171,45 @@ export function CoverQuickAdd({
   const [notes, setNotes] = useState<string>('')
   const [status, setStatus] = useState<string>('not_started')
   const [priority, setPriority] = useState<string>('medium')
+  const [showExitWarning, setShowExitWarning] = useState(false)
+
+  // Initial State Tracking (to detect "dirty" state)
+  const [initialState, setInitialState] = useState<any>(null)
+
+  const isDirty = useMemo(() => {
+    if (!initialState) return false
+    const current = {
+      schoolId,
+      clubId,
+      startTime,
+      endTime,
+      requestType,
+      scheduleType,
+      teacherId,
+      frequency,
+      occurrenceCount,
+      meetingDate,
+      notes,
+      status,
+      priority,
+    }
+    return checkIsDirty(current, initialState)
+  }, [
+    initialState,
+    schoolId,
+    clubId,
+    startTime,
+    endTime,
+    requestType,
+    scheduleType,
+    teacherId,
+    frequency,
+    occurrenceCount,
+    meetingDate,
+    notes,
+    status,
+    priority,
+  ])
 
   // Data Hooks
   const { data: schools } = useSchools()
@@ -116,9 +224,9 @@ export function CoverQuickAdd({
     if (!teacherSearch.trim()) return teachers
 
     const search = teacherSearch.toLowerCase().trim()
-    return teachers.filter((t: any) => {
-      const firstName = t.person_details?.first_name?.toLowerCase() || ''
-      const lastName = t.person_details?.last_name?.toLowerCase() || ''
+    return teachers.filter((t: Teacher) => {
+      const firstName = t.person_details.first_name.toLowerCase()
+      const lastName = t.person_details.last_name.toLowerCase()
       const fullName = `${firstName} ${lastName} `
 
       // Match at word boundaries - start of first name, last name, or full name
@@ -162,6 +270,7 @@ export function CoverQuickAdd({
 
   useEffect(() => {
     if (open) {
+      setStep(1)
       if (editingOccurrence) {
         setSchoolId(editingOccurrence.cover_rule?.school_id || '')
         setClubId(editingOccurrence.cover_rule?.club_id || '')
@@ -200,6 +309,45 @@ export function CoverQuickAdd({
         setStatus('not_started')
         setPriority('medium')
       }
+
+      // Capture initial state for dirty check
+      const state = editingOccurrence
+        ? {
+          schoolId: editingOccurrence.cover_rule?.school_id || '',
+          clubId: editingOccurrence.cover_rule?.club_id || '',
+          startTime: (editingOccurrence.cover_rule?.start_time || '09:00').substring(0, 5),
+          endTime: (editingOccurrence.cover_rule?.end_time || '10:00').substring(0, 5),
+          requestType: 'one-off',
+          scheduleType: 'covers',
+          teacherId: editingOccurrence.assignments?.[0]?.teacher_id || 'unassigned',
+          frequency: editingOccurrence.cover_rule?.frequency || 'weekly',
+          occurrenceCount: 4,
+          meetingDate: editingOccurrence.meeting_date
+            ? format(new Date(editingOccurrence.meeting_date), 'yyyy-MM-dd')
+            : '',
+          notes: editingOccurrence.notes || '',
+          status: editingOccurrence.status,
+          priority: editingOccurrence.priority,
+        }
+        : {
+          schoolId: initialSchoolId === 'all' ? '' : initialSchoolId || '',
+          clubId: '',
+          startTime: '09:00',
+          endTime: '10:00',
+          requestType: 'one-off',
+          scheduleType: 'covers',
+          teacherId: 'unassigned',
+          frequency: 'weekly',
+          occurrenceCount: 4,
+          meetingDate: date ? format(date, 'yyyy-MM-dd') : '',
+          notes: '',
+          status: 'not_started',
+          priority: 'medium',
+        }
+      setInitialState(state)
+    } else {
+      setInitialState(null)
+      setShowExitWarning(false)
     }
   }, [open, initialSchoolId, date, editingOccurrence])
 
@@ -214,12 +362,6 @@ export function CoverQuickAdd({
       const dayOfOccurence = getDay(new Date(meetingDate))
 
       if (editingOccurrence) {
-        console.log(
-          'Updating occurrence:',
-          editingOccurrence.id,
-          'with date:',
-          meetingDate,
-        )
         await updateRequest.mutateAsync({
           occurrence_id: editingOccurrence.id,
           rule_id: editingOccurrence.cover_rule_id,
@@ -259,435 +401,403 @@ export function CoverQuickAdd({
           payload.occurrences = 1
         }
 
-        await createRequest.mutateAsync(payload as any)
+        await createRequest.mutateAsync(payload)
         toast.success('Cover request created')
       }
       onOpenChange(false)
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error'
       toast.error(
-        `Failed to ${editingOccurrence ? 'update' : 'create'} request: ${error.message || 'Unknown error'}`,
+        `Failed to ${editingOccurrence ? 'update' : 'create'} request: ${errorMessage}`,
       )
       console.error(error)
     }
   }
 
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen && isDirty) {
+      setShowExitWarning(true)
+      return
+    }
+    onOpenChange(newOpen)
+  }
+
   if (!date) return null
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[440px] p-0 gap-0 overflow-hidden shadow-2xl">
-        {/* 1. Header with minimal title and close only (Close is auto in DialogContent usually, but we want clean) */}
-        <DialogHeader className="px-6 py-3 flex flex-row items-center justify-between border-b bg-muted/5">
-          <DialogTitle className="text-lg font-normal text-foreground/80 flex items-center gap-2">
-            {editingOccurrence
-              ? 'Edit Schedule Request'
-              : 'New Schedule Request'}
-          </DialogTitle>
-          {/* "Save" button was here in some designs, but Footer is standard */}
-        </DialogHeader>
-        <div className="px-6 py-3 border-b bg-muted/5 space-y-3">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <p className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider">
-                Schedule Type
-              </p>
-              <div className="flex bg-muted/50 rounded-md p-0.5 w-fit">
-                <button
-                  type="button"
-                  onClick={() => setScheduleType('regular')}
-                  className={`px-4 py-1.5 text-xs font-semibold rounded-sm transition-all ${scheduleType === 'regular' ? 'bg-white shadow-sm text-red-600' : 'text-muted-foreground hover:text-foreground'}`}
-                >
-                  Regular
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setScheduleType('covers')}
-                  className={`px-4 py-1.5 text-xs font-semibold rounded-sm transition-all ${scheduleType === 'covers' ? 'bg-white shadow-sm text-blue-600' : 'text-muted-foreground hover:text-foreground'}`}
-                >
-                  Cover
-                </button>
-              </div>
-            </div>
+    <>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
+        <DialogContent className="sm:max-w-[520px] w-[35vw] p-0 gap-0 overflow-hidden shadow-2xl">
+          <DialogHeader className="px-6 py-4 flex flex-row items-center justify-between border-b bg-muted/5">
+            <DialogTitle className="text-xl font-semibold text-foreground/90 flex items-center gap-2">
+              {editingOccurrence
+                ? 'Edit Cover Request'
+                : 'New Cover Request'}
+            </DialogTitle>
+          </DialogHeader>
 
-            <div className="space-y-2">
-              <p className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider">
-                Teacher (optional)
-              </p>
-              <Popover open={teacherOpen} onOpenChange={setTeacherOpen}>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    disabled={teachersLoading}
-                    className="w-full text-sm border-0 border-b border-muted/50 hover:border-muted px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent text-left text-foreground/80 disabled:opacity-50 flex items-center justify-between"
-                  >
-                    <span className="truncate">
-                      {getTeacherName(teacherId)}
-                    </span>
-                    <HugeiconsIcon
-                      icon={ArrowDown01Icon}
-                      className={ICON_SIZES.sm + ' opacity-50 shrink-0 ml-2'}
-                    />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0" align="start">
-                  <Command shouldFilter={false}>
-                    <CommandInput
-                      placeholder="Search teachers..."
-                      value={teacherSearch}
-                      onValueChange={setTeacherSearch}
-                      className="border-0 border-b"
-                    />
-                    {filteredTeachers.length === 0 && teacherSearch ? (
-                      <CommandEmpty>No teachers found.</CommandEmpty>
-                    ) : null}
-                    <CommandList>
-                      <CommandGroup>
-                        <CommandItem
-                          value="unassigned"
-                          onSelect={() => {
-                            setTeacherId('unassigned')
-                            setTeacherOpen(false)
-                            setTeacherSearch('')
-                          }}
-                          className={`cursor-pointer ${teacherId === 'unassigned' ? 'bg-primary text-primary-foreground' : ''}`}
-                        >
-                          Unassigned (Pool)
-                        </CommandItem>
-                        {filteredTeachers.map((t: Teacher) => (
-                          <CommandItem
-                            key={t.id}
-                            value={`${t.person_details.first_name} ${t.person_details.last_name}`}
-                            onSelect={() => {
-                              setTeacherId(t.id)
-                              setTeacherOpen(false)
-                              setTeacherSearch('')
-                            }}
-                            className={`cursor-pointer ${teacherId === t.id ? 'bg-primary text-primary-foreground' : ''}`}
-                          >
-                            {t.person_details.first_name}{' '}
-                            {t.person_details.last_name}
-                          </CommandItem>
+          <StepperNav currentStep={step} />
+
+          <div className="px-8 py-6 max-h-[60vh] overflow-y-auto">
+            {step === 1 ? (
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <Label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+                    Schedule Type
+                  </Label>
+                  <div className="flex bg-muted/50 rounded-lg p-1 w-fit border">
+                    <button
+                      type="button"
+                      onClick={() => setScheduleType('regular')}
+                      className={`px-6 py-2 text-sm font-semibold rounded-md transition-all ${scheduleType === 'regular' ? 'bg-white shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                      Regular
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setScheduleType('covers')}
+                      className={`px-6 py-2 text-sm font-semibold rounded-md transition-all ${scheduleType === 'covers' ? 'bg-white shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                      Cover
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="school-select" className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+                      School
+                    </Label>
+                    <Select
+                      value={schoolId}
+                      onValueChange={(v) => {
+                        setSchoolId(v)
+                        setClubId('')
+                      }}
+                    >
+                      <SelectTrigger size="full" id="school-select">
+                        <SelectValue placeholder="Select School" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {schools?.map((s) => (
+                          <SelectItem key={s.id} value={s.id}>
+                            {s.school_name}
+                          </SelectItem>
                         ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-        </div>
-        <div className="px-6 py-4 space-y-4">
-          {/* 2. Title / Subject (School & Club) */}
-          <div className="flex gap-4 items-start">
-            <div className="mt-1 text-muted-foreground/40 w-5 flex justify-center">
-              <HugeiconsIcon icon={School01Icon} className={ICON_SIZES.sm} />
-            </div>
-            <div className="flex-1">
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-1">
-                  <Label
-                    htmlFor="school-select"
-                    className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider"
-                  >
-                    School
-                  </Label>
-                  <Select
-                    value={schoolId}
-                    onValueChange={(v) => {
-                      setSchoolId(v)
-                      setClubId('')
-                    }}
-                  >
-                    <SelectTrigger
-                      className="w-full text-sm border-0 border-b border-muted/50 hover:border-muted px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent"
-                      id="school-select"
-                    >
-                      <SelectValue placeholder="Add School" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {schools?.map((s) => (
-                        <SelectItem key={s.id} value={s.id}>
-                          {s.school_name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-1">
-                  <Label
-                    htmlFor="club-select"
-                    className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider"
-                  >
-                    Club or Activity
-                  </Label>
-                  <Select
-                    value={clubId}
-                    onValueChange={setClubId}
-                    disabled={!schoolId || clubsLoading}
-                  >
-                    <SelectTrigger
-                      className={`w-full text-sm border-0 border-b border-muted/50 hover:border-muted px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent ${!schoolId ? 'opacity-50' : ''}`}
-                      id="club-select"
-                    >
-                      <SelectValue
-                        placeholder={
-                          !schoolId ? 'Select School First' : 'Add Club'
-                        }
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {clubs?.map((c) => (
-                        <SelectItem key={c.id} value={c.id}>
-                          {c.club_name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 3. Date & Time */}
-          <div className="flex gap-4 items-start">
-            <div className="mt-1 text-muted-foreground/40 w-5 flex justify-center">
-              <HugeiconsIcon icon={Calendar02Icon} className={ICON_SIZES.sm} />
-            </div>
-            <div className="flex-1 space-y-3">
-              <div className="space-y-1">
-                <Label className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider">
-                  Date & Time
-                </Label>
-                <div className="flex items-center gap-6">
-                  {/* Date Picker - Minimalist */}
-                  <div className="relative flex-1">
-                    <Input
-                      id="meeting-date"
-                      type="date"
-                      value={meetingDate}
-                      onChange={(e) => setMeetingDate(e.target.value)}
-                      className="border-0 border-b border-muted/50 hover:border-muted focus:border-primary rounded-none px-0 py-2 h-9 text-sm shadow-none focus-visible:ring-0 bg-transparent transition-colors w-full"
-                    />
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <div className="flex items-center gap-2.5 w-auto">
-                    <HugeiconsIcon
-                      icon={Clock01Icon}
-                      className={
-                        ICON_SIZES.xs + ' text-muted-foreground/40 mr-1'
-                      }
-                    />
-                    <Input
-                      id="start-time"
-                      type="time"
-                      value={startTime}
-                      onChange={(e) => setStartTime(e.target.value)}
-                      className="w-[72px] border-0 border-b border-muted/50 hover:border-muted focus:border-primary rounded-none px-0 py-2 h-9 text-sm shadow-none focus-visible:ring-0 bg-transparent text-center"
-                    />
-                    <span className="text-muted-foreground/30 text-[11px] font-medium uppercase px-1">
-                      to
-                    </span>
-                    <Input
-                      id="end-time"
-                      type="time"
-                      value={endTime}
-                      onChange={(e) => setEndTime(e.target.value)}
-                      className="w-[72px] border-0 border-b border-muted/50 hover:border-muted focus:border-primary rounded-none px-0 py-2 h-9 text-sm shadow-none focus-visible:ring-0 bg-transparent text-center"
-                    />
-                  </div>
-                </div>
-              </div>
 
-              <div className="space-y-1">
-                <Label className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider">
-                  Repeat
-                </Label>
-                <div className="flex items-start gap-1.5 mb-1">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        className="p-0.5 rounded text-muted-foreground/60 hover:text-foreground mt-0.5"
-                      >
-                        <HugeiconsIcon
-                          icon={Alert01Icon}
-                          className={ICON_SIZES.xs}
+                  <div className="space-y-2">
+                    <Label htmlFor="club-select" className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+                      Club or Activity
+                    </Label>
+                    <Select
+                      value={clubId}
+                      onValueChange={setClubId}
+                      disabled={!schoolId || clubsLoading}
+                    >
+                      <SelectTrigger size="full" id="club-select">
+                        <SelectValue
+                          placeholder={!schoolId ? 'Select School First' : 'Select Club'}
                         />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent
-                      sideOffset={6}
-                      className="max-w-xs bg-background text-foreground border border-border"
-                    >
-                      Set a start date, choose frequency and how many times it
-                      should recur. The preview shows the exact dates.
-                    </TooltipContent>
-                  </Tooltip>
-                  <div className="text-[11px] text-muted-foreground/60">
-                    Choose how multiple sessions should be generated.
+                      </SelectTrigger>
+                      <SelectContent>
+                        {clubs?.map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.club_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-                {/* Pattern / Repeat */}
-                <div className="flex items-center gap-4">
-                  <Select
-                    value={requestType}
-                    onValueChange={(v: any) => setRequestType(v)}
-                  >
-                    <SelectTrigger
-                      className="w-auto h-9 text-sm border-0 border-b border-muted/50 hover:border-muted px-0 shadow-none focus:ring-0 rounded-none bg-transparent"
-                      id="repeat-select"
-                    >
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="one-off">Does not repeat</SelectItem>
-                      <SelectItem value="recurring">
-                        Repeats custom...
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
 
-                  {requestType === 'recurring' && (
-                    <div className="flex items-center gap-2">
-                      <Select
-                        value={frequency}
-                        onValueChange={(v: any) => setFrequency(v)}
+                <div className="space-y-2">
+                  <Label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+                    Teacher
+                  </Label>
+                  <Popover open={teacherOpen} onOpenChange={setTeacherOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        disabled={teachersLoading}
+                        className="w-full justify-between font-normal"
                       >
-                        <SelectTrigger className="w-auto h-9 text-sm border-0 border-b border-muted/50 hover:border-muted px-0 shadow-none focus:ring-0 rounded-none bg-transparent">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="weekly">Weekly</SelectItem>
-                          <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <span className="text-xs text-muted-foreground/60 font-medium">
-                        for
-                      </span>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Input
-                            type="number"
-                            min={2}
-                            max={12}
-                            value={occurrenceCount}
-                            onChange={(e) =>
-                              setOccurrenceCount(parseInt(e.target.value))
-                            }
-                            className="w-10 h-9 text-sm border-0 border-b border-muted/50 hover:border-muted px-0 shadow-none focus-visible:ring-0 bg-transparent text-center rounded-none font-semibold"
-                          />
-                        </TooltipTrigger>
-                        <TooltipContent
-                          sideOffset={6}
-                          className="max-w-xs bg-background text-foreground border border-border"
+                        <span className="truncate">{getTeacherName(teacherId)}</span>
+                        <HugeiconsIcon icon={ArrowDown01Icon} className={cn(ICON_SIZES.sm, "opacity-50 shrink-0 ml-2")} />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[300px] p-0" align="start">
+                      <Command shouldFilter={false}>
+                        <CommandInput
+                          placeholder="Search teachers..."
+                          value={teacherSearch}
+                          onValueChange={setTeacherSearch}
+                          className="border-0 border-b"
+                        />
+                        {filteredTeachers.length === 0 && teacherSearch ? (
+                          <CommandEmpty>No teachers found.</CommandEmpty>
+                        ) : null}
+                        <CommandList>
+                          <CommandGroup>
+                            <CommandItem
+                              value="unassigned"
+                              onSelect={() => {
+                                setTeacherId('unassigned')
+                                setTeacherOpen(false)
+                                setTeacherSearch('')
+                              }}
+                              className="cursor-pointer"
+                            >
+                              Unassigned (Pool)
+                            </CommandItem>
+                            {filteredTeachers.map((t) => (
+                              <CommandItem
+                                key={t.id}
+                                value={`${t.person_details.first_name} ${t.person_details.last_name}`}
+                                onSelect={() => {
+                                  setTeacherId(t.id)
+                                  setTeacherOpen(false)
+                                  setTeacherSearch('')
+                                }}
+                                className="cursor-pointer"
+                              >
+                                {t.person_details.first_name}{' '}
+                                {t.person_details.last_name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+                    Description
+                  </Label>
+                  <Textarea
+                    placeholder="Add details about this cover..."
+                    className="min-h-[100px]"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-8">
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <Label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+                      Date
+                    </Label>
+                    <div className="flex items-center gap-3">
+                      <div className="mt-1 text-primary opacity-60">
+                        <HugeiconsIcon icon={Calendar02Icon} className={ICON_SIZES.md} />
+                      </div>
+                      <Input
+                        id="meeting-date"
+                        type="date"
+                        value={meetingDate}
+                        onChange={(e) => setMeetingDate(e.target.value)}
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+                      Time
+                    </Label>
+                    <div className="flex items-center gap-4">
+                      <div className="mt-1 text-primary opacity-60">
+                        <HugeiconsIcon icon={Clock01Icon} className={ICON_SIZES.md} />
+                      </div>
+                      <div className="flex flex-1 items-center gap-3">
+                        <Input
+                          id="start-time"
+                          type="time"
+                          value={startTime}
+                          onChange={(e) => setStartTime(e.target.value)}
+                          className="text-center"
+                        />
+                        <span className="text-muted-foreground/40 font-bold text-xs uppercase tracking-tighter">to</span>
+                        <Input
+                          id="end-time"
+                          type="time"
+                          value={endTime}
+                          onChange={(e) => setEndTime(e.target.value)}
+                          className="text-center"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4 pt-2 border-t">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+                      Repeat Settings
+                    </Label>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Select
+                      value={requestType}
+                      onValueChange={(v: 'one-off' | 'recurring') => setRequestType(v)}
+                    >
+                      <SelectTrigger className="flex-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="one-off">Does not repeat</SelectItem>
+                        <SelectItem value="recurring">Repeats custom...</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    {requestType === 'recurring' && (
+                      <div className="flex items-center gap-3 flex-1">
+                        <Select
+                          value={frequency}
+                          onValueChange={(v: CoverFrequency) => setFrequency(v)}
                         >
-                          {meetingDate ? (
+                          <SelectTrigger className="flex-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="weekly">Weekly</SelectItem>
+                            <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex items-center gap-1.5 px-3 py-2 bg-muted/30 rounded-md border">
+                              <span className="text-xs text-muted-foreground font-bold">×</span>
+                              <Input
+                                type="number"
+                                min={2}
+                                max={12}
+                                className="w-10 h-6 p-0 border-0 bg-transparent text-center font-bold"
+                                value={occurrenceCount}
+                                onChange={(e) => setOccurrenceCount(parseInt(e.target.value))}
+                              />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent sideOffset={6} className="p-3 bg-white shadow-xl border">
                             <div className="space-y-1">
-                              {occurrenceDates.slice(0, 6).map((d, idx) => (
-                                <div key={idx} className="text-[13px]">
-                                  {format(d, 'eee, MMM d, yyyy')} •{' '}
-                                  {formatTimeForDate(d, startTime)} -{' '}
-                                  {formatTimeForDate(d, endTime)}
-                                </div>
-                              ))}
-                              {occurrenceDates.length > 6 && (
-                                <div className="text-[13px]">
-                                  and {occurrenceDates.length - 6} more…
-                                </div>
+                              <p className="text-[10px] font-bold uppercase text-muted-foreground mb-2">Occurrence Preview</p>
+                              {meetingDate ? (
+                                occurrenceDates.slice(0, 6).map((d, idx) => (
+                                  <div key={idx} className="text-xs flex items-center gap-2">
+                                    <div className="w-1 h-1 rounded-full bg-emerald-500" />
+                                    <span className="font-medium text-foreground/80">{format(d, 'eee, MMM d')}</span>
+                                    <span className="text-[10px] text-muted-foreground ml-auto">{formatTimeForDate(d, startTime)}</span>
+                                  </div>
+                                ))
+                              ) : (
+                                <p className="text-xs italic text-muted-foreground">Pick a start date</p>
                               )}
                             </div>
-                          ) : (
-                            <div className="text-[13px]">
-                              Pick a start date to preview dates.
-                            </div>
-                          )}
-                        </TooltipContent>
-                      </Tooltip>
-                      <span className="text-xs text-muted-foreground/60 font-medium">
-                        times
-                      </span>
-                    </div>
-                  )}
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-8 pt-4 border-t">
+                  <div className="space-y-2">
+                    <Label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+                      Progress
+                    </Label>
+                    <Select value={status} onValueChange={setStatus}>
+                      <SelectTrigger className="capitalize">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="not_started">Not Started</SelectItem>
+                        <SelectItem value="in_progress">In Progress</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+                      Priority
+                    </Label>
+                    <Select value={priority} onValueChange={setPriority}>
+                      <SelectTrigger className="capitalize">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
-          <div className="flex gap-4 items-start pt-1">
-            <div className="mt-1 text-muted-foreground/40 w-5 flex justify-center">
-              <HugeiconsIcon icon={Alert01Icon} className={ICON_SIZES.sm} />
+          <DialogFooter className="px-8 py-5 border-t bg-muted/5 flex items-center justify-between sm:justify-between w-full">
+            {step === 2 ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setStep(1)}
+                className="text-muted-foreground hover:text-foreground font-bold uppercase tracking-wider text-[10px]"
+              >
+                Back to Details
+              </Button>
+            ) : (
+              <div />
+            )}
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleOpenChange(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                Cancel
+              </Button>
+              {step === 1 ? (
+                <Button
+                  size="sm"
+                  onClick={() => setStep(2)}
+                  className="px-8 font-bold uppercase tracking-widest text-[11px]"
+                >
+                  Next
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  onClick={handleSubmit}
+                  disabled={createRequest.isPending || updateRequest.isPending}
+                  className="px-8 font-bold uppercase tracking-widest text-[11px]"
+                >
+                  {createRequest.isPending || updateRequest.isPending ? 'Saving...' : 'Save Request'}
+                </Button>
+              )}
             </div>
-            <div className="flex-1 space-y-4">
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-1">
-                  <Label className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider">
-                    Progress
-                  </Label>
-                  <Select value={status} onValueChange={setStatus}>
-                    <SelectTrigger className="w-full text-sm border-0 border-b border-muted/50 hover:border-muted px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent capitalize">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="not_started">Not Started</SelectItem>
-                      <SelectItem value="in_progress">In Progress</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider">
-                    Priority
-                  </Label>
-                  <Select value={priority} onValueChange={setPriority}>
-                    <SelectTrigger className="w-full text-sm border-0 border-b border-muted/50 hover:border-muted px-0 h-9 shadow-none focus:ring-0 rounded-none bg-transparent capitalize">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="low">Low</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <Label className="text-[11px] font-semibold text-muted-foreground/70 uppercase letter-spacing-wider">
-                  Description
-                </Label>
-                <Textarea
-                  placeholder="Add details about this cover..."
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  className="min-h-[60px] text-sm resize-none border-0 border-b border-muted/50 hover:border-muted focus-visible:ring-0 rounded-none bg-transparent px-0 py-1"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <DialogFooter className="px-6 py-3 border-t bg-muted/5 flex items-center justify-end sm:justify-end">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Cancel
-            </Button>
-            <Button
-              size="sm"
-              onClick={handleSubmit}
-              disabled={createRequest.isPending || updateRequest.isPending}
-              className="px-6 font-medium"
-            >
-              {createRequest.isPending || updateRequest.isPending
-                ? 'Saving...'
-                : 'Save'}
-            </Button>
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </DialogContent >
+      </Dialog >
+    <DiscardChangesDialog
+      open={showExitWarning}
+      onConfirm={() => {
+        setShowExitWarning(false)
+        onOpenChange(false)
+      }}
+      onCancel={() => setShowExitWarning(false)}
+    />
+    </>
+    </>
   )
 }

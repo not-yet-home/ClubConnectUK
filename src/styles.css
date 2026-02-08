@@ -31,7 +31,7 @@ code {
 
 :root {
   --background: #ffffff;
-  --background-light: #fcf7ed;
+  --background-light: #aeaeae;
   --foreground: oklch(0.141 0.005 285.823);
   --card: #f7f7f7;
   --card-foreground: oklch(0.141 0.005 285.823);
