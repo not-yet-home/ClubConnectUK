@@ -428,7 +428,10 @@ export function CoverQuickAdd({
   return (
     <>
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="sm:max-w-[520px] w-[35vw] p-0 gap-0 overflow-hidden shadow-2xl">
+        <DialogContent
+          className="sm:max-w-[520px] w-[35vw] p-0 gap-0 overflow-hidden shadow-2xl"
+          aria-describedby={undefined}
+        >
           <DialogHeader className="px-6 py-4 flex flex-row items-center justify-between border-b bg-muted/5">
             <DialogTitle className="text-xl font-semibold text-foreground/90 flex items-center gap-2">
               {editingOccurrence
@@ -595,9 +598,6 @@ export function CoverQuickAdd({
                       Date
                     </Label>
                     <div className="flex items-center gap-3">
-                      <div className="mt-1 text-primary opacity-60">
-                        <HugeiconsIcon icon={Calendar02Icon} className={ICON_SIZES.md} />
-                      </div>
                       <Input
                         id="meeting-date"
                         type="date"
@@ -613,9 +613,6 @@ export function CoverQuickAdd({
                       Time
                     </Label>
                     <div className="flex items-center gap-4">
-                      <div className="mt-1 text-primary opacity-60">
-                        <HugeiconsIcon icon={Clock01Icon} className={ICON_SIZES.md} />
-                      </div>
                       <div className="flex flex-1 items-center gap-3">
                         <Input
                           id="start-time"
@@ -656,14 +653,14 @@ export function CoverQuickAdd({
                         <SelectItem value="recurring">Repeats custom...</SelectItem>
                       </SelectContent>
                     </Select>
-
-                    {requestType === 'recurring' && (
-                      <div className="flex items-center gap-3 flex-1">
+                  </div>
+                  {requestType === 'recurring' && (
+                      <div className="flex items-center gap-3">
                         <Select
                           value={frequency}
                           onValueChange={(v: CoverFrequency) => setFrequency(v)}
                         >
-                          <SelectTrigger className="flex-1">
+                          <SelectTrigger className="flex">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -671,40 +668,50 @@ export function CoverQuickAdd({
                             <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
                           </SelectContent>
                         </Select>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="flex items-center gap-1.5 px-3 py-2 bg-muted/30 rounded-md border">
-                              <span className="text-xs text-muted-foreground font-bold">×</span>
-                              <Input
-                                type="number"
-                                min={2}
-                                max={12}
-                                className="w-10 h-6 p-0 border-0 bg-transparent text-center font-bold"
-                                value={occurrenceCount}
-                                onChange={(e) => setOccurrenceCount(parseInt(e.target.value))}
-                              />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent sideOffset={6} className="p-3 bg-white shadow-xl border">
-                            <div className="space-y-1">
-                              <p className="text-[10px] font-bold uppercase text-muted-foreground mb-2">Occurrence Preview</p>
-                              {meetingDate ? (
-                                occurrenceDates.slice(0, 6).map((d, idx) => (
-                                  <div key={idx} className="text-xs flex items-center gap-2">
-                                    <div className="w-1 h-1 rounded-full bg-emerald-500" />
-                                    <span className="font-medium text-foreground/80">{format(d, 'eee, MMM d')}</span>
-                                    <span className="text-[10px] text-muted-foreground ml-auto">{formatTimeForDate(d, startTime)}</span>
-                                  </div>
-                                ))
-                              ) : (
-                                <p className="text-xs italic text-muted-foreground">Pick a start date</p>
-                              )}
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
+                        <div className="flex items-center gap-1.5 px-3 py-2 rounded-md border h-10">
+                          <span className="text-xs text-muted-foreground font-bold">×</span>
+                          <Input
+                            type="number"
+                            min={2}
+                            max={12}
+                            className="w-8 h-6 p-0 bg-transparent text-center font-bold"
+                            value={occurrenceCount}
+                            onChange={(e) => setOccurrenceCount(parseInt(e.target.value))}
+                          />
+                        </div>
                       </div>
                     )}
-                  </div>
+                  {requestType === 'recurring' && (
+                    <div className="bg-muted/30 rounded-lg p-4 border space-y-3">
+                      <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">
+                        Occurrence Preview
+                      </p>
+                      <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                        {meetingDate ? (
+                          occurrenceDates.slice(0, 8).map((d, idx) => (
+                            <div key={idx} className="text-xs flex items-center justify-between group">
+                              <div className="flex items-center gap-2">
+                                <div className="w-1 h-1 rounded-full bg-emerald-500/50 group-hover:bg-emerald-500 transition-colors" />
+                                <span className="font-medium text-foreground/70 uppercase text-[10px] tracking-tight whitespace-nowrap">
+                                  {format(d, 'eee, MMM d')}
+                                </span>
+                              </div>
+                              <span className="text-[9px] font-bold text-muted-foreground/60 tabular-nums">
+                                {formatTimeForDate(d, startTime)}
+                              </span>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-xs italic text-muted-foreground col-span-2">Pick a start date to see preview</p>
+                        )}
+                      </div>
+                      {occurrenceCount > 8 && (
+                        <p className="text-[9px] text-muted-foreground/50 italic pt-1 border-t border-muted-foreground/10">
+                          + {occurrenceCount - 8} more occurrences
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-8 pt-4 border-t">
@@ -751,20 +758,12 @@ export function CoverQuickAdd({
                 onClick={() => setStep(1)}
                 className="text-muted-foreground hover:text-foreground font-bold uppercase tracking-wider text-[10px]"
               >
-                Back to Details
+                Back
               </Button>
             ) : (
               <div />
             )}
             <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleOpenChange(false)}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                Cancel
-              </Button>
               {step === 1 ? (
                 <Button
                   size="sm"
@@ -780,13 +779,22 @@ export function CoverQuickAdd({
                   disabled={createRequest.isPending || updateRequest.isPending}
                   className="px-8 font-bold uppercase tracking-widest text-[11px]"
                 >
-                  {createRequest.isPending || updateRequest.isPending ? 'Saving...' : 'Save Request'}
+                  {createRequest.isPending || updateRequest.isPending ? 'Saving...' : 'Save'}
                 </Button>
               )}
             </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <DiscardChangesDialog
+        open={showExitWarning}
+        onConfirm={() => {
+          setShowExitWarning(false)
+          onOpenChange(false)
+        }}
+        onCancel={() => setShowExitWarning(false)}
+      />
     </>
   )
 }

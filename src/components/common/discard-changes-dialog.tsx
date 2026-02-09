@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button'
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -29,7 +30,7 @@ export function DiscardChangesDialog({
                     <DialogTitle>{title}</DialogTitle>
                 </DialogHeader>
                 <div className="py-4">
-                    <p className="text-sm text-muted-foreground">{description}</p>
+                    <DialogDescription>{description}</DialogDescription>
                 </div>
                 <DialogFooter className="flex sm:justify-between gap-2">
                     <Button variant="outline" onClick={onCancel} className="flex-1">
