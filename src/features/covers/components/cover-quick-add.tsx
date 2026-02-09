@@ -4,11 +4,12 @@ import { addWeeks, format, getDay, set } from 'date-fns'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   ArrowDown01Icon,
-  Calendar02Icon,
   CalendarSetting01Icon,
-  Clock01Icon,
   Tick02Icon,
   UserEdit01Icon,
+  Cancel01Icon,
+  ArrowLeft02Icon,
+  ArrowRight02Icon,
 } from '@hugeicons/core-free-icons'
 
 import type {
@@ -18,11 +19,6 @@ import type {
   Priority,
 } from '@/types/club.types'
 import type { Teacher } from '@/types/teacher.types'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
 import { ICON_SIZES } from '@/constants/sizes'
 
 import { Button } from '@/components/ui/button'
@@ -40,6 +36,7 @@ import {
 } from '@/components/ui/select'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -96,18 +93,26 @@ function StepperNav({ currentStep }: { currentStep: number }) {
           const isLast = index === steps.length - 1
 
           return (
-            <div key={step.id} className="flex flex-1 items-center last:flex-none">
+            <div
+              key={step.id}
+              className="flex flex-1 items-center last:flex-none"
+            >
               <div className="flex flex-col items-center relative z-10">
                 <div
                   className={cn(
                     'w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300',
                     status === 'completed' && 'bg-emerald-500 text-white',
-                    status === 'active' && 'bg-primary text-primary-foreground shadow-lg',
-                    status === 'pending' && 'bg-muted border-2 border-border text-muted-foreground',
+                    status === 'active' &&
+                      'bg-primary text-primary-foreground shadow-lg',
+                    status === 'pending' &&
+                      'bg-muted border-2 border-border text-muted-foreground',
                   )}
                 >
                   {status === 'completed' ? (
-                    <HugeiconsIcon icon={Tick02Icon} className={ICON_SIZES.sm} />
+                    <HugeiconsIcon
+                      icon={Tick02Icon}
+                      className={ICON_SIZES.sm}
+                    />
                   ) : (
                     <HugeiconsIcon icon={StepIcon} className={ICON_SIZES.sm} />
                   )}
@@ -115,7 +120,9 @@ function StepperNav({ currentStep }: { currentStep: number }) {
                 <span
                   className={cn(
                     'text-[10px] font-bold mt-1 uppercase tracking-wider transition-colors duration-300',
-                    status === 'pending' ? 'text-muted-foreground' : 'text-foreground',
+                    status === 'pending'
+                      ? 'text-muted-foreground'
+                      : 'text-foreground',
                   )}
                 >
                   {step.label}
@@ -313,37 +320,42 @@ export function CoverQuickAdd({
       // Capture initial state for dirty check
       const state = editingOccurrence
         ? {
-          schoolId: editingOccurrence.cover_rule?.school_id || '',
-          clubId: editingOccurrence.cover_rule?.club_id || '',
-          startTime: (editingOccurrence.cover_rule?.start_time || '09:00').substring(0, 5),
-          endTime: (editingOccurrence.cover_rule?.end_time || '10:00').substring(0, 5),
-          requestType: 'one-off',
-          scheduleType: 'covers',
-          teacherId: editingOccurrence.assignments?.[0]?.teacher_id || 'unassigned',
-          frequency: editingOccurrence.cover_rule?.frequency || 'weekly',
-          occurrenceCount: 4,
-          meetingDate: editingOccurrence.meeting_date
-            ? format(new Date(editingOccurrence.meeting_date), 'yyyy-MM-dd')
-            : '',
-          notes: editingOccurrence.notes || '',
-          status: editingOccurrence.status,
-          priority: editingOccurrence.priority,
-        }
+            schoolId: editingOccurrence.cover_rule?.school_id || '',
+            clubId: editingOccurrence.cover_rule?.club_id || '',
+            startTime: (
+              editingOccurrence.cover_rule?.start_time || '09:00'
+            ).substring(0, 5),
+            endTime: (
+              editingOccurrence.cover_rule?.end_time || '10:00'
+            ).substring(0, 5),
+            requestType: 'one-off',
+            scheduleType: 'covers',
+            teacherId:
+              editingOccurrence.assignments?.[0]?.teacher_id || 'unassigned',
+            frequency: editingOccurrence.cover_rule?.frequency || 'weekly',
+            occurrenceCount: 4,
+            meetingDate: editingOccurrence.meeting_date
+              ? format(new Date(editingOccurrence.meeting_date), 'yyyy-MM-dd')
+              : '',
+            notes: editingOccurrence.notes || '',
+            status: editingOccurrence.status,
+            priority: editingOccurrence.priority,
+          }
         : {
-          schoolId: initialSchoolId === 'all' ? '' : initialSchoolId || '',
-          clubId: '',
-          startTime: '09:00',
-          endTime: '10:00',
-          requestType: 'one-off',
-          scheduleType: 'covers',
-          teacherId: 'unassigned',
-          frequency: 'weekly',
-          occurrenceCount: 4,
-          meetingDate: date ? format(date, 'yyyy-MM-dd') : '',
-          notes: '',
-          status: 'not_started',
-          priority: 'medium',
-        }
+            schoolId: initialSchoolId === 'all' ? '' : initialSchoolId || '',
+            clubId: '',
+            startTime: '09:00',
+            endTime: '10:00',
+            requestType: 'one-off',
+            scheduleType: 'covers',
+            teacherId: 'unassigned',
+            frequency: 'weekly',
+            occurrenceCount: 4,
+            meetingDate: date ? format(date, 'yyyy-MM-dd') : '',
+            notes: '',
+            status: 'not_started',
+            priority: 'medium',
+          }
       setInitialState(state)
     } else {
       setInitialState(null)
@@ -431,13 +443,19 @@ export function CoverQuickAdd({
         <DialogContent
           className="sm:max-w-[520px] w-[35vw] p-0 gap-0 overflow-hidden shadow-2xl"
           aria-describedby={undefined}
+          showCloseButton={false}
         >
-          <DialogHeader className="px-6 py-4 flex flex-row items-center justify-between border-b bg-muted/5">
+          <DialogHeader className="px-6 py-4 flex flex-row items-center justify-between border-b bg-muted/5 relative">
             <DialogTitle className="text-xl font-semibold text-foreground/90 flex items-center gap-2">
-              {editingOccurrence
-                ? 'Edit Cover Request'
-                : 'New Cover Request'}
+              {editingOccurrence ? 'Edit Cover Request' : 'New Cover Request'}
             </DialogTitle>
+            <DialogClose className="rounded-full p-1.5 hover:bg-muted transition-colors opacity-70 hover:opacity-100 outline-none">
+              <HugeiconsIcon
+                icon={Cancel01Icon}
+                className="size-5 text-muted-foreground"
+              />
+              <span className="sr-only">Close</span>
+            </DialogClose>
           </DialogHeader>
 
           <StepperNav currentStep={step} />
@@ -445,7 +463,7 @@ export function CoverQuickAdd({
           <div className="px-8 py-6 max-h-[60vh] overflow-y-auto">
             {step === 1 ? (
               <div className="space-y-6">
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <Label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
                     Schedule Type
                   </Label>
@@ -469,7 +487,10 @@ export function CoverQuickAdd({
 
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="school-select" className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+                    <Label
+                      htmlFor="school-select"
+                      className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest"
+                    >
                       School
                     </Label>
                     <Select
@@ -493,7 +514,10 @@ export function CoverQuickAdd({
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="club-select" className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+                    <Label
+                      htmlFor="club-select"
+                      className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest"
+                    >
                       Club or Activity
                     </Label>
                     <Select
@@ -503,7 +527,9 @@ export function CoverQuickAdd({
                     >
                       <SelectTrigger size="full" id="club-select">
                         <SelectValue
-                          placeholder={!schoolId ? 'Select School First' : 'Select Club'}
+                          placeholder={
+                            !schoolId ? 'Select School First' : 'Select Club'
+                          }
                         />
                       </SelectTrigger>
                       <SelectContent>
@@ -528,8 +554,16 @@ export function CoverQuickAdd({
                         disabled={teachersLoading}
                         className="w-full justify-between font-normal"
                       >
-                        <span className="truncate">{getTeacherName(teacherId)}</span>
-                        <HugeiconsIcon icon={ArrowDown01Icon} className={cn(ICON_SIZES.sm, "opacity-50 shrink-0 ml-2")} />
+                        <span className="truncate">
+                          {getTeacherName(teacherId)}
+                        </span>
+                        <HugeiconsIcon
+                          icon={ArrowDown01Icon}
+                          className={cn(
+                            ICON_SIZES.sm,
+                            'opacity-50 shrink-0 ml-2',
+                          )}
+                        />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[300px] p-0" align="start">
@@ -621,7 +655,9 @@ export function CoverQuickAdd({
                           onChange={(e) => setStartTime(e.target.value)}
                           className="text-center"
                         />
-                        <span className="text-muted-foreground/40 font-bold text-xs uppercase tracking-tighter">to</span>
+                        <span className="text-muted-foreground/40 font-bold text-xs uppercase tracking-tighter">
+                          to
+                        </span>
                         <Input
                           id="end-time"
                           type="time"
@@ -634,7 +670,7 @@ export function CoverQuickAdd({
                   </div>
                 </div>
 
-                <div className="space-y-4 pt-2 border-t">
+                <div className="space-y-6 pt-2 border-t">
                   <div className="flex items-center justify-between">
                     <Label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
                       Repeat Settings
@@ -643,53 +679,64 @@ export function CoverQuickAdd({
                   <div className="flex items-center gap-4">
                     <Select
                       value={requestType}
-                      onValueChange={(v: 'one-off' | 'recurring') => setRequestType(v)}
+                      onValueChange={(v: 'one-off' | 'recurring') =>
+                        setRequestType(v)
+                      }
                     >
                       <SelectTrigger className="flex-1">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="one-off">Does not repeat</SelectItem>
-                        <SelectItem value="recurring">Repeats custom...</SelectItem>
+                        <SelectItem value="recurring">
+                          Repeats custom...
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   {requestType === 'recurring' && (
-                      <div className="flex items-center gap-3">
-                        <Select
-                          value={frequency}
-                          onValueChange={(v: CoverFrequency) => setFrequency(v)}
-                        >
-                          <SelectTrigger className="flex">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="weekly">Weekly</SelectItem>
-                            <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <div className="flex items-center gap-1.5 px-3 py-2 rounded-md border h-10">
-                          <span className="text-xs text-muted-foreground font-bold">×</span>
-                          <Input
-                            type="number"
-                            min={2}
-                            max={12}
-                            className="w-8 h-6 p-0 bg-transparent text-center font-bold"
-                            value={occurrenceCount}
-                            onChange={(e) => setOccurrenceCount(parseInt(e.target.value))}
-                          />
-                        </div>
+                    <div className="flex items-center gap-3">
+                      <Select
+                        value={frequency}
+                        onValueChange={(v: CoverFrequency) => setFrequency(v)}
+                      >
+                        <SelectTrigger className="flex-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="weekly">Weekly</SelectItem>
+                          <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <div className="flex items-center gap-1.5 px-3 py-2 rounded-md border h-9">
+                        <span className="text-xs text-muted-foreground font-bold">
+                          ×
+                        </span>
+                        <Input
+                          type="number"
+                          min={2}
+                          max={12}
+                          className="w-8 h-6 p-0 outline-none rounded-none bg-transparent text-center font-bold"
+                          value={occurrenceCount}
+                          onChange={(e) =>
+                            setOccurrenceCount(parseInt(e.target.value))
+                          }
+                        />
                       </div>
-                    )}
+                    </div>
+                  )}
                   {requestType === 'recurring' && (
-                    <div className="bg-muted/30 rounded-lg p-4 border space-y-3">
+                    <div className="bg-muted/30 rounded-lg p-4 border space-y-2">
                       <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">
                         Occurrence Preview
                       </p>
                       <div className="grid grid-cols-2 gap-x-6 gap-y-2">
                         {meetingDate ? (
                           occurrenceDates.slice(0, 8).map((d, idx) => (
-                            <div key={idx} className="text-xs flex items-center justify-between group">
+                            <div
+                              key={idx}
+                              className="text-xs flex items-center justify-between group"
+                            >
                               <div className="flex items-center gap-2">
                                 <div className="w-1 h-1 rounded-full bg-emerald-500/50 group-hover:bg-emerald-500 transition-colors" />
                                 <span className="font-medium text-foreground/70 uppercase text-[10px] tracking-tight whitespace-nowrap">
@@ -702,7 +749,9 @@ export function CoverQuickAdd({
                             </div>
                           ))
                         ) : (
-                          <p className="text-xs italic text-muted-foreground col-span-2">Pick a start date to see preview</p>
+                          <p className="text-xs italic text-muted-foreground col-span-2">
+                            Pick a start date to see preview
+                          </p>
                         )}
                       </div>
                       {occurrenceCount > 8 && (
@@ -753,11 +802,15 @@ export function CoverQuickAdd({
           <DialogFooter className="px-8 py-5 border-t bg-muted/5 flex items-center justify-between sm:justify-between w-full">
             {step === 2 ? (
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
                 onClick={() => setStep(1)}
-                className="text-muted-foreground hover:text-foreground font-bold uppercase tracking-wider text-[10px]"
+                className="text-muted-foreground hover:text-foreground font-bold uppercase tracking-wider text-[10px] bg-muted/50 group h-8"
               >
+                <HugeiconsIcon
+                  icon={ArrowLeft02Icon}
+                  className="size-3.5 mr-2 transition-transform group-hover:-translate-x-1"
+                />
                 Back
               </Button>
             ) : (
@@ -768,18 +821,28 @@ export function CoverQuickAdd({
                 <Button
                   size="sm"
                   onClick={() => setStep(2)}
-                  className="px-8 font-bold uppercase tracking-widest text-[11px]"
+                  className="px-8 font-bold uppercase tracking-widest text-[11px] group"
                 >
                   Next
+                  <HugeiconsIcon
+                    icon={ArrowRight02Icon}
+                    className="size-3.5 ml-2 transition-transform group-hover:translate-x-1"
+                  />
                 </Button>
               ) : (
                 <Button
                   size="sm"
                   onClick={handleSubmit}
                   disabled={createRequest.isPending || updateRequest.isPending}
-                  className="px-8 font-bold uppercase tracking-widest text-[11px]"
+                  className="px-8 font-bold uppercase tracking-widest text-[11px] group h-8"
                 >
-                  {createRequest.isPending || updateRequest.isPending ? 'Saving...' : 'Save'}
+                  {createRequest.isPending || updateRequest.isPending
+                    ? 'Saving...'
+                    : 'Save'}
+                  <HugeiconsIcon
+                    icon={ArrowRight02Icon}
+                    className="size-3.5 ml-2 transition-transform group-hover:translate-x-1"
+                  />
                 </Button>
               )}
             </div>
