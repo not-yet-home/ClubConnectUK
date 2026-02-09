@@ -31,7 +31,7 @@ code {
 
 :root {
   --background: #ffffff;
-  --background-light: #fcf7ed;
+  --background-light: #aeaeae;
   --foreground: oklch(0.141 0.005 285.823);
   --card: #f7f7f7;
   --card-foreground: oklch(0.141 0.005 285.823);
@@ -41,7 +41,7 @@ code {
   --primary-light: #f0e0aa;
   --primary-dark: #aa934c;
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: #f7f7f7;
+  --secondary: #eeeeee;
   --secondary-foreground: oklch(96.419% 0.05365 114.225);
   --muted: oklch(0.967 0.001 286.375);
   --muted-foreground: oklch(0.552 0.016 285.938);
